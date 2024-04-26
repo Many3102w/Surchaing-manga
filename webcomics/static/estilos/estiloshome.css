@@ -4,7 +4,7 @@
     src: url("/webcomics/static/Fuentes/");
 }
 
-div.Header {
+.Header {
     background-color: #494747;
     display: flex;
     flex-wrap: wrap;
