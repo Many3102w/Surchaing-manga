@@ -30,7 +30,7 @@
   </head>
   <body>
 
-    <div class="Header">
+    <div class="surchain_nav">
       <p> Surchaing Manga Home </p>
       <img src="" alt="imagen">
       <p> Usuario: No iniciado </p>
@@ -38,13 +38,15 @@
 
       <form action="" method="get"> {% csrf_token %}
         <label for="busqueda"> Buscar 🔍 </label> 
-        <input type="search" id="busqueda" name="termino" value="" placeholder="Busca un manga" style="border-radius: 10px;">
+        <input type="search" id="busqueda" name="termino" value="" placeholder="Busca un manga">
         <button> Buscar </button>
       </form>
+
+      <p> Prueba header </p>
     </div>
 
     <div class="publicidad"> 
-      <p> Espacio para pubilcidad </p>
+      <p style="width: 1300px; margin: 0 auto;"> Espacio para pubilcidad </p>
     </div>
 
     {% load static %}
@@ -60,14 +62,16 @@
     <h1> Manga Studio </h1>
 
     <article>
-    <div class="contenedor">
+    <div class="contenedor_flexible">
       {% for manga_item in mangas %}
-      <div class="card" style="width: 14rem;">
+      <div class="card" style="width: 11rem;">
         <img src="..." class="card-img-top" alt="...">
         <div class="card-body">
           <h5 class="card-title"> {{ manga_item.nombre_del_manga }} </h5>
           <a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
           <p> Calificación: {{ manga_item.calificacion_promedio }} </p>
+          <p> Publicado: {{ manga_item.fecha_de_carga }} </p>
+          <p> Publicado por: {{ manga_item.publicado_por }} </p>  
         </div>
       </div>
       {% endfor %}
@@ -79,12 +83,14 @@
     <article>
       <div class="contenedor">
         {% for manga_item in post %}
-        <div class="card" style="width: 14rem;">
+        <div class="card" style="width: 11rem;">
           <img src="..." class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title"> {{ manga_item.nombre_del_manga }} </h5>
             <a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
             <p> Calificación: {{ manga_item.calificacion_promedio }} </p>
+            <p> Publicado: {{ manga_item.fecha_de_carga }} </p>
+            <p> Publicado por: {{ manga_item.publicado_por }} </p> 
           </div>
         </div>
         {% endfor %}
@@ -93,8 +99,9 @@
     {% endif %}
   
     <section>
-    <div class="navegacion">
+    <div class="nav-footer">
       <nav aria-label="...">
+        <div class="navegacion">
         <ul class="pagination" style="float: left; border: white;">
           <li class="page-item disabled">
             <a class="page-link"> Previo </a>
@@ -109,6 +116,8 @@
           </li>
         </ul>
       </nav>
+    </div>
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
