@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-6j=2a07g#m8qi4xywd*e!o&v(n4ve#i_h%u6uxaywyt-ka_w!$'
+#Clave a ocultar.
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
+
 ]
 
 # Application definition
@@ -39,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'webcomics'
+    'apps.webcomics'
 ]
 
 MIDDLEWARE = [
@@ -57,7 +62,9 @@ ROOT_URLCONF = 'webcomic.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [r"C:\Users\50686\Desktop\ProyectoDjango\webcomics\templates"],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'apps/templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'es-cr'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'UTC'
 
@@ -132,3 +139,6 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    pass
