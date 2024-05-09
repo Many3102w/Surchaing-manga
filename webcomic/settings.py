@@ -32,6 +32,7 @@ SECRET_KEY = 'django-insecure-6j=2a07g#m8qi4xywd*e!o&v(n4ve#i_h%u6uxaywyt-ka_w!$
 DEBUG = True
 
 ALLOWED_HOSTS = [
+# Estos son host locales, si no están no se podrá previsualizar el sitio, por ahora, dejemoslo hasta producciṕn
     'localhost',
     '127.0.0.1',
 ]
