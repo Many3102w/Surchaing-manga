@@ -1,0 +1,7 @@
+node_modules
+
+myenv/
+**/__pycache__/
+.vscode/
+.env
+f6d35f55cf6adf5296fe25bb6812afd937ffa846
