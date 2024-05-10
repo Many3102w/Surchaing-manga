@@ -141,4 +141,4 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if not DEBUG:
-    pass
+    ALLOWED_HOSTS = ["www.surchaingmanga.net"]
