@@ -1,3 +1,5 @@
+# Surchaing Manga
+
 Antes de comenzar con el proyecto a nivel colavorativo se necesita tener en cuenta lo siguiente:
 
 1. Colaborar siempre con respeto mutuo entre desarrolladores.
@@ -7,25 +9,25 @@ del repositorio.
 4. Ser activo al proyecto.
 5. Subir los cambios al repositorio cuando se terminen.
 
-Requisitos.
+## Requisitos
 
-Para el backend:
+### Para el Backend:
 1. Saber de python.
 2. Saber un framework como Django.
 
-Para front-end:
+### Para Frontend:
 1. Saber lo mínimo o máximo de html.
 2. Saber lo mínimo o máximo de css.
 3. Saber algo mínimo de javascript.
 
-cambios añadidos al código:
+### Cambios añadidos al código
 1. Se añadio una configuración adicional que ayuda a decirle
 al servidor donde se almacenarán los archivos a futuro.
 
-cambios a añadir:
+### cambios a añadir
 1. Se añadirá más seguridad en algunas claves expuestas
 en el código.
 2. Se implementará mejoras en el css para adaptar la página principal a una 
 amplia gama de dispositivos: Tablets, tv, celulares etc.
 
-cambios realizados y documento escrito por - Emidev
+###### Cambios realizados y documento escrito por: Emidev
