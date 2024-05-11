@@ -12,18 +12,16 @@
         <link rel="icon" type="icon/png" href="../static/surchaing_manga.png" >
     </head>
 <body>
-
-    <div class="surchain_nav">
-        <p> Surchaing Manga Home </p>
-        <img src="" alt="imagen">
-        <p> Usuario: No iniciado </p>
-        <button> Registrarse </button>
-        <form action="" method="get"> {% csrf_token %}
-            <label for="busqueda"> Buscar 🔍 </label> 
-            <input type="search" id="busqueda" name="termino" value="" placeholder="Busca un manga">
-            <button>Buscar</button>
-        </form>
-    </div>
+    <header>
+        <a class="logo">
+                <img src="../static/surchaing_manga.png" alt="Surchaing Manga"> 
+            </div>
+        <nav>
+            <a href="/home">Inicio</a>
+            <a href="/">Buscar</a>
+            <a href="/">Acerca de</a>
+        </nav>
+    </header>
 
     <div class="publicidad"> 
       <p> Espacio para pubilcidad </p>
@@ -76,11 +74,9 @@
     </article>
     {% endif %}
   
-    <section>
     <div class="nav-footer">
       <nav aria-label="...">
-        <div class="navegacion">
-        <ul class="pagination" style="float: left; border: white;">
+        <ul class="pagination">
           <li class="page-item disabled">
             <a class="page-link"> Previo </a>
           </li>
@@ -94,8 +90,6 @@
           </li>
         </ul>
       </nav>
-    </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

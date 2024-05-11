@@ -5,6 +5,7 @@ from webcomics.models import Manga
 from django.core.paginator import Paginator
 
 # Create your views here.
+'''
 def home(request):
     manga = Manga.objects.all()[0:9]
 
@@ -14,12 +15,16 @@ def home(request):
         buscar = Manga.objects.filter(
             nombre_del_manga = value
         )
-        return render(request, "home.html", {"post": buscar})
+        return render(request, "index.html", {"post": buscar})
     else:
-        return render(request, "home.html", {"mangas": manga})
+        return render(request, "index.html", {"mangas": manga})
+'''
 
 def manga_view(request):
     return HttpResponse("manga")
 
 def about(request):
     return HttpResponse("Sobre surchaing manga")
+
+def index(request):
+    return render(request, "index.html", {})
