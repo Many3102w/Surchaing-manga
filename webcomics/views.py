@@ -18,8 +18,15 @@ def home(request):
     else:
         return render(request, "home.html", {"mangas": manga})
 
-def manga_view(request):
-    return HttpResponse("manga")
+def manga_view(request, name):
+    manga = Manga.objects.filter(nombre_del_manga__contains=name)
+
+    if manga.exists():
+        mensaje = f"Mangas obtenido {name}"
+    else:
+        mensaje = f"Lamentablemente no se encontró el manga: {name}"
+
+    return HttpResponse(mensaje)
 
 def about(request):
     return HttpResponse("Sobre surchaing manga")
