@@ -8,6 +8,10 @@ body {
     height: 70vh;
 }
 
+menu {
+    display: flex;
+}
+
 .publicidad {
     background-color: #181616;
     color: white;

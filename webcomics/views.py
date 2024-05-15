@@ -22,7 +22,7 @@ def manga_view(request):
     return HttpResponse("manga")
 
 def about(request):
-    return HttpResponse("Sobre surchaing manga")
+    return render(request, "about.html", {})
 
 def index(request):
     return render(request, "index.html", {})
