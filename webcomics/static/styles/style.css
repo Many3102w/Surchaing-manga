@@ -1,11 +1,10 @@
 body {
     font-family: "NikkyouSans";
-    margin: 0;
-    background-image: url("../background.png");
+    background-image: url("../img/background.jpg");
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
-    height: 70vh;
+    background-attachment: fixed;
+    height: 100%;
 }
 
 menu {
@@ -19,3 +18,6 @@ menu {
     height: 50px;
 }
 
+#SearchBar {
+    margin: 15px 20px 0 20px;
+}
