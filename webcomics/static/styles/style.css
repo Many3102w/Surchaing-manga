@@ -1,6 +1,6 @@
 body {
     font-family: "NikkyouSans";
-    background-image: url("../img/background.jpg");
+    background-image: url("../src/background.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -19,5 +19,5 @@ menu {
 }
 
 #SearchBar {
-    margin: 15px 20px 0 20px;
+    margin: 15px 20px 0 5px;
 }
