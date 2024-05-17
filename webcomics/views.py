@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template.loader import get_template
 from webcomics.models import Manga
 from django.core.paginator import Paginator
 
 # Create your views here.
+#Vistas basadas en funciones
 def home(request):
     #vista en progreso
     manga = Manga.objects.all()
@@ -16,23 +16,40 @@ def home(request):
         buscar = Manga.objects.filter(
             nombre_del_manga = value
         )
-        return render(request, "home.html", {"post": buscar})
+        
     else:
         return render(request, "home.html", {"mangas": manga})
-
+    
+def search_manga(request):
+    #lógica para la búsqueda de mangas
+    #El método get es para pedirle información al servidor
+    if request.method == "GET":
+        manga = request.GET.get("manga")
+        if len(manga) > 16:
+            return HttpResponse("Error: El nombre es muy largo")
+        else:
+            manga_name = Manga.objects.filter(nombre_del_manga__icontains=manga)
+        
+            if manga_name.exists():
+                return render(request, 'index.html', {"manga_name": manga_name})
+            else:
+                return render(request, 'index.html', {"manga_name": manga_name})
+        
 #Vista y lógica realizada para poder buscar los mangas por parámetro de url (en prueba)
-def manga_view(request, name):
-    manga = Manga.objects.filter(nombre_del_manga__contains=name)
+def manga_view(request):
+    if request.method == "GET":
+        manga = request
+        manga = Manga.objects.filter(nombre_del_manga__contains=None)
 
     if manga.exists():
-        mensaje = f"Mangas obtenido {name}"
+        mensaje = f"Mangas obtenido {None}"
     else:
-        mensaje = f"Lamentablemente no se encontró el manga: {name}"
+        mensaje = f"Lamentablemente no se encontró el manga: {None}"
 
     return HttpResponse(mensaje)
 
 def about(request):
-    return render(request, "about.html", {})
+    return HttpResponse("En progreso")
 
 def registrar_usuario(request):
     #Vista para el registro
