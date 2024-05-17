@@ -2,7 +2,7 @@
     <!-- Container wrapper -->
     <div class="container">
         <!-- LOGO -->
-        <a class="navbar-brand" href="#"><img id="Surchaing-logo"
+        <a class="navbar-brand" href="{% url 'about' %}"><img id="Surchaing-logo"
             src="../static/src/logo/logo.gif" alt="Surchaing Manga"
             draggable="false" height="70" /></a>
         <!-- Botón para abrir menu desplegable -->
@@ -10,11 +10,12 @@
             <span class="navbar-toggler-icon" data-bs-toggle="collapse" data-bs-target="#NavMenu"></span>
         </button>
         <!-- Barra de búsqueda -->
-        <form class="d-flex align-items-center w-100 form-search" id="SearchBar">
+        <form class="d-flex align-items-center w-100 form-search" id="SearchBar" action="{% url 'name' %}" method="get">
             <div class="input-group mb-3">
-                <input type="search" class="form-control" placeholder="Buscar" aria-label="Buscar" name=""/>
+                {% csrf_token %}
+                <input type="search" class="form-control" placeholder="Buscar" aria-label="Buscar" name="manga"/>
                 <div class="input-group-append">
-                    <button class="btn btn-primary" type="button">
+                    <button class="btn btn-primary" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
