@@ -3,60 +3,69 @@
 
 {% block  content %}
 
-<h1>Manga Studio</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
+<h1>Bienvenidos</h1>
 
-    <article>
-    <div class="contenedor_flexible">
-      {% for manga_item in mangas %}
-      <div class="card" style="width: 11rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title"> {{ manga_item.nombre_del_manga }} </h5>
-          <a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
-          <p> Calificación: {{ manga_item.calificacion_promedio }} </p>
-          <p> Publicado: {{ manga_item.fecha_de_carga }} </p>
-          <p> Publicado por: {{ manga_item.publicado_por }} </p>  
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    </article>
-
-    {% if post %}
-    <p> Mangas encontrados: </p>
-    <article>
-      <div class="contenedor">
-        {% for manga_item in post %}
-        <div class="card" style="width: 11rem;">
-          <img src="..." class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title"> {{ manga_item.nombre_del_manga }} </h5>
-            <a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
-            <p> Calificación: {{ manga_item.calificacion_promedio }} </p>
-            <p> Publicado: {{ manga_item.fecha_de_carga }} </p>
-            <p> Publicado por: {{ manga_item.publicado_por }} </p> 
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </article>
-    {% endif %}
-  
-    <div class="nav-footer">
-      <nav aria-label="...">
-        <ul class="pagination">
-          <li class="page-item disabled">
-            <a class="page-link"> Previo </a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item active" aria-current="page">
-            <a class="page-link" href="#">2</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#"> Siguiente </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
 {% endblock %}
