@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from webcomics.models import Manga
 from django.core.paginator import Paginator
+import datetime
 
 # Create your views here.
 #Vistas basadas en funciones
@@ -51,9 +52,10 @@ def manga_view(request):
 def about(request):
     return HttpResponse("En progreso")
 
-def registrar_usuario(request):
+def ingresar(request):
     #Vista para el registro
-    return HttpResponse("Formulario de registro")
+    TIME = datetime.datetime.now()
+    return HttpResponse(f"Formulario de registro :v. Tiempo actual: {TIME}")
 
 def watchlist(request):
     #Vista para la watchlist
