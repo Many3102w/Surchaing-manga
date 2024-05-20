@@ -5,7 +5,7 @@ from webcomics.views import index
 urlpatterns = [
     path("", index),
     path('home/', views.home, name="home"),
-    path('surchaingmanga/registrarse/', views.registrar_usuario, name='registrarse'),
+    path('surchaingmanga/ingresar/', views.ingresar, name='ingresar'),
     path("surchaingmanga/manga_view/<str:name>/", views.manga_view),
     path("search/", views.search_manga, name='name'),
     path('surchaingmanga/watchlist/', views.watchlist, name='watchlist'),
