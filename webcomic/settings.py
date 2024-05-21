@@ -37,6 +37,26 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+#Variables de control (UTILIZAR CON CUIDADO).
+
+SQLITE = True
+#Variable de control que se encarga si se debe utilizar la base de datos
+#de desarrollo. Está en True para que se pueda utilizar la base
+#de datos de sqlite3, estará en False cuando se tenga que utilizar 
+#otros motores de bases de datos más robustos como postgresql o mysql.
+#Si va a utilizar esta variable, colocar False en ROBUST_DABATABASE para evitar
+#conflictos. Recuerde cambiar de opciones siempre cuando ya se esté seguro de que no 
+#se va utilizar
+
+#Para evitar conflictos, solo cambie en false cuando ya existan datos en sqlite3 y que no
+#existan datos nuevos en la nueva base de datos o viceversa, ya que esto puede generar
+#conflictos con base de datos.
+
+ROBUST_DATABASE = False
+#NO se recomienda colocar esto en True si no se va utilizar
+#Una base de datos para producción o para otra base de datos como postgresql. Si se va a utilizar,
+#desactive la variable de sqlite3 para evitar conflictos.
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,7 +71,7 @@ INSTALLED_APPS = [
 ]
 
 MORE_APPS = [
-
+    #Instalar aplicaciones adicionales
 ]
 
 MIDDLEWARE = [
@@ -65,6 +85,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'webcomic.urls'
+
+#Sistema de plantillas a utilizar.
 
 TEMPLATES = [
     {
@@ -86,17 +108,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'webcomic.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if SQLITE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    pass
 
+if ROBUST_DATABASE:
+    # Configurar la base de datos en producción o para escalar a una nueva base de datos.
+    #Recuerde configurar la base de datos abajo de este if.
+    pass
+else:
+    # No hace nada
+    pass
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -116,7 +147,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -132,6 +162,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+#Muy pronto más ajustes adicionales.
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
