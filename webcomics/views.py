@@ -50,20 +50,16 @@ def manga_view(request):
     return HttpResponse(mensaje)
 
 def about(request):
-    return HttpResponse("En progreso")
+    return render(request, "about.html")
 
 def ingresar(request):
-    #Vista para el registro
-    TIME = datetime.datetime.now()
-    return HttpResponse(f"Formulario de registro :v. Tiempo actual: {TIME}")
+    return render(request, "login.html")
 
 def watchlist(request):
-    #Vista para la watchlist
     return HttpResponse("Watchlist")
 
 def imdbpro(request):
-    #?
-    return HttpResponse("En proceso")
+    return render()
 
 #pagina principal
 def index(request):
