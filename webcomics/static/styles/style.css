@@ -5,8 +5,11 @@ body {
     height: 100%;
 }
 
-#welcome {
-    width: 100%;
-    background-image: url("../src/background.jpg");
-    margin: 0 0 0 0;
+@media screen and (max-width: 992px) {
+    .container {
+        margin: 0 0 0 0;
+        width: 100%;
+        max-width: 100%;
+    }
+
 }
