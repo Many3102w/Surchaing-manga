@@ -60,9 +60,31 @@ header.sticky {
     }
     
     #NavWrapper {
+        flex-direction: column;
+        align-items: center;
         margin: 0 0 0 0;
         width: 100%;
         max-width: 100%;
     }
 
+    .navbar-brand {
+        padding: 0 0 20px 0;
+    }
+
+    .navbar-toggler {
+        order: 1;
+        margin-bottom: 10px;
+    }
+
+    .navbar-collapse {
+        order: 3;
+    }
+
+    #Icons {
+        order: 2;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
 }
