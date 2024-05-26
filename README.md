@@ -30,4 +30,24 @@ en el código.
 2. Se implementará mejoras en el css para adaptar la página principal a una 
 amplia gama de dispositivos: Tablets, tv, celulares etc.
 
-###### Cambios realizados y documento escrito por: Emidev
+## ¿Cómo desplegar el sitio en tu máquina?
+
+1. Instala [Python](https://www.python.org/) (si es que aún no lo has instalado).
+2. Clona este repositorio.
+3. Abre una consola en el directorio donde hayas clonado el repositiorio.
+4. Monta un entorno.
+~~~
+python -m venv [nombre_de_tu_entorno]
+~~~
+5. Activa el entorno.
+~~~
+source [nombre_de_tu_entorno]\Scripts\activate
+~~~
+6. Instala dependencias.
+~~~
+pip install -r requirements.txt
+~~~
+7. Corre el servidor local
+~~~
+python manage.py runserver
+~~~
