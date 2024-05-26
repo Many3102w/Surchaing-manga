@@ -21,21 +21,18 @@ def home(request):
     else:
         return render(request, "home.html", {"mangas": manga})
     
-def search_manga(request):
-    #lógica para la búsqueda de mangas
-    #El método get es para pedirle información al servidor
+def search(request):
     if request.method == "GET":
         manga = request.GET.get("manga")
-        if len(manga) > 16:
-            return HttpResponse("Error: El nombre es muy largo")
-        else:
-            manga_name = Manga.objects.filter(nombre_del_manga__icontains=manga)
-        
-            if manga_name.exists():
-                return render(request, 'index.html', {"manga_name": manga_name})
+        if manga:
+            if len(manga) > 16:
+                return HttpResponse("Error: El nombre es muy largo")
             else:
-                return render(request, 'index.html', {"manga_name": manga_name})
-        
+                manga_name = Manga.objects.filter(nombre_del_manga__icontains=manga)
+                return render(request, 'search.html', {"manga_name": manga_name})
+        else:
+            return render(request, 'search.html', {})
+
 #Vista y lógica realizada para poder buscar los mangas por parámetro de url (en prueba)
 def manga_view(request):
     if request.method == "GET":

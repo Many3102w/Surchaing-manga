@@ -48,6 +48,10 @@ header.sticky {
     text-align: center;
 }
 
+header.static #Surchaing-logo {
+    content: url('../src/logo/dark_logo.webp')
+}
+
 @media screen and (max-width: 992px) {
     header {
         position: static;
