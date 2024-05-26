@@ -35,13 +35,9 @@ amplia gama de dispositivos: Tablets, tv, celulares etc.
 1. Instala [Python](https://www.python.org/) (si es que aún no lo has instalado).
 2. Clona este repositorio.
 3. Abre una consola en el directorio donde hayas clonado el repositiorio.
-4. Monta un entorno.
+4. Activa el entorno.
 ~~~
-python -m venv [nombre_de_tu_entorno]
-~~~
-5. Activa el entorno.
-~~~
-source [nombre_de_tu_entorno]\Scripts\activate
+.\virtualenv\Scripts\activate
 ~~~
 6. Instala dependencias.
 ~~~
