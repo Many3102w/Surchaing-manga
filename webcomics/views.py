@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from webcomics.models import Manga
 from django.core.paginator import Paginator
-import datetime
+
 
 # Create your views here.
 #Vistas basadas en funciones

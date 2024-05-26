@@ -59,6 +59,8 @@ ROBUST_DATABASE = False
 
 # Application definition
 
+#Aplicaciones por defecto de Django. Contienen funcionalidades internas para que pueda funcionar.
+#Se pueden instalar en en proyecto aplicaciones hechas por los devs.
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -86,6 +88,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'webcomic.urls'
 
+ADMINS = []
 #Sistema de plantillas a utilizar.
 
 TEMPLATES = [
