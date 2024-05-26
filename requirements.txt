@@ -1,7 +1,4 @@
 django
 environ
 django-environ
-pillowdjango
-environ
-django-environ
 pillow
