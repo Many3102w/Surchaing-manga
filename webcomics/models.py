@@ -8,7 +8,11 @@ class Manga(models.Model):
     nombre_del_manga = models.CharField(verbose_name="Nombre_del_manga", unique=True, max_length=100)
     fecha_de_carga = models.DateField(verbose_name="Fecha de carga", max_length=100)
     publicado_por = models.CharField(verbose_name="publicado_por", max_length=100, default="No definido")
+    front_page = models.ImageField(verbose_name="portada", blank=True)
+    manga_file = models.FileField(verbose_name="Archivo_de_manga", blank=True)
     calificacion_promedio = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
+
+
 
     # Atributos adicionales (si es necesario)
 
