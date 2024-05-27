@@ -14,6 +14,11 @@ header.sticky {
     width: 100%;
 }
 
+header.static {
+    background: #1d2021;
+    position: static;
+}
+
 #NavWrapper {
     display: flex;
     justify-content: space-between;
@@ -35,7 +40,7 @@ header.sticky {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 15px; /* Espaciado entre elementos */
+    margin: 0 15px; 
 }
 
 .nav-link {
@@ -46,10 +51,6 @@ header.sticky {
     text-decoration: none;
     padding: 10px 15px;
     text-align: center;
-}
-
-header.static #Surchaing-logo {
-    content: url('../src/logo/dark_logo.webp')
 }
 
 @media screen and (max-width: 992px) {

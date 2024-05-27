@@ -1,6 +1,8 @@
 window.addEventListener("scroll", function(){
     var header = document.querySelector("header");
-    header.classList.toggle("sticky", window.scrollY > 0);
+    if (!header.classList.contains("static")) {
+        header.classList.toggle("sticky", window.scrollY > 0);
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {

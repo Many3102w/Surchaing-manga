@@ -8,9 +8,9 @@
     <body>
         {% include "../components/loading.html"%}
         <div id="wrapper">
-            <header>
-                {% include "../components/nav.html"%}
-            </header>
+            {% block nav %} 
+                {% include "../components/header.html"%}
+            {% endblock %}
             {% block  content%}
 
             {% endblock %}
