@@ -4,9 +4,9 @@ from .models import Manga
 
 
 class Mangas_admin(admin.ModelAdmin):
-    list_display = ('id', 'nombre_del_manga', 'fecha_de_carga', 'publicado_por', 'front_page', 'manga_file', 'calificacion_promedio')
+    list_display = ('id', 'nombre_del_manga', 'fecha_de_carga', 'publicado_por', 'front_page', 'manga_file', 'calificacion_promedio', 'type_of_manga')
     search_fields = ("nombre_del_manga", "fecha_de_carga")
-    list_editable = ('nombre_del_manga', 'fecha_de_carga', 'publicado_por', 'front_page', 'manga_file', 'calificacion_promedio')
+    list_editable = ('nombre_del_manga', 'fecha_de_carga', 'type_of_manga', 'publicado_por', 'front_page', 'manga_file', 'calificacion_promedio', 'type_of_manga')
 
     date_hierarchy = "fecha_de_carga"
     empty_value_display = 'vacio'
