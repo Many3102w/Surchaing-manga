@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 
 # Create your views here.
 #Vistas basadas en funciones
+
 def home(request):
     #vista en progreso
     manga = Manga.objects.all()
