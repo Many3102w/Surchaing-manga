@@ -1,4 +1,6 @@
 {% load static %}
+:wa
+
 <!doctype html>
 <html lang="es">
     <head>
@@ -44,7 +46,7 @@
         <img src="..." class="card-img-top" alt="...">
         <div class="card-body">
           <h5 class="card-title"> {{ manga_item.nombre_del_manga }} </h5>
-          <a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
+          a href="{% url 'manga' }" class="btn btn-primary" style="background-color: rgb(47, 47, 47);"> Ver manga </a>
           <p> Calificación: {{ manga_item.calificacion_promedio }} </p>
           <p> Publicado: {{ manga_item.fecha_de_carga }} </p>
           <p> Publicado por: {{ manga_item.publicado_por }} </p>  

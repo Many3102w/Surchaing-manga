@@ -55,9 +55,19 @@ def ingresar(request):
 def watchlist(request):
     return HttpResponse("Watchlist")
 
-def imdbpro(request):
-    return render()
 
-#pagina principal
 def index(request):
-    return render(request, "index.html", {})
+    # Filtrar mangas con calificación igual o mayor a 0.8
+    high_rated_mangas = Manga.objects.filter(calificacion_promedio__gte=8.00)
+    
+    # Filtrar mangas por género
+    action_mangas = Manga.objects.filter(type_of_manga='Accion')
+    adventure_mangas = Manga.objects.filter(type_of_manga='Aventura')
+
+    context = {
+        'high_rated_mangas': high_rated_mangas,
+        'action_mangas': action_mangas,
+        'adventure_mangas': adventure_mangas
+    }
+
+    return render(request, "index.html", context)

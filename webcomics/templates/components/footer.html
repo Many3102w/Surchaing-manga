@@ -1,0 +1,32 @@
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static "/styles/footer.css" %}">
+{% endblock%}
+
+<footer>
+    <div class="group-a container">
+        <div class="box">
+            <ul>
+                <li><a href="#" class="footer-link link-secondary">EMPRESA</a></li>
+                <li><a href="#" class="footer-link link-secondary">EQUIPO</a></li>
+                <li><a href="#" class="footer-link link-secondary">POLITICA DE PRIVACIDAD</a></li>
+            </ul>
+        </div>
+        <div class="box">
+            <h2>Contacto para subir mangas</h2>
+            <h2 style="font-size: 45px; text-align: center;"><a href="https://discord.com"><i class="bi bi-discord"></i></a></h2>
+            <p>Tambien puedes enviarme un mensaje a mi discord personal idco_o</p>
+            <a href="mailto:mangas@surchaingmanga.com">mangas@surchaingmanga.com</a>
+        </div>
+        <div class="box">
+            <figure>
+                <a href="#">
+                    <img src="{% static "/src/logo/light_logo.webp" %}" alt="Surchaing Manga">
+                </a>
+            </figure>
+            <p>Esta página esta hecha con la intención de que crezcas como artista. Si eres creador de contenido de ayudará con la publicidad</p>
+            <p>[Texto motivador...]</p>
+            <small>&copy; 2024 <b>Surchaing Manga</b> - Todos los Derechos Reservados.</small>
+        </div>
+    </div>
+<footer>

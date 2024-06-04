@@ -1,7 +1,9 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
         <title>{% block title %} {% endblock %} | Surchaing Manga</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% include "../components/head.html" %}
         {% block extra_css %}{% endblock %}
     </head>
@@ -14,7 +16,9 @@
             {% block  content%}
 
             {% endblock %}
+            {% include "../components/footer.html" %}
         </div>
-        {% include "../components/scripts-import.html" %}
+        {% include "../components/scripts_import.html" %}
+        {% block extra_js %}{% endblock %}
     </body>
 </html>

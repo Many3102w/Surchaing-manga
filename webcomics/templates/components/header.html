@@ -1,5 +1,6 @@
+{% load static %}
 {% block extra_css %}
-    <link rel="stylesheet" href="../../static/styles/header.css">
+    <link rel="stylesheet" href="{% static "/styles/header.css" %}">
 {% endblock%}
 
 <header class="{% block header_class %}{% endblock %}">
@@ -46,3 +47,8 @@
     </nav>
     <!-- Navbar -->
 </header>
+
+{% block extra_js %}
+    <script src="{% static "/scripts/header.js" %}"></script>
+{% endblock %}
+

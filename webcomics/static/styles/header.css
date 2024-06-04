@@ -73,12 +73,13 @@ header.static {
     }
 
     .navbar-brand {
+        align-self: flex-start;
+        margin-left: 0;
         padding: 0 0 20px 0;
     }
 
     .navbar-toggler {
-        order: 1;
-        margin-bottom: 10px;
+        align-self: center;
     }
 
     .navbar-collapse {

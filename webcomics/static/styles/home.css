@@ -52,3 +52,16 @@
 .hero .btn:hover {
     background: darkred;
 }
+
+.hero a:hover {
+    color: #6610f2;
+}
+
+.hero a {
+    color: #744fdc;
+}
+
+.main-content h1 {
+    text-align: center;
+    padding: 20px 0 20px 0;
+}
