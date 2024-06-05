@@ -21,14 +21,16 @@ Tabla para la gestión de mangas en la base de datos.
     #Se aplicaron mejores practicas para el modelo 
     
     nombre_del_manga = models.CharField(verbose_name="Nombre del manga", unique=True, max_length=100, db_column="nombre")
-    fecha_de_carga = models.DateField(verbose_name="Fecha de carga", max_length=100, db_column="Fecha")
-    publicado_por = models.CharField(verbose_name="publicado_por", max_length=100, blank=True)
-    front_page = models.ImageField(verbose_name="portada", upload_to='portadas/', blank=True)
+    fecha_de_carga = models.DateField(verbose_name="Fecha de carga", max_length=100, db_column="fecha")
+    publicado_por = models.CharField(verbose_name="publicado_por", max_length=100, blank=True, db_column="autor")
+    front_page = models.ImageField(verbose_name="portada", upload_to='portadas/', blank=True, db_column='portadas')
 
-    manga_file = models.FileField(verbose_name="Archivo del manga", blank=True, null=True, db_column="Archivo")
+    manga_file = models.FileField(verbose_name="Archivo del manga", blank=True, null=True, db_column="archivo")
 
     type_of_manga = models.CharField(verbose_name="Género del manga", choices=Types_of_mangas,
-                                    help_text="Agregar el género del manga", blank=True, default=Types_of_mangas[0], max_length=10)
+                                    help_text="Agregar el género del manga", blank=True, default=Types_of_mangas[0], max_length=10,
+                                    db_column="genero del manga"
+                                    )
     calificacion_promedio = models.DecimalField(
         max_digits=4, 
         decimal_places=2, 
