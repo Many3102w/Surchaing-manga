@@ -7,25 +7,32 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # Esto va estar cargado desde una vista. En admin se puede modificar.
 class Manga(models.Model):
     class Meta:
-        pass 
+        app_label = 'webcomics'
+        db_table = 'Mangas'
+        db_table_comment = """
+Tabla para la gestión de mangas en la base de datos.
+        """
+
     Types_of_mangas = [
         ('Accion', 'Acción'),
         ('Aventura', 'Aventura')
     ]
+
     #Se aplicaron mejores practicas para el modelo 
     
     nombre_del_manga = models.CharField(verbose_name="Nombre del manga", unique=True, max_length=100, db_column="nombre")
     fecha_de_carga = models.DateField(verbose_name="Fecha de carga", max_length=100, db_column="Fecha")
-    publicado_por = models.CharField(verbose_name="Autor del manga", max_length=100, blank=True, null=True, db_column="autor")
-    front_page = models.ImageField(verbose_name="Portada", blank=True, null=True, upload_to='front_pages', db_column="portada")
+    publicado_por = models.CharField(verbose_name="publicado_por", max_length=100, blank=True)
+    front_page = models.ImageField(verbose_name="portada", upload_to='portadas/', blank=True)
+
     manga_file = models.FileField(verbose_name="Archivo del manga", blank=True, null=True, db_column="Archivo")
+
     type_of_manga = models.CharField(verbose_name="Género del manga", choices=Types_of_mangas,
-                                    help_text="Agregar el género del manga", blank=True, null=True, default=Types_of_mangas[0], max_length=10, db_column="Genero")
+                                    help_text="Agregar el género del manga", blank=True, default=Types_of_mangas[0], max_length=10)
     calificacion_promedio = models.DecimalField(
         max_digits=4, 
         decimal_places=2, 
         default=0.0,
-        db_column="calificacion",
         validators=[
             MinValueValidator(0.00), 
             MaxValueValidator(10.00)
