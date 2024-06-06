@@ -1,6 +1,6 @@
 {% load static %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static "/styles/header.css" %}">
+    <link rel="stylesheet" href="{% static "/css/header.css" %}">
 {% endblock%}
 
 <header class="{% block header_class %}{% endblock %}">
@@ -9,7 +9,7 @@
         <div id="NavWrapper" class="container">
             <!-- LOGO -->
             <a class="navbar-brand" href="/"><img id="Surchaing-logo"
-                src="../static/src/logo/light_logo.webp" alt="Surchaing Manga"
+                src="{% static "/images/logo/light_logo.webp" %}" alt="Surchaing Manga"
                 draggable="false" height="70" /></a>
             <!-- Botón para abrir menu desplegable -->
             <button type="button" class="navbar-toggler">
@@ -49,6 +49,6 @@
 </header>
 
 {% block extra_js %}
-    <script src="{% static "/scripts/header.js" %}"></script>
+    <script src="{% static "/js/header.js" %}"></script>
 {% endblock %}
 
