@@ -60,7 +60,7 @@ def watchlist(request):
 def index(request):
     # Filtrar mangas con calificación igual o mayor a 0.8
     high_rated_mangas = Manga.objects.filter(calificacion_promedio__gte=8.00)
-    
+
     # Filtrar mangas por género
     action_mangas = Manga.objects.filter(type_of_manga='Accion')
     adventure_mangas = Manga.objects.filter(type_of_manga='Aventura')
