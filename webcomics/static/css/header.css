@@ -25,7 +25,31 @@ header.static {
     align-items: center;
     width: 100%;
 }
-@media screen and (max-width: 992px) {
+
+nav {
+    font-family: NikkyouSans;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    font-weight: bold;
+}
+
+.dropdown-menu {
+    background-color: #282828;
+    color: white !important;
+}
+
+.dropdown-item {
+    color: white
+}
+
+.dropdown-item:hover {
+    color: #a370f7;
+    background-color: #1d2021;
+}
+
+@media screen and (max-width: 768px) {
     header {
         position: static;
         background: #1d2021
@@ -34,6 +58,10 @@ header.static {
     header.sticky {
         position: static;
         background: #1d2021
+    }
+
+    #NavMenu {
+        text-align: center;
     }
     
     #NavWrapper {

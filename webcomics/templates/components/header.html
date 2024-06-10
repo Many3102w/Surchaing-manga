@@ -1,6 +1,6 @@
 {% load static %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static "/css/header.css" %}">
+<link rel="stylesheet" href="{% static "/css/header.css" %}">
 {% endblock%}
 
 <header class="{% block header_class %}{% endblock %}">
@@ -8,20 +8,20 @@
         <!-- Container wrapper -->
         <div id="NavWrapper" class="container">
             <!-- LOGO y botón de hamburguesa -->
-            <div class="navbar-header d-flex align-items-center">
+            <div class="navbar-header d-flex align-items-center justify-content-between">
                 <a class="navbar-brand" href="/">
                     <img id="Surchaing-logo"
-                         src="{% static "/images/logo/light_logo.webp" %}" 
-                         alt="Surchaing Manga"
-                         draggable="false" 
-                         height="70" />
+                        src="{% static "/images/logo/light_logo.webp" %}" 
+                        alt="Surchaing Manga"
+                        draggable="false" 
+                        height="70" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#NavMenu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
             <!-- Collapsible wrapper -->
-            <div id="NavMenu" class="collapse navbar-collapse">
+            <div id="NavMenu" class="collapse navbar-collapse d-flex justify-content-center">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item me-3">
                         <a class="nav-link d-flex align-items-center text-center" href="{% url 'index' %}">Inicio</a>
@@ -29,8 +29,14 @@
                     <li class="nav-item me-3">
                         <a class="nav-link d-flex align-items-center text-center" href="#">Catálogo</a>
                     </li>
-                    <li class="nav-item me-3">
-                        <a class="nav-link d-flex align-items-center text-center" href="{% url 'about' %}">Acerca de</a>
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link d-flex align-items-center text-center dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Acerca de
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'about' %}">Equipo</a></li>
+                            <li><a class="dropdown-item" href="{% url 'about' %}">Ayuda</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -48,6 +54,5 @@
 </header>
 
 {% block extra_js %}
-    <script src="{% static "/js/header.js" %}"></script>
+<script src="{% static "/js/header.js" %}"></script>
 {% endblock %}
-
