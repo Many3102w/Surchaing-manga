@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 # Estos son host locales, si no están no se podrá previsualizar el sitio, por ahora, dejemoslo hasta producciṕn
     'localhost',
     '127.0.0.1',
+    'surchaing.edmateo.site',
 ]
 
 #Variables de control (UTILIZAR CON CUIDADO).

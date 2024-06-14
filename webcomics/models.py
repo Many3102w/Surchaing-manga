@@ -23,7 +23,7 @@ Tabla para la gestión de mangas en la base de datos.
     nombre_del_manga = models.CharField(verbose_name="Nombre del manga", unique=True, max_length=100, db_column="nombre")
     fecha_de_carga = models.DateField(verbose_name="Fecha de carga", max_length=100, db_column="fecha")
     publicado_por = models.CharField(verbose_name="publicado_por", max_length=100, blank=True, db_column="autor")
-    front_page = models.ImageField(verbose_name="portada", upload_to='portadas/', blank=True, db_column='portadas')
+    front_page = models.ImageField(verbose_name="portada", upload_to='front_pages/', blank=True, db_column='portadas')
 
     manga_file = models.FileField(verbose_name="Archivo del manga", blank=True, null=True, db_column="archivo")
 

@@ -9,6 +9,10 @@ body {
     background-attachment: fixed;
 }
 
+h1, h2 {
+    font-family: NikkyouSans;
+}
+
 @media screen and (max-width: 992px) {
     .container {
         margin: 0 0 0 0;
