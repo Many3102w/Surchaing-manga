@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='manga',
             name='type_of_manga',
-            field=models.CharField(blank=True, choices=[('Prueba', 'Prueba1')], default=('Prueba', 'Prueba1'), help_text='Agregar el género del manga', max_length=10, verbose_name='Géneros de mangas'),
+            field=models.CharField(blank=True, choices=[('Prueba', 'Prueba1')], default=('Prueba', 'Prueba1'), help_text='Agregar el género del manga', max_length=25, verbose_name='Géneros de mangas'),
         ),
     ]

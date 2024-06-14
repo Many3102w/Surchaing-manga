@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='manga',
             name='type_of_manga',
-            field=models.CharField(blank=True, choices=[('Accion', 'Acción'), ('Aventura', 'Aventura')], default=('Accion', 'Acción'), help_text='Agregar el género del manga', max_length=10, verbose_name='Género del manga'),
+            field=models.CharField(blank=True, choices=[('Accion', 'Acción'), ('Aventura', 'Aventura')], default=('Accion', 'Acción'), help_text='Agregar el género del manga', max_length=25, verbose_name='Género del manga'),
         ),
         migrations.AlterModelTable(
             name='manga',

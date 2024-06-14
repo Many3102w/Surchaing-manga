@@ -3,3 +3,4 @@ environ
 django-environ
 pillow
 python-dotenv
+whitenoise

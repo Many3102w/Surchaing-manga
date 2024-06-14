@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from .base import *
 from dotenv import load_dotenv
+from webcomic.logging import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,7 +14,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+]
 
 DATABASES = {
     'default': {
@@ -26,4 +29,6 @@ DATABASES = {
     }
 }
 
-STATIC_ROOT = Path.joinpath(BASE_DIR, "static")
+STATIC_ROOT = Path.joinpath(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+

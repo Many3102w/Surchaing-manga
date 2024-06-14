@@ -1,0 +1,23 @@
+html {
+    scrollbar-gutter: auto;
+}
+
+body {
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+h1, h2 {
+    font-family: NikkyouSans;
+}
+
+@media screen and (max-width: 992px) {
+    .container {
+        margin: 0 0 0 0;
+        width: 100%;
+        max-width: 100wv;
+    }
+
+}
