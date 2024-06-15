@@ -2,3 +2,4 @@ django
 environ
 django-environ
 pillow
+django-ckeditor-5
