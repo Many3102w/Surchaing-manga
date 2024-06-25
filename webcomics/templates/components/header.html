@@ -1,6 +1,6 @@
 {% load static %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static "/css/header.css" %}">
+<link rel="stylesheet" href="{% static "css/header.css" %}">
 {% endblock%}
 
 <header class="{% block header_class %}{% endblock %}">
@@ -11,7 +11,7 @@
             <div class="navbar-header d-flex align-items-center justify-content-between">
                 <a class="navbar-brand" href="/">
                     <img id="Surchaing-logo"
-                        src="{% static "/images/logo/light_logo.webp" %}" 
+                        src="{% static "images/logo/light_logo.webp" %}" 
                         alt="Surchaing Manga"
                         draggable="false" 
                         height="70" />
@@ -54,5 +54,5 @@
 </header>
 
 {% block extra_js %}
-<script src="{% static "/js/header.js" %}"></script>
+<script src="{% static "js/header.js" %}"></script>
 {% endblock %}

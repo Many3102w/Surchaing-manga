@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from webcomics.views import index
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path("", index, name="index"),
@@ -10,4 +12,4 @@ urlpatterns = [
     path("search/", views.search, name='search'),
     path('watchlist/', views.watchlist, name='watchlist'),
     path("about/", views.about, name="about"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
