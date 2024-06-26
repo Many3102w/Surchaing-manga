@@ -2,12 +2,12 @@
 {% load static %}
 {% block title %}Inicio{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static '/css/home.css'%}'">
-    <link rel="stylesheet" href='{% static '/css/manga-slider.css'%}'>
+    <link rel="stylesheet" href='{% static 'css/home.css' %}'>
+    <link rel="stylesheet" href='{% static 'css/manga-slider.css' %}'>
 {% endblock %}
 
 {% block content %}
-    <div class="hero">
+    <div class="hero" style="height: 100vh; background-image: url('{% static 'images/backgrounds/background.gif' %}');">
         <div class="hero-content container">
             <h1>vive experiencias<br> únicas y derivadas</h1>
             <p>Encajando en nuestra sociedad, no por obligación, sino por gusto.</p>
@@ -38,7 +38,7 @@
             <h1>Mangas Recientes</h1>
             <div class="manga-container">
                 <div class="slide">
-                    {% for manga in high_rated_mangas %}
+                    {% for manga in recent_mangas %}
                     <div class="manga-item" style="background-image: url({{ manga.front_page.url }});">
                         <div class="manga-content">
                             <div class="manga-name"> {{manga.nombre_del_manga}} </div>
@@ -64,5 +64,5 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static '/js/manga-slider.js'%}"></script>
+    <script src="{% static 'js/manga-slider.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "./layouts/base.html" %}
+{% load static %}
+{% block title %}Inicio{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href='{% static '/css/home.css'%}'">
+    <link rel="stylesheet" href='{% static '/css/manga-slider.css'%}'>
+{% endblock %}
+
+{% block content %}
+    <div class="hero" style="height: 80vh;">
+    <div class="hero-content container">
+    {% for manga in high_rated_mangas %}
+        <section style="background-image: url('{{ manga.front_page.url }}');">
+            <p>AAAAAAAAA</p>
+        <section>
+    {% endfor %}
+    </div>
+    </div>
+    pene
+{% endblock%}

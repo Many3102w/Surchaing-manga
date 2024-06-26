@@ -28,7 +28,7 @@ Tabla para la gestión de mangas en la base de datos.
     manga_file = models.FileField(verbose_name="Archivo del manga", blank=True, null=True, db_column="archivo")
 
     type_of_manga = models.CharField(verbose_name="Género del manga", choices=Types_of_mangas,
-                                    help_text="Agregar el género del manga", blank=True, default=Types_of_mangas[0], max_length=10,
+                                    help_text="Agregar el género del manga", blank=True, default=Types_of_mangas[0], max_length=100,
                                     db_column="genero del manga"
                                     )
     calificacion_promedio = models.DecimalField(

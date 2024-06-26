@@ -1,9 +1,7 @@
 .hero {
     position: relative;
-    background-image: url('../images/backgrounds/background.gif');
     background-size: cover;
     background-position: center;
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: left;
