@@ -1,0 +1,81 @@
+.hero-slider-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.hero-slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slider-section {
+    min-width: 100%;
+    height: 80vh;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    padding: 0 1rem; /* Espaciado interno para evitar que el texto toque los bordes */
+    text-align: center; /* Centrar el texto */
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    max-width: 90%; /* Limita el ancho máximo del texto */
+    word-wrap: break-word; /* Permite la ruptura de palabras largas */
+}
+
+.hero-slider-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.hero-slider-button.left {
+    left: 10px;
+}
+
+.hero-slider-button.right {
+    right: 10px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .hero-slider {
+        overflow-x: auto; /* Permitir scroll horizontal en móviles */
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch; /* Para scroll suave en iOS */
+    }
+
+    .slider-section {
+        scroll-snap-align: start;
+    }
+
+    .hero-slider-button {
+        display: none; /* Ocultar botones en móviles */
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .slider-section {
+        height: 25vh;
+    }
+}
