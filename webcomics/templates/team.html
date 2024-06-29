@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}Nuestro Equipo{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
     <link rel="stylesheet" href='{% static 'css/home.css'%}'">
+    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
     <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
 {% endblock %}
 
@@ -14,13 +14,62 @@
 {% block  content %}
 <div id="main-container" class="container" style="padding: 20px 0 20px 0">
     <div class="main-content">
-        <h1>NUESTRO EQUIPO</h1>
-        <div class="team-member">
-            <img src="{% static 'images/members/manfort.webp' %}" alt="Manfort">
-        <div class="text-box">
-            <h2>MANFORT</h2>
-            <h3>Administrador, editor, diseñador, control de calidad, tesorero y escritor.</h3>
-            <h4><span class="fi fi-mx fis"></span> México</h4>
+    <h1>NUESTRO EQUIPO</h1>
+        <div class="team-container">
+            <div class="team-member">
+                <img src="{% static "images/members/manfort.webp" %}" alt="Manfort">
+                <h3>MANFORT</h3>
+                <p>Fundador, Administrador, Control de Calidad y Diseñador</p>
+                <p><span class="fi fi-mx"></span> México</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                </div>
+            </div>
+            <div class="team-member">
+                <img src="{% static "images/members/rozank.webp" %}" alt="Rozank">
+                <h3>ROZANK</h3>
+                <p>Administrador, Editor, Diseñador y Escritor</p>
+                <p><span class="fi fi-ve"></span> Venezuela</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                </div>
+            </div>
+            <div class="team-member">
+                <img src="{% static "images/members/morgot.webp" %}" alt="Morgot">
+                <h3>MORGOT</h3>
+                <p>Administrador, Calidad, Tesorero y Escritor</p>
+                <p><span class="fi fi-es"></span> España</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                </div>
+            </div>
+            <div class="team-member">
+                <img src="{% static "images/members/ketamin.webp" %}" alt="Ketamin">
+                <h3>KETAMIN</h3>
+                <p>Escritor, Ayudante general y Tabulador</p>
+                <p><span class="fi fi-mx"></span> México</p>
+                <div class="social-icons">
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://facebook.com"><i class="bi bi-twitter-x"></i></a>
+                </div>
+
+            </div>
+            <div class="team-member">
+                <img src="{% static "images/members/edmateo.webp" %}" alt="Edmateo">
+                <h3>EDMATEO</h3>
+                <p>Programador Full Stack</p>
+                <p><span class="fi fi-co"></span> Colombia</p>
+                <div class="social-icons">
+                    <a href="https://edmateo.site"><i class="bi bi-link-45deg"></i></a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

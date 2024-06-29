@@ -30,11 +30,6 @@ nav {
     font-family: NikkyouSans;
 }
 
-.navbar-nav .nav-link {
-    color: white !important;
-    font-weight: bold;
-}
-
 .dropdown-menu {
     background-color: #282828;
     color: white !important;
