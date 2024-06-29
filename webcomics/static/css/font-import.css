@@ -2,3 +2,8 @@
   font-family: NikkyouSans;
   src: url('../fonts/NikkyouSans/NikkyouSans-mLKax.ttf');
 }
+
+@font-face {
+    font-family: surchaing;
+    src: url('../fonts/surchaing/E-Regular.ttf');
+}

@@ -1,0 +1,28 @@
+{% extends "./layouts/base.html" %}
+{% load static %}
+{% block title %}Nuestro Equipo{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
+    <link rel="stylesheet" href='{% static 'css/home.css'%}'">
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
+{% endblock %}
+
+{% block nav %}
+    {% include "./components/static_header.html" %}
+{% endblock %}
+
+{% block  content %}
+<div id="main-container" class="container" style="padding: 20px 0 20px 0">
+    <div class="main-content">
+        <h1>NUESTRO EQUIPO</h1>
+        <div class="team-member">
+            <img src="{% static 'images/members/manfort.webp' %}" alt="Manfort">
+        <div class="text-box">
+            <h2>MANFORT</h2>
+            <h3>Administrador, editor, diseñador, control de calidad, tesorero y escritor.</h3>
+            <h4><span class="fi fi-mx fis"></span> México</h4>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

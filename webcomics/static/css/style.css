@@ -13,11 +13,20 @@ h1, h2 {
     font-family: NikkyouSans;
 }
 
+.main-content h1 {
+    font-family: NikkyouSans;
+    text-align: center;
+    padding: 20px 0 20px 0;
+}
+
+.vermas {
+    text-align: right;
+}
+
 @media screen and (max-width: 992px) {
     .container {
         margin: 0 0 0 0;
         width: 100%;
         max-width: 100wv;
     }
-
 }

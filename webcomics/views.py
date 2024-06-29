@@ -49,6 +49,11 @@ class IngresarView(TemplateView):
 class LibraryView(TemplateView):
     template_name = "library.html"
 
+class HelpView(TemplateView):
+    template_name = "help.html"
+
+class TeamView(TemplateView):
+    template_name = "team.html"
 
 class IndexView(TemplateView):
     template_name = "index.html"

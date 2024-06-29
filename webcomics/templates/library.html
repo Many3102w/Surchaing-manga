@@ -23,6 +23,20 @@
 <div id="main-container" class="container" style="padding-bottom: 20px">
     <div class="main-content">
         {% include "./components/ad_banner.html" %}
+        {% for genre, mangas in manga_by_genre.items %}
+        <h1>{{ genre }}</h1>
+        <div class="diagonal-slider">
+            {% for manga in mangas %}
+            <div class="diagonal-slider-card">
+                <a href="#">
+                <img src="{{ manga.front_page.url }}">
+                <div class="diagonal-slider-head">{{ manga.nombre_del_manga }}</div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="vermas"><a href="#">ver más</a></div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
