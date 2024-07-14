@@ -1,7 +1,4 @@
 {% load static %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static "/css/header.css" %}">
-{% endblock%}
 
 <header class="{% block header_class %}{% endblock %}">
     <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
@@ -34,8 +31,8 @@
                             Acerca de
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'team' %}">Equipo</a></li>
                             <li><a class="dropdown-item" href="{% url 'help' %}">Ayuda</a></li>
+                            <li><a class="dropdown-item" href="{% url 'team' %}">Equipo</a></li>
                         </ul>
                     </li>
                 </ul>

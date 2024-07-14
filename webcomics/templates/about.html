@@ -1,25 +1,20 @@
 {% extends "./layouts/base.html" %}
 {% load static %}
-{% block title %}Buscar{% endblock %}
+{% block title %}Nuestro Equipo{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static '/css/about.css'%}'">
+    <link rel="stylesheet" href='{% static 'css/home.css'%}'">
+    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
+{% endblock %}
+
+{% block nav %}
+    {% include "./components/static_header.html" %}
 {% endblock %}
 
 {% block  content %}
-
-<div class="hero">
-    <div class="hero-content container">
-        <h1>Acerca de</h1>
+<div id="main-container" class="container" style="padding: 20px 0 20px 0">
+    <div class="main-content">
+    <h1>NUESTRO EQUIPO</h1>
     </div>
 </div>
-<container >
-<h1>PENE</h1>
-<h1>PENE</h1>
-<h1>PENE</h1>
-<h1>PENE</h1>
-<h1>PENE</h1>
-<h1>PENE</h1>
-
-
 {% endblock %}
-
