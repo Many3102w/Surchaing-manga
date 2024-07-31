@@ -1,5 +1,9 @@
 # Surchaing Manga
 
+## REPO MUERTO
+por ahora, este repo lleva un mes sin actualizarce, esto debido a que el hdspm de Emi no ha hecho un qlo y cada commit que hacía era un desaste, pero con cariño <3.
+Por ahora, Surchaing está pasando por una refactorización de todo el código y está alojado en [El codeberg personal de Pingüino](https://codeberg.org/Imnot_EdMateo/Surchaing-Manga)
+
 Antes de comenzar con el proyecto a nivel colavorativo se necesita tener en cuenta lo siguiente:
 
 1. Colaborar siempre con respeto mutuo entre desarrolladores.
