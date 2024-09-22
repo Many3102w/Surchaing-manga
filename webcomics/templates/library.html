@@ -2,8 +2,8 @@
 {% load static %}
 {% block title %}Catálogo{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static '/css/home.css'%}'">
-    <link rel="stylesheet" href='{% static '/css/sliders.css'%}'>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sliders.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -20,9 +20,11 @@
     <button class="hero-slider-button left">⟵</button>
     <button class="hero-slider-button right">⟶</button>
 </div>
-<div id="main-container" class="container" style="padding-bottom: 20px">
+<div id="main-container" class="container" style="padding-bottom: 20px;">
     <div class="main-content">
         {% include "./components/ad_banner.html" %}
+
+        <!-- Sección de Géneros -->
         {% for genre, mangas in manga_by_genre.items %}
         <h1>{{ genre }}</h1>
         <div class="diagonal-slider">
