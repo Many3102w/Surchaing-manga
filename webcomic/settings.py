@@ -13,6 +13,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'surchaing.edmateo.site']
 
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'webcomics',
     'ckeditor_uploader',  
+    'perfil',
 ]
 
 MIDDLEWARE = [
@@ -94,3 +97,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

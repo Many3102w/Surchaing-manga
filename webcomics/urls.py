@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 from .views import *
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path("", IndexView.as_view(), name="index"),
@@ -13,4 +14,5 @@ urlpatterns = [
     path("help/", HelpView.as_view(), name='help'),
     path("search/", SearchView.as_view(), name='search'),
     path("about/", AboutView.as_view(), name="about"),
+    path('login/', LoginView.as_view(), name='login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

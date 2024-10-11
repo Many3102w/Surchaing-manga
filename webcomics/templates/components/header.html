@@ -1,17 +1,14 @@
 {% load static %}
 
 <header class="{% block header_class %}{% endblock %}">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <!-- Container wrapper -->
-        <div id="NavWrapper" class="container">
+        <div id="NavWrapper" class="container bt">
             <!-- LOGO y botón de hamburguesa -->
             <div class="navbar-header d-flex align-items-center justify-content-between">
                 <a class="navbar-brand" href="/">
-                    <img id="Surchaing-logo"
-                        src="{% static "/images/logo/light_logo.webp" %}" 
-                        alt="Surchaing Manga"
-                        draggable="false" 
-                        height="70" />
+                    <img id="Surchaing-logo" src="{% static "/images/logo/light_logo.webp" %}" alt="Surchaing Manga"
+                        draggable="false" height="70" />
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#NavMenu">
                     <span class="navbar-toggler-icon"></span>
@@ -24,10 +21,17 @@
                         <a class="nav-link d-flex align-items-center text-center" href="{% url 'index' %}">Inicio</a>
                     </li>
                     <li class="nav-item me-3">
-                        <a class="nav-link d-flex align-items-center text-center" href="{% url 'library' %}">Catálogo</a>
+                        <a class="nav-link d-flex align-items-center text-center"
+                            href="{% url 'library' %}">Catálogo</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item me-3">
+                        <a class="nav-link d-flex align-items-center text-center" href="{% url 'perfil' %}">Perfil</a>
+                    </li>
+                    {%endif%}
                     <li class="nav-item dropdown me-3">
-                        <a class="nav-link d-flex align-items-center text-center dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link d-flex align-items-center text-center dropdown-toggle" href="#"
+                            id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Acerca de
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -40,16 +44,38 @@
             <!-- Icons -->
             <div id="Icons" class="d-flex">
                 <a class="nav-link" href="{% url 'search' %}"><i class="bi bi-search"></i></a>
-                <a class="nav-link" href="{% url 'ingresar' %}">
-                    <button class="btn btn-outline-primary">INGRESA</button>
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button id="logout" type="submit" class="btn btn-outline-primary">LOGOUT</button>
+                </form>
+                {%else%}
+                <a class="nav-link" href="{% url 'login' %}">
+                    <button class="btn btn-outline-primary">LOGIN</button>
                 </a>
+                {%endif%}
+
             </div>
+            {% if user.is_authenticated %}
+            <div style="padding-top: 2%; padding-left: 2%;">
+                <p style="color: white;">@{{user}}</p>
+            </div>
+            {%endif%}
         </div>
         <!-- Container wrapper -->
+
     </nav>
     <!-- Navbar -->
 </header>
 
 {% block extra_js %}
-<script src="{% static "js/header.js" %}"></script>
+<script src="{% static " js/header.js" %}"></script>
 {% endblock %}
+
+<style>
+    .bt {
+        border: 1px solid rgb(243, 243, 248);
+        background-color: rgba(0, 0, 0, 0.521);
+    }
+</style>
+

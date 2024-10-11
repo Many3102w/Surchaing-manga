@@ -1,0 +1,60 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href='{% static ' css/home.css'%}'">
+<link rel="stylesheet" href='{% static ' css/about.css'%}'">
+<link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
+{% endblock %}
+
+{% block content %}
+{% include "components/static_header.html" %} <div class="container">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <br><br><br>
+        <div class="card" style="border-width: 0;"><!--rgb(94, 138, 123); -->
+            <div class="card-header text-center" style="background-color:rgb(102, 101, 101)">
+                <h3 style="color: white;">Iniciar Sesión</h3>
+            </div>
+            <div class="card-body" style="background-color: rgb(236, 237, 241);">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="background-color:rgb(102, 101, 101);border-width: 0;">Ingresar</button>
+                </form>
+            </div>
+        </div>
+        <br><br><br>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+
+
+<style>
+    .mrt {
+        margin: 300px;
+    }
+
+    .background-gif {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('../../static/images/logo/REYYEYR.gif');
+        background-size: cover;
+        filter: blur(5px);
+        /* Ajusta el valor para más o menos desenfoque */
+        z-index: -1;
+    }
+</style>

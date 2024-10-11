@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from webcomics.models import Manga
 
+
 class HomeView(TemplateView):
     template_name = "home.html"
 
@@ -36,6 +37,10 @@ class MangaView(TemplateView):
         else:
             mensaje = f"Lamentablemente no se encontró el manga: {manga_name}"
         return HttpResponse(mensaje)
+
+
+class LoginView(TemplateView):
+    template_name = "login.html"
 
 
 class AboutView(TemplateView):
