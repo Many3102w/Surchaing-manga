@@ -1,29 +1,36 @@
 {% load static %}
+<link rel="stylesheet" href="{% static "/css/footer.css" %}">
 
 <footer>
-    <div class="container group-a">
-        <div class="box">
+    <div class="footer-container">
+        <!-- Sección de contacto -->
+        <div class="footer-box contact">
+            <h2>Contacto para subir mangas</h2>
+            <p>También puedes enviarme un mensaje a mi discord personal: idco_o</p>
+            <div class="btns-footer">
+                <a href="https://discord.com" class="discord-btn"><i class="bi bi-discord"></i> Discord</a>
+                <a href="mailto:mangas@surchaingmanga.com" class="email-btn"><i class="bi bi-envelope"></i> Correo</a>
+            </div>
+        </div>
+
+        <!-- Sección de enlaces de la empresa -->
+        <div class="footer-box">
             <ul>
-                <li><a href="#" class="footer-link link-secondary">EMPRESA</a></li>
-                <li><a href="#" class="footer-link link-secondary">EQUIPO</a></li>
-                <li><a href="#" class="footer-link link-secondary">POLITICA DE PRIVACIDAD</a></li>
+                <li><a href="#">EMPRESA</a></li>
+                <li><a href="#">EQUIPO</a></li>
+                <li><a href="#">POLÍTICA DE PRIVACIDAD</a></li>
             </ul>
         </div>
-        <div class="box">
-            <h2>Contacto para subir mangas</h2>
-            <h2 style="font-size: 45px; text-align: center;"><a href="https://discord.com"><i class="bi bi-discord"></i></a></h2>
-            <p>Tambien puedes enviarme un mensaje a mi discord personal idco_o</p>
-            <a href="mailto:mangas@surchaingmanga.com">mangas@surchaingmanga.com</a>
-        </div>
-        <div class="box">
+
+        <!-- Sección de logo y descripción -->
+        <div class="footer-box logo">
             <figure>
                 <a href="#">
-                    <img src="{% static "/images/logo/light_logo.webp" %}" alt="Surchaing Manga">
+                    <img src="{% static '/images/logo/light_logo.webp' %}" alt="Surchaing Manga">
                 </a>
             </figure>
-            <p>Esta página esta hecha con la intención de que crezcas como artista. Si eres creador de contenido de ayudará con la publicidad</p>
-            <p>[Texto motivador...]</p>
-            <small>&copy; 2024 <b>Surchaing Manga</b> - Todos los Derechos Reservados.</small>
+            <p>Esta página está hecha con la intención de que crezcas como artista. Si eres creador de contenido, te ayudaremos con la publicidad.</p>
+            <small>&copy; 2024 <b>Surchaing Manga</b> - Todos los derechos reservados.</small>
         </div>
     </div>
-<footer>
+</footer>

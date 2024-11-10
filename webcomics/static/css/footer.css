@@ -1,56 +1,111 @@
+/* Estilo principal del footer */
 footer {
     width: 100%;
     background-color: #1d2021;
+    padding: 60px 0;
+    margin-top: 10rem;
+    margin-bottom: -10rem;
+    color: #efefef;
 }
 
-footer .group-a {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 50px;
-    padding: 45px 0;
-}
-
-footer .group-a .box img{
-    width: 100%;
-    height: 100%;
+.footer-container {
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 40px;
 }
 
-footer .group-a .box figure img {
-    width: 150px;
+footer .footer-box {
+    flex: 1;
+    min-width: 250px;
 }
 
-footer .group-a .box h2 {
-    font-family: NikkyouSans;
-    color: #fff;
-    margin-bottom: 25px;
-    font-size: 20px;
+footer .footer-box h2 {
+    font-family: 'NikkyouSans', sans-serif;
+    color: white;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
 }
 
-footer .group-a .box ul {
+footer .footer-box ul {
     list-style: none;
+    padding: 0;
 }
 
-footer .group-a .box p {
+footer .footer-box ul a {
     color: #efefef;
+    font-size: 1.1rem;
+    display: block;
     margin-bottom: 10px;
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
-footer .group-a .box small {
-    color: #efefef;
-    margin-bottom: 10px;
+footer .footer-box ul a:hover {
+    color: #007bff;
 }
 
-footer .group-a .footer-link a:hover {
-    color: aqua;
+footer .footer-box .btns-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
-@media screen and (max-width:800px){
-    footer .group-a {
-        width: 90%;
-        grid-template-columns: repeat(1, 1fr);
-        grid-gap: 30px;
-        padding: 35px 0;
+footer .footer-box .btns-footer a {
+    background-color: white;
+    color: black;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+footer .footer-box .btns-footer a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+footer .footer-box.logo {
+    text-align: center;
+}
+
+footer .footer-box.logo figure img {
+    width: 180px;
+    margin-bottom: 20px;
+}
+
+footer .footer-box.logo p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+footer .footer-box.logo small {
+    font-size: 0.875rem;
+    color: #b0b0b0;
+}
+
+footer .discord-btn,
+footer .email-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 800px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    footer .footer-box {
+        text-align: center;
+        min-width: 100%;
     }
 }

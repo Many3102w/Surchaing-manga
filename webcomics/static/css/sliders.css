@@ -1,11 +1,13 @@
 .hero-slider-container {
     position: relative;
     width: 100%;
+    
     overflow: hidden;
 }
 
 .hero-slider {
     display: flex;
+    margin-top: 7rem;
     transition: transform 0.5s ease-in-out;
 }
 
@@ -24,14 +26,14 @@
     height: 100%;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    padding: 0 1rem; /* Espaciado interno para evitar que el texto toque los bordes */
-    text-align: center; /* Centrar el texto */
+    padding: 0 1rem; 
+    text-align: center; 
 }
 
 .hero-content h1 {
     font-size: 3rem;
-    max-width: 90%; /* Limita el ancho máximo del texto */
-    word-wrap: break-word; /* Permite la ruptura de palabras largas */
+    max-width: 90%;
+    word-wrap: break-word;
 }
 
 .hero-slider-button {

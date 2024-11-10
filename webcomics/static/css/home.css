@@ -4,8 +4,7 @@
     background-position: center;
     display: flex;
     align-items: center;
-    justify-content: left;
-    color: white;
+    justify-content: space-between;
     z-index: 1;
 }
 
@@ -19,21 +18,51 @@
     background: rgba(0, 0, 0, 0.85);
 }
 
-.hero-content {
-    position: relative;
-    padding: 0 15px 0 15px;
+.container-home{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     z-index: 2;
+    padding: 10rem;
+    margin-top: 4rem;
 }
 
 .hero h1 {
     font-family: NikkyouSans;
-    font-size: 3rem;
-    margin: 0;
+    font-size: 2rem;
+    color: white;
 }
 
 .hero p {
-    font-size: 1.5rem;
-    margin: 20px 0;
+    font-size: 1rem;
+    color: white;
+    text-align: justify;
+    max-width: 800px;
+    
+}
+
+.hero-banner-logo img{
+    margin: 10px;
+    max-width: 400px;
+}
+
+.hero .socials{
+    display: flex;
+    flex-direction: row;
+    z-index: 100;
+}
+
+.container-home .hero-content .socials a{
+    font-size: 1.8rem;
+    margin: 1rem;
+    color: white;
+    transition: all 300ms ease;
+}
+
+.hero .socials a:hover {
+    color: gray;
+    transform: scale(1.2);
+    transition: all 300ms ease;
 }
 
 .hero .btn {
@@ -55,29 +84,19 @@
     color: #6610f2;
 }
 
-.hero a {
-    color: #efefef;
+.btnShowMore{
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 140px;
+    color: white;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    transition: all 300ms ease;
 }
 
-.welcome {
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.welcome img {
-    max-width: 320px;
-}
-
-@media screen and (min-width: 800px) {
-    .welcome {
-        flex-direction: row;
-    }
-
-    .welcome img {
-        float: right;
-        max-width: 320px;
-    }
+.btnShowMore:hover{
+    background-color: #0069D9;
 }

@@ -1,0 +1,80 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin-bottom: -10rem;
+    background-image: url('../../static/images/logo/REYYEYR.gif');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+}
+
+.login-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.login-card-header {
+    background-color: rgb(102, 101, 101);
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px 10px 0 0;
+}
+
+.login-title {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+}
+
+.login-card-body {
+    padding: 20px;
+    background-color: rgb(236, 237, 241);
+    border-radius: 0 0 10px 10px;
+}
+
+.login-form-group {
+    margin-bottom: 20px;
+}
+
+.login-form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.login-form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: rgb(102, 101, 101);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background-color: rgb(94, 93, 93);
+}
+
+.login-container {
+}

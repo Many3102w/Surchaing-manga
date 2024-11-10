@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkPath = new URL(link.href).pathname;
 
     if (linkPath === currentUrl) {
-        link.classList.add('active'); // Agregar clase 'active' al enlace correspondiente
+        link.classList.add('active');
     }
   });
 });
-
-

@@ -20,9 +20,9 @@
     <button class="hero-slider-button left">⟵</button>
     <button class="hero-slider-button right">⟶</button>
 </div>
-<div id="main-container" class="container" style="padding-bottom: 20px;">
+<div id="main-container" class="container" style="padding-bottom: 8rem;">
     <div class="main-content">
-        {% include "./components/ad_banner.html" %}
+        <!--{% include "./components/ad_banner.html" %}-->
 
         <!-- Sección de Géneros -->
         {% for genre, mangas in manga_by_genre.items %}
@@ -37,7 +37,7 @@
             </div>
             {% endfor %}
         </div>
-        <div class="vermas"><a href="#">ver más</a></div>
+        <button class="btnShowMore">VER MÁS</button>
         {% endfor %}
     </div>
 </div>

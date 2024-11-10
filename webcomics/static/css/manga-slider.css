@@ -1,3 +1,11 @@
+.main-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .manga-container {
     position: relative;
     width: 100%;
@@ -10,7 +18,7 @@
 
 .manga-item {
     top: 50%;
-    width: 165px;
+    width: 1200px;
     height: 250px;
     position: absolute;
     transform: translate(0, -50%);
@@ -93,7 +101,7 @@
 
 .manga-content .manga-name {
     text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
-    font-size: 45px;
+    font-size: 30px;
     padding-bottom: 20px;
     text-transform: uppercase;
     font-weight: 400;
@@ -102,8 +110,13 @@
 }
 
 .manga-content button {
+    padding: 10px;
+    font-weight: 300;
+    border-radius: 8px;
+    width: 130px;
     opacity: 0;
     animation: animate 1s ease-in-out 1 forwards;
+    margin-top: 10px; /* Agrega espacio entre el nombre y el botón */
 }
 
 @keyframes animate {

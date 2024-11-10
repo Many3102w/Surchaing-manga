@@ -1,20 +1,51 @@
 {% extends "./layouts/base.html" %}
 {% load static %}
-{% block title %}Nuestro Equipo{% endblock %}
+{% block title %}Página de Ayuda - Surchaing Manga{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static 'css/home.css'%}'">
-    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
-    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
+    <link rel="stylesheet" href='{% static 'css/home.css'%}'>
+    <link rel="stylesheet" href='{% static 'css/about.css'%}'>
+    <link rel="stylesheet" href='{% static 'css/help.css'%}'>
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'>
 {% endblock %}
 
 {% block nav %}
     {% include "./components/static_header.html" %}
 {% endblock %}
 
-{% block  content %}
-<div id="main-container" class="container" style="padding: 20px 0 20px 0">
+{% block content %}
+<div id="main-container" class="container">
     <div class="main-content">
-    <h1>AYUDA</h1>
+        <h1>Página de Ayuda</h1>
+        <p>Bienvenido a la sección de ayuda de <strong>Surchaing Manga</strong>. Aquí encontrarás toda la información que necesitas para sacar el máximo provecho de nuestra plataforma. Si tienes alguna pregunta o necesitas asistencia, estamos aquí para ayudarte.</p>
+
+        <section>
+            <h2>Preguntas Frecuentes (FAQ)</h2>
+            <div class="faq-item">
+                <h3>¿Cómo puedo subir mis mangas?</h3>
+                <p>Para subir tus mangas, simplemente dirígete a la sección <a href="#">"Subir Manga"</a> en tu perfil. Asegúrate de tener el archivo en formato .jpg o .png y agrega una descripción adecuada para que otros usuarios puedan disfrutar de tu contenido.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Puedo obtener retroalimentación sobre mi manga?</h3>
+                <p>Sí, puedes recibir retroalimentación de otros usuarios a través de comentarios en las páginas de cada manga. Además, te invitamos a unirte a nuestro servidor de Discord para interactuar directamente con otros creadores y recibir apoyo.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Cómo puedo editar mi perfil?</h3>
+                <p>Para editar tu perfil, haz clic en tu nombre de usuario en la parte superior de la página. Desde allí, podrás actualizar tu foto de perfil, nombre de usuario y otros detalles.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Cómo puedo descargar mangas?</h3>
+                <p>Para descargar un manga, simplemente haz clic en el botón de descarga que aparece en la página de cada manga. Algunos mangas pueden tener restricciones de descarga dependiendo de los derechos de autor.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>¿Necesitas más ayuda?</h2>
+            <p>Si no encuentras la respuesta a tu pregunta, no dudes en contactarnos a través de los siguientes canales:</p>
+            <ul>
+                <li><strong>Correo Electrónico:</strong> <a href="mailto:mangas@surchaingmanga.com">mangas@surchaingmanga.com</a></li>
+                <li><strong>Discord:</strong> Únete a nuestro servidor de Discord y contáctanos directamente: <a href="https://discord.com">Surchaing Manga Discord</a></li>
+            </ul>
+        </section>
     </div>
 </div>
 {% endblock %}
