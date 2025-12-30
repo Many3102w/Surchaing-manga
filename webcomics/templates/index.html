@@ -4,91 +4,203 @@
 {% block title %}Inicio{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static "css/home.css" %}'>
-    <link rel="stylesheet" href='{% static "css/manga-slider.css" %}'>
+<link rel="stylesheet" href='{% static "css/home_redesign.css" %}'>
+<style>
+    /* Force hide the default footer on this page only */
+    footer {
+        display: none !important;
+    }
+
+    /* Hero overrides for this specific "Dark Mode" top section */
+    .concept-hero {
+        background-color: #111;
+        color: white;
+        padding-top: 100px;
+        padding-bottom: 100px;
+        margin-bottom: 80px;
+        position: relative;
+        /* Placeholder for the 3-image background effect - using a dark gradient for now */
+        background: linear-gradient(to right, #1a1a1a, #000);
+    }
+
+    .gold-brand {
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        color: #d4af37;
+        /* Gold color */
+        font-family: 'Times New Roman', serif;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .concept-hero h1 {
+        color: white;
+        font-size: 6rem;
+        /* Adjust for "TUS PRENDAS..." fit */
+        line-height: 0.9;
+        max-width: 900px;
+    }
+
+    .concept-hero p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        margin-top: 20px;
+        letter-spacing: 2px;
+        font-weight: bold;
+    }
+
+    /* Section Header Styling specific to reference */
+    .concept-sidebar h2 {
+        font-size: 2.5rem;
+        color: #ccc;
+        /* Light gray for non-active looking headers */
+    }
+
+    /* Footer overrides */
+    .concept-footer {
+        background-color: #f4f4f0;
+        color: #333;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+<!-- We wrap the whole content in the light bg, but hero breakouts -->
+<div style="background-color: #f4f4f0; min-height: 100vh;">
+
     <!-- Hero Section -->
-    <div class="hero" style="height: 100vh; background-image: url('{% static "images/logo/REYYEYR.gif" %}')">
-        <div class="container-home">
-            <div class="hero-content">
-                <h1>¡Bienvenido a Surchaing Manga!</h1>
-                <p>Nuestra página está orientada a una mejora continua, tanto en flexibilidad de uso como en la visibilidad del usuario. Queremos que nuestra página se vea estéticamente agradable. Nuestra meta es que tú, como usuario, no solo quieras ver nuestros mangas, sino que también te animes a crear uno desde lo más profundo de tu imaginación y plasmarlo en una hoja. Que grandes artistas como tú crezcan sin encontrar límites. <br>¡Ayúdanos para ayudarte!</p>
-                <div class="socials">
-                    <a href="https://discord.gg/feMmaq4B"><i class="bi bi-discord"></i></a>
-                    <a href="https://www.youtube.com/@ElmanfortLogic"><i class="bi bi-youtube"></i></a>
-                    <a href="https://x.com/manfort157249"><i class="bi bi-twitter"></i></a>
-                </div>
-            </div>
-            <div class="hero-banner-logo">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Codeberg_logo.svg/800px-Codeberg_logo.svg.png" alt="LOGO DE NUESTRO PATROCINADOR MÁS DESTACADO">
-            </div>
-        </div>
-    </div>    
- 
-    <!-- Spotify Player 
-            <div class="spotify-container" style="margin-top: 20px; text-align: center;">
-                <h1>Escucha en Spotify</h1>
-                <iframe id="spotify-player" style="border-radius:12px" src="https://open.spotify.com/embed/track/3daf4CNGod9r7I0ING5fn9?utm_source=generator" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>-->
-
-    <!-- Main Container -->
-    <div id="main-container" class="container" style="padding-bottom: 20px">
-        <div class="main-content">
-            
-
-            <!-- Manga Sections -->
-            <!-- High Rated Mangas -->
-            <h1>Mangas mejor Valorados</h1>
-            <div class="manga-container">
-                <div class="slide">
-                    {% for manga in high_rated_mangas %}
-                    <div class="manga-item" style="background-image: url({{ manga.front_page.url }});">
-                        <div class="manga-content">
-                            <div class="manga-name">{{ manga.nombre_del_manga }}</div>
-                            <button type="button" class="btn btn-primary">Ver más</button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="buttons">
-                    <button class="prev"></button>
-                    <button class="next"></button>
-                </div>
-            </div>
-            
-
-            <!-- Recent Mangas -->
-            <h1>Mangas Recientes</h1>
-            <div class="manga-container">
-                <div class="slide">
-                    {% for manga in high_rated_mangas %}
-                    <div class="manga-item" style="background-image: url({{ manga.front_page.url }});">
-                        <div class="manga-content">
-                            <div class="manga-name">{{ manga.nombre_del_manga }}</div>
-                            <button type="button" class="btn btn-primary">Ver más</button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="buttons">
-                    <button class="prev"></button>
-                    <button class="next"></button>
-                </div>
-            </div>
-            
+    <div class="concept-hero">
+        <div class="gold-brand">DERSSG'M</div>
+        <div class="concept-container">
+            <h1>TUS PRENDAS<br>FAVORITAS YA<br>ESTAN AQUI</h1>
+            <p>EXCLUSIVIDAD EN CADA HILO A TUS MANOS</p>
         </div>
     </div>
+
+    <div class="concept-container">
+
+        <!-- Section 1: DENIM TEARS -->
+        <div class="concept-section">
+            <div class="concept-sidebar">
+                <h2 class="active-title" style="color: #ccc;">DENIM TEARS</h2>
+                <p>Porte y poder 24/7</p>
+            </div>
+            <div class="concept-grid">
+                {% for manga in denim_mangas %}
+                <a href="{% url 'manga_view' manga.nombre_del_manga %}" style="text-decoration: none; color: inherit;">
+                    <div class="concept-card">
+                        {% if manga.front_page %}
+                        <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
+                        {% else %}
+                        <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                        {% endif %}
+                        <div class="meta">
+                            <h3>{{ manga.nombre_del_manga }}</h3>
+                            <span>{{ manga.type_of_manga }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Section 2: ESSENTIALS -->
+        <div class="concept-section">
+            <div class="concept-sidebar">
+                <h2 style="color: #ccc;">ESSENTIALS</h2>
+                <p>Esencia y aura en cada costura.</p>
+            </div>
+            <div class="concept-grid">
+                {% for manga in essentials_mangas %}
+                <a href="{% url 'manga_view' manga.nombre_del_manga %}" style="text-decoration: none; color: inherit;">
+                    <div class="concept-card">
+                        {% if manga.front_page %}
+                        <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
+                        {% else %}
+                        <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                        {% endif %}
+                        <div class="meta">
+                            <h3>{{ manga.nombre_del_manga }}</h3>
+                            <span>{{ manga.type_of_manga }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Section 3: PORSCHE 911 -->
+        <div class="concept-section">
+            <div class="concept-sidebar">
+                <h2 style="color: #ccc;">PORSCHE 911</h2>
+                <p>CADA KM CUENTA</p>
+            </div>
+            <div class="concept-grid">
+                {% for manga in porsche_mangas %}
+                <a href="{% url 'manga_view' manga.nombre_del_manga %}" style="text-decoration: none; color: inherit;">
+                    <div class="concept-card">
+                        {% if manga.front_page %}
+                        <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
+                        {% else %}
+                        <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                        {% endif %}
+                        <div class="meta">
+                            <h3>{{ manga.nombre_del_manga }}</h3>
+                            <span>{{ manga.type_of_manga }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Custom Footer Section -->
+        <div class="concept-footer" style="padding-top: 100px;">
+            <div class="handwritten" style="font-family: cursive; font-size: 3rem;">Contacto:</div>
+
+            <div class="footer-links"
+                style="justify-content: space-between; text-align: left; align-items: flex-start; max-width: 1000px;">
+                <div class="footer-col">
+                    <strong style="color: #bfa37c;">Instagram</strong>
+                    <a href="#">@Derssgm</a>
+                </div>
+
+                <div class="footer-col">
+                    <strong style="color: #bfa37c;">Whatsapp</strong>
+                    <a href="#">+52(833)-803-0599</a>
+                </div>
+
+                <div class="footer-col">
+                    <strong style="color: #444;">Gmail</strong>
+                    <a href="mailto:@Derssgm">@Derssgm</a>
+                </div>
+
+                <div class="footer-col">
+                    <strong style="color: #444;">Facebook</strong>
+                    <span>Derss G'm</span>
+                </div>
+
+                <div class="footer-col">
+                    <strong style="color: #444;">Tiktok</strong>
+                    <span>@Derssgm</span>
+                </div>
+
+                <div class="footer-col">
+                    <strong>Pedidos:</strong>
+                    <span style="border-bottom: 2px solid #bfa37c; color: #bfa37c;">Storee</span>
+                </div>
+            </div>
+            <!-- Decor leaf/plant if possible, using a placeholder for now or nothing -->
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/slider.js' %}"></script>
-    <script>
-        // Función para cambiar la canción de Spotify
-        function cambiarMusica() {
-            var player = document.getElementById('spotify-player');
-            player.src = "https://open.spotify.com/embed/track/3Hvu1pq89d6yMFFLCbB9dX";
-        }
-    </script>
+<script>
+    document.body.classList.add('home-page');
+</script>
 {% endblock %}

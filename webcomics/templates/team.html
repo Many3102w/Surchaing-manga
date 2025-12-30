@@ -1,81 +1,168 @@
-{% extends "./layouts/base.html" %}
+{% extends "layouts/base.html" %}
 {% load static %}
-{% block title %}Nuestro Equipo{% endblock %}
+
+{% block title %}Nuestro Equipo | Surchaing Manga{% endblock %}
+
 {% block extra_css %}
-    <link rel="stylesheet" href='{% static 'css/home.css'%}'">
-    <link rel="stylesheet" href='{% static 'css/about.css'%}'">
-    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/7.2.3/css/flag-icons.min.css'">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<style>
+    /* Scoped container style matching the Profile page */
+    .team-page-container {
+        max-width: 1200px;
+        /* Wider than profile for grid */
+        margin: 100px auto 50px;
+        padding: 50px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .team-header {
+        text-align: center;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 30px;
+        margin-bottom: 50px;
+    }
+
+    .team-header h1 {
+        font-family: 'HeavyHeader', sans-serif;
+        font-size: 3rem;
+        text-transform: uppercase;
+        margin: 0;
+        color: #111;
+    }
+
+    .team-header p {
+        color: #777;
+        font-size: 1.1rem;
+        margin-top: 10px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Grid Layout */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 40px;
+    }
+
+    /* Member Card - Minimalist */
+    .team-member-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .team-member-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .member-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #111;
+        /* Matching profile preview border */
+        margin-bottom: 20px;
+        background-color: #f0f0f0;
+    }
+
+    .member-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: #333;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        margin-bottom: 20px;
+        border: 2px solid #111;
+    }
+
+    .member-name {
+        font-family: 'HeavyHeader', sans-serif;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        color: #111;
+        margin-bottom: 5px;
+    }
+
+    .member-role {
+        font-size: 1rem;
+        color: #555;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .member-country {
+        font-size: 0.9rem;
+        color: #888;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: #888;
+        grid-column: 1 / -1;
+        padding: 40px;
+        font-size: 1.2rem;
+    }
+</style>
 {% endblock %}
 
 {% block nav %}
-    {% include "./components/static_header.html" %}
+{% include "components/static_header.html" %}
 {% endblock %}
 
-{% block  content %}
-<div id="main-container" class="container" style="padding: 120px 0 20px">
-    <div class="main-content">
-    <h1>NUESTRO EQUIPO</h1>
-        <div class="team-container">
+{% block content %}
 
-            <div class="team-member">
-                <img src="{% static "images/members/manfort.webp" %}" alt="Manfort">
-                <h3>MANFORT</h3>
-                <p>Fundador, Administrador, Control de Calidad y Diseñador</p>
-                <p><span class="fi fi-mx"></span> México</p>
-                <div class="social-icons">
-                    <a href="https://www.youtube.com/@ElmanfortLogic"><i class="bi bi-youtube"></i></a>
-                    <a href="https://x.com/manfort157249"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-discord"></i></a>
-                </div>
-            </div>
+<div class="team-page-container">
+    <div class="team-header">
+        <h1>Nuestro Equipo</h1>
+        <p>Conoce a las mentes creativas detrás de Surchaing Manga.</p>
+    </div>
 
-            <div class="team-member">
-                <img src="{% static "images/members/rozank.webp" %}" alt="Rozank">
-                <h3>ROZANK</h3>
-                <p>Administrador, Editor, Diseñador y Escritor</p>
-                <p><span class="fi fi-ve"></span> Venezuela</p>
-                <div class="social-icons">
-                    <a href="https://www.youtube.com/@rozanku"><i class="bi bi-youtube"></i></a>
-                    <a href="https://x.com/RozankART"><i class="bi bi-twitter-x"></i></a>
-                    <a href="https://ko-fi.com/rozankvod"><svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/></svg></a>
-                </div>
+    <div class="team-grid">
+        {% for member in team_members %}
+        <div class="team-member-card">
+            {% if member.avatar_url %}
+            <img src="{{ member.avatar_url }}" alt="{{ member.username }}" class="member-avatar">
+            {% else %}
+            <div class="member-placeholder">
+                <i class="bi bi-person"></i>
             </div>
+            {% endif %}
 
-            <div class="team-member">
-                <img src="{% static "images/members/morgot.webp" %}" alt="Morgot">
-                <h3>MORGOT</h3>
-                <p>Administrador, Calidad, Tesorero y Escritor</p>
-                <p><span class="fi fi-es"></span> España</p>
-                <div class="social-icons">
-                    <a href="https://www.youtube.com/@Morgot9"><i class="bi bi-youtube"></i></a>
-                    <a href="https://x.com/Morgot08747825"><i class="bi bi-twitter-x"></i></a>
+            <div class="member-info">
+                <h2 class="member-name">{{ member.username }}</h2>
+                <div class="member-role">{% if member.role %}{{ member.role }}{% else %}Superuser{% endif %}</div>
+                {% if member.country %}
+                <div class="member-country">
+                    <i class="bi bi-geo-alt-fill" style="font-size: 0.8rem;"></i>
+                    {{ member.country }}
                 </div>
+                {% endif %}
             </div>
-
-            <div class="team-member">
-                <img src="{% static "images/members/edmateo.webp" %}" alt="Edmateo">
-                <h3>EDMATEO</h3>
-                <p>Programador Full Stack</p>
-                <p><span class="fi fi-co"></span> Colombia</p>
-                <div class="social-icons">
-                    <a href="https://edmateo.site"><i class="bi bi-link-45deg"></i></a>
-                    <a href="mailto:mineestasedmateo@proton.me"><i class="bi bi-envelope"></i></a>
-                </div>
-            </div>
-            
-            <div class="team-member">
-                <img src="{% static "images/members/Etzzio .jpg" %}" alt="Morgot">
-                <h3>MORGOT</h3>
-                <p>Administrador, Calidad, Tesorero y Escritor</p>
-                <p><span class="fi fi-es"></span> España</p>
-                <div class="social-icons">
-                    <a href="https://www.youtube.com/@Morgot9"><i class="bi bi-youtube"></i></a>
-                    <a href="https://x.com/Morgot08747825"><i class="bi bi-twitter-x"></i></a>
-                </div>
-            </div>
-            
         </div>
+        {% empty %}
+        <div class="empty-message">
+            No hay miembros del equipo visibles por ahora.
+        </div>
+        {% endfor %}
     </div>
 </div>
-{% endblock %}
 
+{% endblock %}

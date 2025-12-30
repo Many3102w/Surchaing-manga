@@ -1,15 +1,15 @@
 {% load static %}
-<link rel="stylesheet" href="{% static "/css/header.css" %}">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
 
 <!-- Navbar -->
 <header class="navbar-container">
     <nav class="navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            
+
             <!-- LOGO -->
             <a class="navbar-brand" href="/">
-                <img id="Surchaing-logo" src="{% static "/images/logo/light_logo.webp" %}" alt="Surchaing Manga"
-                     draggable="false" height="70" />
+                <img id="Surchaing-logo" src="{% static 'images/logo/new_logo.jpg' %}" alt="Surchaing Manga"
+                    draggable="false" height="70" />
             </a>
 
             <!-- Menú principal en una sola línea -->
@@ -31,7 +31,16 @@
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-primary">Logout</button>
                 </form>
-                <span class="user-greeting">@{{ user }}</span>
+                <span class="user-greeting">
+                    {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}"
+                        style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 5px; object-fit: cover;">
+                    {% else %}
+                    <i class="bi bi-person-circle"
+                        style="font-size: 1.5rem; vertical-align: middle; margin-right: 5px;"></i>
+                    {% endif %}
+                    @{{ user.username }}
+                </span>
                 {% else %}
                 <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
                 {% endif %}
@@ -41,5 +50,5 @@
 </header>
 
 {% block extra_js %}
-<script src="{% static "js/header.js" %}"></script>
+<script src="{% static 'js/header.js' %}"></script>
 {% endblock %}

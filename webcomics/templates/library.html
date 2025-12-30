@@ -1,48 +1,448 @@
 {% extends "./layouts/base.html" %}
 {% load static %}
+
 {% block title %}Catálogo{% endblock %}
+
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'css/sliders.css' %}">
+<link rel="stylesheet" href='{% static "css/home_redesign.css" %}'>
+<style>
+    /* Feed specific styles */
+    .feed-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .feed-header-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+
+    .btn-create-post {
+        background-color: #111;
+        color: #fff;
+        padding: 10px 20px;
+        font-family: 'HeavyHeader', sans-serif;
+        text-decoration: none;
+        border-radius: 5px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        border: 1px solid #111;
+        transition: all 0.2s;
+    }
+
+    .btn-create-post:hover {
+        background-color: transparent;
+        color: #111;
+    }
+
+    .feed-card {
+        background: white;
+        border: 1px solid #ccc;
+        margin-bottom: 60px;
+        border-radius: 0;
+        position: relative;
+    }
+
+    .feed-card-header {
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .feed-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #333;
+        margin-right: 15px;
+        background-image: url('{% static "images/logo/new_logo.jpg" %}');
+        background-size: cover;
+    }
+
+    .feed-username {
+        font-weight: bold;
+        font-size: 0.95rem;
+        color: #111;
+    }
+
+    /* Description Overlay */
+    .feed-image-container {
+        width: 100%;
+        background-color: #f8f8f8;
+        position: relative;
+        /* Needed for absolute positioning of overlay */
+        overflow: hidden;
+    }
+
+    .description-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        /* Dark semi-transparent background */
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        padding: 20px;
+        text-align: center;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    /* Show on hover */
+    .feed-image-container:hover .description-overlay {
+        opacity: 1;
+    }
+
+    /* Support for touch devices: click to toggle/show */
+    .feed-image-container.active-touch .description-overlay {
+        opacity: 1;
+    }
+
+    .feed-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+    }
+
+    .feed-actions {
+        padding: 15px;
+        display: flex;
+        gap: 20px;
+        font-size: 1.5rem;
+    }
+
+    .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        font-size: 1.5rem;
+        color: inherit;
+        transition: color 0.2s;
+    }
+
+    .action-btn:hover {
+        opacity: 0.6;
+    }
+
+    .action-btn.liked {
+        color: red;
+    }
+
+    .action-btn.favorited {
+        color: #000;
+        /* Or gold/yellow if preferred */
+    }
+
+    .feed-caption {
+        padding: 0 15px 15px 15px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .feed-caption strong {
+        margin-right: 8px;
+    }
+
+    .comments-section {
+        padding: 0 15px 15px 15px;
+        border-top: 1px solid #eee;
+        background-color: #fafafa;
+    }
+
+    .comment-item {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+
+    .comment-form {
+        display: flex;
+        margin-top: 10px;
+    }
+
+    .comment-form input {
+        flex: 1;
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .comment-form button {
+        border: none;
+        background: none;
+        color: #0095f6;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* Dropdown for delete */
+    .dropdown {
+        position: relative;
+        margin-left: auto;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 25px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 4px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-content a.delete-link {
+        color: red;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .feed-container {
+            padding: 0;
+        }
+
+        .feed-card {
+            border-left: none;
+            border-right: none;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="hero-slider-container">
-    <div class="hero-slider">
-        {% for manga in high_rated_mangas %}
-        <div class="hero slider-section" style="height: 80vh; background-image: url('{{ manga.front_page.url }}');">
-            <div class="hero-content container">
-                <h1>{{ manga.nombre_del_manga }}</h1>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <button class="hero-slider-button left">⟵</button>
-    <button class="hero-slider-button right">⟶</button>
-</div>
-<div id="main-container" class="container" style="padding-bottom: 8rem;">
-    <div class="main-content">
-        <!--{% include "./components/ad_banner.html" %}-->
+<div class="concept-container">
 
-        <!-- Sección de Géneros -->
-        {% for genre, mangas in manga_by_genre.items %}
-        <h1>{{ genre }}</h1>
-        <div class="diagonal-slider">
-            {% for manga in mangas %}
-            <div class="diagonal-slider-card">
-                <a href="#">
-                <img src="{{ manga.front_page.url }}">
-                <div class="diagonal-slider-head">{{ manga.nombre_del_manga }}</div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        <button class="btnShowMore">VER MÁS</button>
-        {% endfor %}
+    <!-- Increased top padding to avoid navbar overlap -->
+    <div class="concept-hero"
+        style="min-height: 30vh; border-bottom: none; margin-bottom: 20px; padding-top: 150px; padding-bottom: 20px;">
+        <h1 style="font-size: 5rem;">CATÁLOGO</h1>
     </div>
+
+    <div class="feed-container">
+
+        {% if user.is_superuser %}
+        <div class="feed-header-actions">
+            <!-- Link to create post -->
+            <a href="{% url 'create_post' %}" class="btn-create-post">
+                <i class="bi bi-plus-square"></i> Crear Post
+            </a>
+        </div>
+        {% endif %}
+
+        {% for manga in recent_mangas %}
+        <div class="feed-card" id="manga-{{ manga.id }}">
+            <!-- Header -->
+            <div class="feed-card-header">
+                <div class="feed-avatar"></div>
+                <div class="feed-username">
+                    {% if manga.publicado_por %}{{ manga.publicado_por }}{% else %}Surchaing Manga{% endif %}
+                    <div style="font-size: 0.8rem; color: #888; font-weight: normal; margin-top: 2px;">
+                        {{ manga.type_of_manga }}
+                    </div>
+                </div>
+                {% if user.is_superuser %}
+                <div class="dropdown">
+                    <div style="cursor: pointer; padding: 5px;">
+                        <i class="bi bi-three-dots"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="{% url 'delete_post' manga.id %}" class="delete-link"
+                            onclick="return confirm('¿Estás seguro de que quieres eliminar esto?')">Eliminar</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Image -->
+            <div class="feed-image-container" onclick="this.classList.toggle('active-touch')">
+                <a href="{% url 'manga_view' manga.nombre_del_manga %}">
+                    {% if manga.front_page %}
+                    <img src="{{ manga.front_page.url }}" class="feed-image" alt="{{ manga.nombre_del_manga }}">
+                    {% else %}
+                    <img src="{% static 'images/logo/light_logo.webp' %}" class="feed-image" alt="Placeholder">
+                    {% endif %}
+                </a>
+                <div class="description-overlay">
+                    <p>{% if manga.descripcion %}{{ manga.descripcion }}{% else %}Sin descripción{% endif %}</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="feed-actions">
+                <!-- Like Button -->
+                <button class="action-btn like-btn" onclick="toggleLike({{ manga.id }})">
+                    <i class="bi bi-heart{% if request.user in manga.likes.all %}-fill liked{% endif %}"></i>
+                </button>
+
+                <!-- Comment Button (focus input) -->
+                <button class="action-btn" onclick="focusComment({{ manga.id }})">
+                    <i class="bi bi-chat"></i>
+                </button>
+
+                <!-- Share Button -->
+                <button class="action-btn" onclick="sharePost('{% url 'manga_view' manga.nombre_del_manga %}')">
+                    <i class="bi bi-send"></i>
+                </button>
+
+                <div style="margin-left: auto;">
+                    <!-- Favorite Button -->
+                    <button class="action-btn fav-btn" onclick="toggleFavorite({{ manga.id }})">
+                        <i
+                            class="bi bi-bookmark{% if request.user in manga.favorited_by.all %}-fill favorited{% endif %}"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Likes Count -->
+            <div style="padding: 0 15px 5px 15px; font-weight: bold; font-size: 0.9rem;">
+                <span id="likes-count-{{ manga.id }}">{{ manga.likes.count }}</span> Me gusta
+            </div>
+
+            <!-- Caption -->
+            <div class="feed-caption">
+                <strong>{{ manga.nombre_del_manga }}</strong>
+                Disfruta de esta increíble historia.
+                <br>
+                <span style="color: #999; font-size: 0.8rem; text-transform: uppercase;">{{ manga.fecha_de_carga|date:"F
+                    j, Y" }}</span>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                {% for comment in manga.comments.all|slice:":3" %}
+                <div class="comment-item">
+                    <strong>{{ comment.user.username }}</strong> {{ comment.text }}
+                </div>
+                {% endfor %}
+                {% if manga.comments.count > 3 %}
+                <a href="#" style="color: #999; font-size: 0.85rem; text-decoration: none;">Ver los {{
+                    manga.comments.count }} comentarios</a>
+                {% endif %}
+
+                <!-- Add Comment Form -->
+                <form class="comment-form" action="{% url 'add_comment' manga.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="text" id="comment-input-{{ manga.id }}"
+                        placeholder="Añade un comentario..." required autocomplete="off">
+                    <button type="submit">Publicar</button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 40px;">
+            <p>No hay publicaciones aún.</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/slider.js' %}"></script>
+<script>
+    document.body.classList.add('home-page');
+
+    function focusComment(mangaId) {
+        document.getElementById('comment-input-' + mangaId).focus();
+    }
+
+    function sharePost(url) {
+        const fullUrl = window.location.origin + url;
+        navigator.clipboard.writeText(fullUrl).then(() => {
+            alert('¡Enlace copiado al portapapeles!');
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+            // Fallback
+            prompt("Copia este enlace:", fullUrl);
+        });
+    }
+
+    function toggleLike(mangaId) {
+        fetch(`/like/${mangaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                const btn = document.querySelector(`#manga-${mangaId} .like-btn i`);
+                if (data.liked) {
+                    btn.classList.remove('bi-heart');
+                    btn.classList.add('bi-heart-fill');
+                    btn.style.color = 'red';
+                } else {
+                    btn.classList.remove('bi-heart-fill');
+                    btn.classList.add('bi-heart');
+                    btn.style.color = 'inherit';
+                }
+                document.getElementById(`likes-count-${mangaId}`).innerText = data.count;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function toggleFavorite(mangaId) {
+        fetch(`/favorite/${mangaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                const btn = document.querySelector(`#manga-${mangaId} .fav-btn i`);
+                if (data.favorited) {
+                    btn.classList.remove('bi-bookmark');
+                    btn.classList.add('bi-bookmark-fill');
+                } else {
+                    btn.classList.remove('bi-bookmark-fill');
+                    btn.classList.add('bi-bookmark');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
 {% endblock %}

@@ -1,1 +1,169 @@
-<h1>perfil</h1>
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block title %}Mi Perfil | Surchaing Manga{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 100px auto 50px;
+        padding: 40px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        /* Optional, sticking to sharper corners mostly but a little roundness is ok */
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+
+    .profile-img-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 30px;
+        border: 2px solid #111;
+    }
+
+    .profile-title h2 {
+        font-family: 'HeavyHeader', sans-serif;
+        font-size: 2.5rem;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .profile-title p {
+        color: #777;
+        font-size: 1.1rem;
+    }
+
+    .form-section {
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        /* Thinner border */
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #000;
+        outline: none;
+    }
+
+    .btn-update {
+        background-color: #111;
+        color: #fff;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        font-family: 'HeavyHeader', sans-serif;
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        transition: background-color 0.3s;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .btn-update:hover {
+        background-color: #333;
+    }
+
+    .alert {
+        padding: 15px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+{% include "components/static_header.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="profile-header">
+        {% if user.profile.avatar %}
+        <img class="profile-img-preview" src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+        {% else %}
+        <!-- Default placeholder or generic avatar -->
+        <div class="profile-img-preview"
+            style="background: #333; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+            <i class="bi bi-person"></i>
+        </div>
+        {% endif %}
+        <div class="profile-title">
+            <h2>{{ user.username }}</h2>
+            <p>{{ user.email }}</p>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Información de Usuario
+            </h3>
+            <div class="form-group">
+                <label class="form-label">Nombre de Usuario</label>
+                {{ u_form.username }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Perfil Público</h3>
+
+            <div class="form-group">
+                <label class="form-label">Imagen de Perfil</label>
+                {{ p_form.avatar }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Rol / Título (para la página de Equipo)</label>
+                {{ p_form.role }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">País (para la página de Equipo)</label>
+                {{ p_form.country }}
+            </div>
+        </div>
+
+        <button class="btn-update" type="submit">Actualizar Perfil</button>
+    </form>
+</div>
+{% endblock %}

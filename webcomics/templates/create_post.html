@@ -1,0 +1,135 @@
+{% extends "./layouts/base.html" %}
+{% load static %}
+
+{% block title %}Crear Post{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "css/home_redesign.css" %}'>
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        padding: 40px;
+        border: 1px solid #ccc;
+    }
+
+    .form-container h1 {
+        font-family: 'HeavyHeader', sans-serif;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .btn-submit {
+        background-color: #111;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .btn-submit:hover {
+        background-color: #333;
+    }
+
+    #image-preview {
+        max-width: 100%;
+        height: auto;
+        margin-top: 15px;
+        display: none;
+        /* Hidden by default */
+        border: 1px solid #ddd;
+        padding: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="concept-container">
+    <div class="form-container">
+        <h1>Nuevo Post</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">Título</label>
+                {{ form.nombre_del_manga }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Descripción</label>
+                {{ form.descripcion }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Autor / Publicado Por</label>
+                {{ form.publicado_por }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Género</label>
+                {{ form.type_of_manga }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Imagen (Portada)</label>
+                {{ form.front_page }}
+                <!-- Image Preview Element -->
+                <img id="image-preview" src="#" alt="Vista previa de portada" />
+            </div>
+
+            <!-- Removed Manga File input as requested -->
+
+            <button type="submit" class="btn-submit">Publicar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.body.classList.add('home-page');
+
+    // Image Preview Logic
+    const frontPageInput = document.getElementById('id_front_page'); // Django default ID for 'front_page' field
+    const previewImage = document.getElementById('image-preview');
+
+    if (frontPageInput) {
+        frontPageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.style.display = 'none';
+                previewImage.src = '#';
+            }
+        });
+    }
+</script>
+{% endblock %}

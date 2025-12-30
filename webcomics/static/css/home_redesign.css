@@ -1,0 +1,208 @@
+/* Basic Setup */
+:root {
+    --bg-color: #f4f4f0; /* Off-white/Beige */
+    --text-color: #111;
+    --accent-gray: #777;
+    --grid-gap: 40px;
+    --section-spacing: 120px;
+}
+
+/* Hide default footer on homepage */
+body.home-page footer {
+    display: none !important;
+}
+
+/* Overwrite background for homepage */
+body.home-page #wrapper {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+body.home-page {
+    background-color: var(--bg-color);
+}
+
+/* Typography */
+@font-face {
+    font-family: 'HeavyHeader';
+    src: local('Impact'), local('Arial Black'), sans-serif;
+    font-weight: 900;
+}
+
+/* Layout Container */
+.concept-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Hero Section */
+.concept-hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.concept-hero h1 {
+    font-family: 'HeavyHeader', sans-serif;
+    font-size: 8rem;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+    letter-spacing: -2px;
+}
+
+.concept-hero p {
+    font-size: 1.2rem;
+    color: var(--accent-gray);
+    margin-top: 20px;
+    max-width: 600px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Content Sections (Sidebar + Grid) */
+.concept-section {
+    display: flex;
+    margin-bottom: var(--section-spacing);
+    flex-wrap: wrap; /* responsive */
+}
+
+.concept-sidebar {
+    flex: 0 0 350px;
+    padding-right: 40px;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+}
+
+.concept-sidebar h2 {
+    font-family: 'HeavyHeader', sans-serif;
+    font-size: 3rem;
+    text-transform: uppercase;
+    color: #ccc; /* Disabled/Light look like reference 'DENIM TEARS' */
+    margin: 0;
+    line-height: 1;
+}
+
+.concept-sidebar h2.active-title {
+    color: var(--text-color);
+}
+
+.concept-sidebar p {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: var(--accent-gray);
+    font-family: 'Arial', sans-serif;
+}
+
+.concept-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Manga Cards */
+.concept-card {
+    background: white;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.concept-card:hover {
+    transform: translateY(-5px);
+}
+
+.concept-card img {
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    margin-bottom: 15px;
+    background-color: #eee;
+}
+
+.concept-card .meta {
+    text-align: left;
+}
+
+.concept-card .meta h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.concept-card .meta span {
+    font-size: 0.8rem;
+    color: var(--accent-gray);
+}
+
+/* Custom Footer */
+.concept-footer {
+    border-top: 1px solid #ccc;
+    padding-top: 60px;
+    padding-bottom: 60px;
+    margin-top: 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.handwritten {
+    font-family: 'Brush Script MT', 'Bradley Hand', 'Segoe Script', cursive;
+    font-size: 4rem;
+    transform: rotate(-5deg);
+    display: inline-block;
+    margin-bottom: 40px;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: serif; /* Reference uses a serif for footer labels */
+}
+
+.footer-col {
+    margin: 20px;
+    text-align: left;
+}
+
+.footer-col strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-family: 'HeavyHeader', sans-serif;
+}
+
+.footer-col a, .footer-col span {
+    display: block;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Media Queries */
+@media (max-width: 900px) {
+    .concept-hero h1 {
+        font-size: 4rem;
+    }
+    .concept-section {
+        flex-direction: column;
+    }
+    .concept-sidebar {
+        margin-bottom: 40px;
+        position: static;
+    }
+}

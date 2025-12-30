@@ -15,4 +15,11 @@ urlpatterns = [
     path("search/", SearchView.as_view(), name='search'),
     path("about/", AboutView.as_view(), name="about"),
     path('login/', LoginView.as_view(), name='login'),
+    
+    # Social Features
+    path('create_post/', CreatePostView.as_view(), name='create_post'),
+    path('like/<int:manga_id>/', like_manga, name='like_manga'),
+    path('favorite/<int:manga_id>/', toggle_favorite, name='toggle_favorite'),
+    path('comment/<int:manga_id>/', add_comment, name='add_comment'),
+    path('delete_post/<int:manga_id>/', delete_post, name='delete_post'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,12 +3,21 @@
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 10; 
+    z-index: 10;
 }
 
 .navbar {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: #000;
     padding: 1rem;
+    border-bottom: 1px solid #333;
+    /* Separator line of 1px */
+}
+
+/* Add margin to the logo specifically */
+.navbar-brand img {
+    margin: 10px;
+    /* Adjust as needed */
+    margin-right: 20px;
 }
 
 .container {
