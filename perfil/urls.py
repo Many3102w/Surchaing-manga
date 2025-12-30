@@ -5,5 +5,5 @@ from .views import *
 
 
 urlpatterns = [
-path("/", PerfilView.as_view(), name="perfil")
+path("perfil/", PerfilView.as_view(), name="perfil")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
