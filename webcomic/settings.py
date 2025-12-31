@@ -1,3 +1,4 @@
+# Reload triggered for URL debug
 from pathlib import Path
 import os
 import environ
@@ -100,3 +101,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Hugging Face API Configuration
+HUGGINGFACE_API_TOKEN = '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'
+HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
+HUGGINGFACE_API_URL = f'https://api-inference.huggingface.co/models/{HUGGINGFACE_DEPTH_MODEL}'

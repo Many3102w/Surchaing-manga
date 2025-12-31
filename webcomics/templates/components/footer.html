@@ -1,36 +1,50 @@
 {% load static %}
-<link rel="stylesheet" href="{% static "/css/footer.css" %}">
+<link rel="stylesheet" href="{% static 'css/footer_canva.css' %}">
 
-<footer>
-    <div class="footer-container">
-        <!-- Sección de contacto -->
-        <div class="footer-box contact">
-            <h2>Contacto para subir mangas</h2>
-            <p>También puedes enviarme un mensaje a mi discord personal: idco_o</p>
-            <div class="btns-footer">
-                <a href="https://discord.com" class="discord-btn"><i class="bi bi-discord"></i> Discord</a>
-                <a href="mailto:mangas@surchaingmanga.com" class="email-btn"><i class="bi bi-envelope"></i> Correo</a>
+<footer id="custom-site-footer">
+    <div class="footer-canva-wrapper">
+        <!-- Título y Elementos Decorativos -->
+        <div class="footer-canva-header">
+            <div class="canva-curve-line"></div>
+            <h2 class="canva-title">CONTACT<span class="canva-crown-char">O</span>:</h2>
+        </div>
+
+        <!-- Layout Collage de Información -->
+        <div class="footer-canva-info">
+            <div class="canva-item instagram">
+                <span class="canva-label">Instagram</span>
+                <a href="https://instagram.com/Derssgm" target="_blank">@Derssgm</a>
+            </div>
+
+            <div class="canva-item whatsapp">
+                <span class="canva-label">Whatsapp</span>
+                <a href="https://wa.me/528338030599" target="_blank">+52(833)-803-0599</a>
+            </div>
+
+            <div class="canva-item gmail">
+                <span class="canva-label">Gmail</span>
+                <a href="mailto:Derssgm@gmail.com">@Derssgm</a>
+            </div>
+
+            <div class="canva-item facebook">
+                <span class="canva-label">Facebook</span>
+                <a href="https://facebook.com" target="_blank">Derss G'm</a>
+            </div>
+
+            <div class="canva-item tiktok">
+                <span class="canva-label">Tiktok</span>
+                <a href="https://tiktok.com/@Derssgm" target="_blank">@Derssgm</a>
+            </div>
+
+            <div class="canva-item pedidos">
+                <span class="canva-label-inline">Pedidos:</span>
+                <a href="#" class="canva-underlined">Storee💅👑</a>
             </div>
         </div>
 
-        <!-- Sección de enlaces de la empresa -->
-        <div class="footer-box">
-            <ul>
-                <li><a href="#">EMPRESA</a></li>
-                <li><a href="#">EQUIPO</a></li>
-                <li><a href="#">POLÍTICA DE PRIVACIDAD</a></li>
-            </ul>
-        </div>
-
-        <!-- Sección de logo y descripción -->
-        <div class="footer-box logo">
-            <figure>
-                <a href="#">
-                    <img src="{% static '/images/logo/light_logo.webp' %}" alt="Surchaing Manga">
-                </a>
-            </figure>
-            <p>Esta página está hecha con la intención de que crezcas como artista. Si eres creador de contenido, te ayudaremos con la publicidad.</p>
-            <small>&copy; 2024 <b>Surchaing Manga</b> - Todos los derechos reservados.</small>
+        <!-- Rama Decorativa Derecha -->
+        <div class="canva-branch-decoration">
+            <i class="bi bi-leaf"></i>
         </div>
     </div>
 </footer>

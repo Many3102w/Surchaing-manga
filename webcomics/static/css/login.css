@@ -4,7 +4,8 @@
     align-items: center;
     min-height: 100vh;
     margin-bottom: -10rem;
-    background-image: url('../../static/images/logo/REYYEYR.gif');
+    background-color: #f4f4f0;
+    /* Color beige/blanco crema del sitio */
     background-size: cover;
     background-position: center;
     z-index: -2;
@@ -76,5 +77,4 @@
     background-color: rgb(94, 93, 93);
 }
 
-.login-container {
-}
+.login-container {}

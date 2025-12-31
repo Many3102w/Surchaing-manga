@@ -1,6 +1,7 @@
 /* Basic Setup */
 :root {
-    --bg-color: #f4f4f0; /* Off-white/Beige */
+    --bg-color: #f4f4f0;
+    /* Off-white/Beige */
     --text-color: #111;
     --accent-gray: #777;
     --grid-gap: 40px;
@@ -8,8 +9,9 @@
 }
 
 /* Hide default footer on homepage */
+/* Mantenemos el footer visible en todas las páginas */
 body.home-page footer {
-    display: none !important;
+    display: block !important;
 }
 
 /* Overwrite background for homepage */
@@ -17,6 +19,7 @@ body.home-page #wrapper {
     background-color: var(--bg-color);
     color: var(--text-color);
 }
+
 body.home-page {
     background-color: var(--bg-color);
 }
@@ -69,7 +72,8 @@ body.home-page {
 .concept-section {
     display: flex;
     margin-bottom: var(--section-spacing);
-    flex-wrap: wrap; /* responsive */
+    flex-wrap: wrap;
+    /* responsive */
 }
 
 .concept-sidebar {
@@ -84,7 +88,8 @@ body.home-page {
     font-family: 'HeavyHeader', sans-serif;
     font-size: 3rem;
     text-transform: uppercase;
-    color: #ccc; /* Disabled/Light look like reference 'DENIM TEARS' */
+    color: #ccc;
+    /* Disabled/Light look like reference 'DENIM TEARS' */
     margin: 0;
     line-height: 1;
 }
@@ -121,7 +126,8 @@ body.home-page {
 
 .concept-card img {
     width: 100%;
-    height: auto; /* Maintain aspect ratio */
+    height: auto;
+    /* Maintain aspect ratio */
     aspect-ratio: 2/3;
     object-fit: cover;
     margin-bottom: 15px;
@@ -170,7 +176,8 @@ body.home-page {
     flex-wrap: wrap;
     max-width: 800px;
     margin: 0 auto;
-    font-family: serif; /* Reference uses a serif for footer labels */
+    font-family: serif;
+    /* Reference uses a serif for footer labels */
 }
 
 .footer-col {
@@ -185,7 +192,8 @@ body.home-page {
     font-family: 'HeavyHeader', sans-serif;
 }
 
-.footer-col a, .footer-col span {
+.footer-col a,
+.footer-col span {
     display: block;
     color: var(--text-color);
     text-decoration: none;
@@ -198,9 +206,11 @@ body.home-page {
     .concept-hero h1 {
         font-size: 4rem;
     }
+
     .concept-section {
         flex-direction: column;
     }
+
     .concept-sidebar {
         margin-bottom: 40px;
         position: static;

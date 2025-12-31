@@ -8,7 +8,7 @@
 
             <!-- LOGO -->
             <a class="navbar-brand" href="/">
-                <img id="Surchaing-logo" src="{% static 'images/logo/new_logo.jpg' %}" alt="Surchaing Manga"
+                <img id="Surchaing-logo" src="{% static 'images/logo/logo_v2.png' %}" alt="Surchaing Manga"
                     draggable="false" height="70" />
             </a>
 
@@ -16,16 +16,18 @@
             <ul class="navbar-nav d-flex align-items-center">
                 <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'library' %}">Catálogo</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'help' %}">Ayuda</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'team' %}">Equipo</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'perfil' %}">Perfil</a></li>
+                {% endif %}
+                {% if user.is_superuser %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'superuser_dashboard' %}"
+                        style="color: #ecc94b; font-weight: bold;">PANEL DE CONTROL</a></li>
                 {% endif %}
             </ul>
 
             <!-- Iconos y botones de sesión -->
             <div class="navbar-icons d-flex align-items-center">
-                <a class="nav-link" href="{% url 'search' %}"><i class="bi bi-search"></i></a>
                 {% if user.is_authenticated %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

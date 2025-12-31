@@ -1,111 +1,213 @@
-/* Estilo principal del footer */
-footer {
-    width: 100%;
-    background-color: #1d2021;
-    padding: 60px 0;
-    margin-top: 10rem;
-    margin-bottom: -10rem;
-    color: #efefef;
+/* RECONSTRUCCIÓN TOTAL FOOTER - DISEÑO CANVA */
+#custom-site-footer {
+    display: block !important;
+    width: 100% !important;
+    background-color: #ffffff !important;
+    /* BLANCO OBLIGATORIO */
+    padding: 100px 0 60px !important;
+    margin: 0 !important;
+    color: #111 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border: none !important;
 }
 
-.footer-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    flex-wrap: wrap;
-    gap: 40px;
+.footer-canva-wrapper {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 40px !important;
+    background: white !important;
+    position: relative !important;
+    min-height: 600px !important;
 }
 
-footer .footer-box {
-    flex: 1;
-    min-width: 250px;
+/* Header: CONTACTO: con curva y corona */
+.footer-canva-header {
+    position: relative !important;
+    text-align: center !important;
+    margin-bottom: 80px !important;
 }
 
-footer .footer-box h2 {
-    font-family: 'NikkyouSans', sans-serif;
-    color: white;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+.canva-curve-line {
+    position: absolute !important;
+    left: 20% !important;
+    top: -40px !important;
+    width: 300px !important;
+    height: 100px !important;
+    border-top: 2.5px solid #111 !important;
+    border-radius: 50% 50% 0 0 !important;
+    transform: rotate(-10deg) !important;
 }
 
-footer .footer-box ul {
-    list-style: none;
-    padding: 0;
+.canva-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 5rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 10px !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    text-transform: uppercase !important;
 }
 
-footer .footer-box ul a {
-    color: #efefef;
-    font-size: 1.1rem;
-    display: block;
-    margin-bottom: 10px;
-    text-decoration: none;
-    transition: color 0.3s;
+.canva-crown-char {
+    position: relative !important;
 }
 
-footer .footer-box ul a:hover {
-    color: #007bff;
+.canva-crown-char::before {
+    content: '👑' !important;
+    position: absolute !important;
+    top: -50px !important;
+    left: 55% !important;
+    transform: translateX(-50%) !important;
+    font-size: 2.5rem !important;
 }
 
-footer .footer-box .btns-footer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+/* INFO - Collage Organico */
+.footer-canva-info {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
 }
 
-footer .footer-box .btns-footer a {
-    background-color: white;
-    color: black;
-    padding: 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.3s ease;
+.canva-item {
+    position: absolute !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-footer .footer-box .btns-footer a:hover {
-    background-color: #007bff;
-    color: white;
+.canva-label {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 2.4rem !important;
+    font-weight: 500 !important;
+    color: #111 !important;
+    margin-bottom: -5px !important;
 }
 
-footer .footer-box.logo {
-    text-align: center;
+.canva-item a {
+    font-family: 'Playfair Display', serif !important;
+    color: #bfa37c !important;
+    /* DORADO CANVA */
+    text-decoration: none !important;
+    font-size: 1.6rem !important;
+    font-style: italic !important;
+    transition: opacity 0.3s !important;
 }
 
-footer .footer-box.logo figure img {
-    width: 180px;
-    margin-bottom: 20px;
+/* Posiciones exactas mockup */
+.canva-item.instagram {
+    left: 5%;
+    top: 0;
 }
 
-footer .footer-box.logo p {
-    font-size: 1rem;
-    margin-bottom: 20px;
+.canva-item.whatsapp {
+    left: 25%;
+    top: 80px;
 }
 
-footer .footer-box.logo small {
-    font-size: 0.875rem;
-    color: #b0b0b0;
+.canva-item.gmail {
+    left: 45%;
+    top: 180px;
 }
 
-footer .discord-btn,
-footer .email-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.canva-item.facebook {
+    left: 60%;
+    top: 250px;
 }
 
-@media (max-width: 800px) {
-    .footer-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
+.canva-item.tiktok {
+    left: 75%;
+    top: 320px;
+}
+
+.canva-item.pedidos {
+    position: absolute !important;
+    left: 10% !important;
+    top: 400px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+}
+
+.canva-label-inline {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 2.4rem !important;
+    margin-right: 15px !important;
+}
+
+.canva-underlined {
+    text-decoration: underline !important;
+    font-weight: bold !important;
+    color: #bfa37c !important;
+}
+
+/* Rama Decorativa */
+.canva-branch-decoration {
+    position: absolute !important;
+    right: 20px !important;
+    bottom: 40px !important;
+    font-size: 12rem !important;
+    color: #111 !important;
+    opacity: 0.9 !important;
+    transform: rotate(20deg) !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 900px) {
+    .canva-title {
+        font-size: 3rem !important;
     }
 
-    footer .footer-box {
+    .footer-canva-info {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 30px !important;
+        padding-bottom: 50px !important;
+    }
+
+    .canva-item {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        text-align: center !important;
+    }
+
+    .canva-curve-line,
+    .canva-branch-decoration {
+        display: none !important;
+    }
+
+    .canva-item.pedidos {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        justify-content: center !important;
+    }
+}
+
+/* Barra legal mínima */
+.footer-legal-bar {
+    margin-top: 60px;
+    text-align: center;
+    color: #aaa;
+    font-family: sans-serif;
+    font-size: 0.7rem;
+}
+
+@media (max-width: 900px) {
+    .contact-title {
+        font-size: 3rem;
+    }
+
+    .footer-contact-info {
+        grid-template-columns: 1fr;
+        gap: 20px;
         text-align: center;
-        min-width: 100%;
+    }
+
+    .decorative-line {
+        display: none;
+    }
+
+    .leaf-decorative {
+        display: none;
     }
 }

@@ -62,6 +62,102 @@
         border: 1px solid #ddd;
         padding: 5px;
     }
+
+    /* 2D to 3D Conversion Overlay */
+    #conversion-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+
+    .conversion-box {
+        width: 90%;
+        max-width: 500px;
+        padding: 40px;
+        background: #1a1a1a;
+        border-radius: 20px;
+        box-shadow: 0 0 50px rgba(197, 160, 89, 0.2);
+        border: 1px solid #333;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 10px;
+        background: #333;
+        border-radius: 5px;
+        margin: 30px 0;
+        overflow: hidden;
+    }
+
+    #progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #c5a059, #ecc94b);
+        transition: width 0.3s ease;
+    }
+
+    .preview-3d-wrap {
+        perspective: 1000px;
+        margin-bottom: 30px;
+    }
+
+    #preview-3d {
+        width: 200px;
+        height: 280px;
+        object-fit: cover;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        animation: rotate3d 4s infinite linear;
+        border-radius: 10px;
+    }
+
+    @keyframes rotate3d {
+        0% {
+            transform: rotateY(0deg) rotateX(0deg);
+        }
+
+        50% {
+            transform: rotateY(180deg) rotateX(10deg);
+        }
+
+        100% {
+            transform: rotateY(360deg) rotateX(0deg);
+        }
+    }
+
+    .conversion-status {
+        font-family: 'HeavyHeader', sans-serif;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .error-msg {
+        color: #ff4d4d;
+        display: none;
+    }
+
+    .retry-btn {
+        display: none;
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -88,8 +184,22 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Talla</label>
+                {{ form.talla }}
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Género</label>
                 {{ form.type_of_manga }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Precio de Venta ($)</label>
+                {{ form.precio }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Costo de Adquisición ($)</label>
+                {{ form.costo }}
             </div>
 
             <div class="form-group">
@@ -99,10 +209,28 @@
                 <img id="image-preview" src="#" alt="Vista previa de portada" />
             </div>
 
+
             <!-- Removed Manga File input as requested -->
 
-            <button type="submit" class="btn-submit">Publicar</button>
+            <button type="submit" class="btn-submit" id="submit-btn">Publicar</button>
         </form>
+    </div>
+</div>
+
+<!-- 2D to 3D Conversion Overlay -->
+<div id="conversion-overlay">
+    <div class="conversion-box">
+        <div class="preview-3d-wrap">
+            <img id="preview-3d" src="" alt="3D Preview">
+        </div>
+        <div class="conversion-status" id="status-text">Convirtiendo a 3D...</div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="error-message" class="error-msg">
+            <i class="bi bi-exclamation-triangle-fill"></i> Error en la conversión: Procesamiento fallido
+        </div>
+        <button type="button" class="retry-btn" id="retry-btn">CERRAR Y REINTENTAR</button>
     </div>
 </div>
 {% endblock %}
@@ -112,8 +240,15 @@
     document.body.classList.add('home-page');
 
     // Image Preview Logic
-    const frontPageInput = document.getElementById('id_front_page'); // Django default ID for 'front_page' field
+    const frontPageInput = document.getElementById('id_front_page');
     const previewImage = document.getElementById('image-preview');
+    const preview3D = document.getElementById('preview-3d');
+    const form = document.querySelector('form');
+    const overlay = document.getElementById('conversion-overlay');
+    const progressBar = document.getElementById('progress-bar');
+    const statusText = document.getElementById('status-text');
+    const errorMsg = document.getElementById('error-message');
+    const retryBtn = document.getElementById('retry-btn');
 
     if (frontPageInput) {
         frontPageInput.addEventListener('change', function (event) {
@@ -123,13 +258,91 @@
                 reader.onload = function (e) {
                     previewImage.src = e.target.result;
                     previewImage.style.display = 'block';
+                    preview3D.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
-            } else {
-                previewImage.style.display = 'none';
-                previewImage.src = '#';
             }
         });
     }
+
+
+
+    // Conversion Simulation Logic
+    form.addEventListener('submit', function (e) {
+        console.log('✨ Form submit intercepted!');
+
+        if (overlay.dataset.completed === "true") {
+            console.log('✅ Form already processed, allowing submission');
+            return;
+        }
+
+        e.preventDefault();
+        console.log('🚀 Starting 3D conversion simulation...');
+
+        // Check if an image is selected, if not use a placeholder
+        if (!preview3D.src || preview3D.src === '' || preview3D.src === window.location.href + '#') {
+            console.log('⚠️ No image selected, creating placeholder');
+            // Create a placeholder with text
+            const canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 280;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#2d2d2d';
+            ctx.fillRect(0, 0, 200, 280);
+            ctx.fillStyle = '#c5a059';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('PROCESANDO', 100, 130);
+            ctx.fillText('IMAGEN 3D', 100, 155);
+            preview3D.src = canvas.toDataURL();
+        }
+
+        // Show Overlay
+        overlay.style.display = 'flex';
+        errorMsg.style.display = 'none';
+        retryBtn.style.display = 'none';
+        statusText.style.display = 'block';
+        statusText.innerText = 'PROCESANDO CAPAS 3D...';
+        console.log('🎬 Overlay displayed');
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 12 + 3;  // Progress between 3-15% each tick
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                console.log('📊 Progress complete (100%)');
+
+                // Random failure simulation (15% chance)
+                if (Math.random() < 0.15) {
+                    console.log('❌ Simulated conversion error');
+                    statusText.style.display = 'none';
+                    errorMsg.style.display = 'block';
+                    retryBtn.style.display = 'inline-block';
+                    progressBar.style.backgroundColor = '#ff4d4d';
+                } else {
+                    console.log('✅ Conversion successful!');
+                    statusText.innerText = 'CONVERSIÓN COMPLETADA!';
+                    setTimeout(() => {
+                        console.log('📤 Submitting form to server...');
+                        overlay.dataset.completed = "true";
+                        form.submit();
+                    }, 1000);
+                }
+            }
+        }, 350);
+    });
+
+    retryBtn.addEventListener('click', () => {
+        console.log('🔄 Retry button clicked, closing overlay');
+        overlay.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressBar.style.backgroundColor = '';
+        overlay.dataset.completed = '';
+    });
+
 </script>
 {% endblock %}

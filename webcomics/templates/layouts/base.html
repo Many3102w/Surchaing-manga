@@ -1,24 +1,121 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>{% block title %} {% endblock %} | Surchaing Manga</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {% include "../components/head.html" %}
-        {% block extra_css %}{% endblock %}
-    </head>
-    <body>
-        {% include "../components/loading.html"%}
-        <div id="wrapper">
-            {% block nav %} 
-                {% include "../components/header.html"%}
-            {% endblock %}
-            {% block  content%}
 
+<head>
+    <title>{% block title %} {% endblock %} | Moda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "../components/head.html" %}
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    {% include "../components/loading.html"%}
+    <div id="wrapper">
+        {% block nav %}
+        {% include "../components/header.html"%}
+        {% endblock %}
+
+        <div id="main-content">
+            {% block content%}
             {% endblock %}
-            {% include "../components/footer.html" %}
         </div>
-        {% include "../components/scripts_import.html" %}
-        {% block extra_js %}{% endblock %}
-    </body>
+
+        <!-- Mobile Bottom Navbar -->
+        <div class="mobile-bottom-nav">
+            <a href="{% url 'index' %}" class="nav-item">
+                <i class="bi bi-house-door"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="{% url 'library' %}" class="nav-item">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>Catálogo</span>
+            </a>
+            <a href="{% url 'team' %}" class="nav-item">
+                <i class="bi bi-people"></i>
+                <span>Equipo</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'perfil' %}" class="nav-item">
+                <i class="bi bi-person"></i>
+                <span>Perfil</span>
+            </a>
+            {% endif %}
+            {% if user.is_superuser %}
+            <a href="{% url 'superuser_dashboard' %}" class="nav-item panel-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Panel</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        /* Mobile Navigation Styles */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .mobile-bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #555;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .mobile-bottom-nav .nav-item i {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+
+        .mobile-bottom-nav .nav-item:hover,
+        .mobile-bottom-nav .nav-item.active {
+            color: #000;
+        }
+
+        .mobile-bottom-nav .panel-link {
+            color: #bfa37c;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar-container {
+                display: none;
+                /* Hide top nav on small screens as requested */
+            }
+
+            .mobile-bottom-nav {
+                display: flex;
+            }
+
+            body {
+                padding-bottom: 70px;
+                /* Space for the bottom nav */
+            }
+
+            #main-content {
+                margin-top: 0 !important;
+            }
+        }
+    </style>
+
+    {% include "../components/footer.html" %}
+    {% include "../components/scripts_import.html" %}
+    {% block extra_js %}{% endblock %}
+</body>
+
 </html>

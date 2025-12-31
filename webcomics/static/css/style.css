@@ -4,12 +4,10 @@ html {
 
 body {
     box-sizing: border-box;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
 }
 
-h1, h2 {
+h1,
+h2 {
     font-family: NikkyouSans;
 }
 
@@ -17,7 +15,6 @@ h1, h2 {
     font-family: NikkyouSans;
     text-align: left;
     padding: 40px 0 10px
-    
 }
 
 
@@ -35,7 +32,7 @@ h1, h2 {
 }
 
 #loading-screen.fade-out {
-    opacity: 0; 
+    opacity: 0;
     pointer-events: none;
 }
 

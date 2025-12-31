@@ -1,0 +1,323 @@
+import os
+
+content = """{% extends "./layouts/base.html" %}
+{% load static %}
+
+{% block title %}Catálogo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href='{% static "css/home_redesign.css" %}'>
+<style>
+    .feed-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .feed-header-actions { display: flex; justify-content: flex-end; margin-bottom: 25px; }
+    .btn-create-post {
+        background: #111; color: #fff; padding: 12px 24px; border-radius: 6px; 
+        text-decoration: none; text-transform: uppercase; font-size: 0.8rem; font-weight: 800;
+        display: inline-flex; align-items: center; gap: 10px; border: 1px solid #111; transition: 0.25s;
+    }
+    .btn-create-post:hover { background: transparent; color: #111; transform: translateY(-2px); }
+
+    .feed-card {
+        background: #fff; border: 1px solid #eee; margin-bottom: 60px;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.07); border-radius: 8px; position: relative;
+        overflow: hidden;
+    }
+    .feed-card-header { padding: 15px 20px; display: flex; align-items: center; border-bottom: 1px solid #f8f8f8; }
+    .feed-avatar { width: 38px; height: 38px; border-radius: 50%; background: #333 url('{% static "images/logo/new_logo.jpg" %}') center/cover; margin-right: 15px; }
+    .feed-username { font-weight: 700; font-size: 0.95rem; color: #111; }
+    
+    .dropdown { position: relative; margin-left: auto; }
+    .dropdown-content {
+        display: none; position: absolute; right: 0; top: 30px; background: #fff;
+        min-width: 140px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; border-radius: 6px;
+    }
+    .dropdown-content a { color: #333; padding: 12px 18px; text-decoration: none; display: block; font-size: 0.9rem; }
+    .dropdown-content a:hover { background: #f5f5f5; }
+    .dropdown:hover .dropdown-content { display: block; }
+    
+    .feed-image-container { 
+        width: 100%; aspect-ratio: 1/1; background: #f9f9f9; position: relative; overflow: hidden; 
+        cursor: zoom-in;
+    }
+    .has-3d .feed-image { opacity: 0; }
+    .feed-image { 
+        width: 100%; height: 100%; object-fit: contain; /* Better fit for all formats */
+        transition: opacity 0.5s; 
+    }
+    .depth-3d-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 5; }
+    .has-3d .depth-3d-canvas { display: block; }
+    
+    .manga-3d-badge {
+        position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8);
+        color: #fff; padding: 6px 14px; border-radius: 30px; font-size: 0.65rem; font-weight: 900;
+        z-index: 10; border: 1px solid rgba(255,255,255,0.2); pointer-events: none;
+        backdrop-filter: blur(8px);
+    }
+    
+    .manga-size-badge {
+        position: absolute; bottom: 20px; left: 20px; background: rgba(255,255,255,0.9);
+        color: #000; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 800;
+        z-index: 10; border: 1px solid rgba(0,0,0,0.1); pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-transform: uppercase;
+    }
+
+    .feed-actions { padding: 18px 20px; display: flex; gap: 24px; font-size: 1.6rem; color: #1a1a1a; }
+    .action-btn { background: none; border: none; cursor: pointer; color: inherit; transition: 0.2s; }
+    .liked { color: #ff3040 !important; }
+    
+    .feed-caption { padding: 0 20px 20px 20px; font-size: 1rem; line-height: 1.5; }
+    .price-tag { color: #bfa37c; font-weight: 900; float: right; font-size: 1.2rem; }
+    
+    .comment-form { display: flex; padding: 15px 20px; border-top: 1px solid #f5f5f5; background: #fafafa; }
+    .comment-form input { flex: 1; border: 1px solid #e0e0e0; padding: 10px 15px; border-radius: 30px; margin-right: 12px; font-size: 0.9rem; }
+    .comment-form button { border: none; background: none; color: #0095f6; font-weight: 800; cursor: pointer; }
+
+    /* Zoom Modal Styles */
+    #zoom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+    }
+    #zoom-modal img {
+        max-width: 90%;
+        max-height: 90%;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        border-radius: 4px;
+        transform: scale(0.9);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #zoom-modal.active {
+        display: flex;
+    }
+    #zoom-modal.active img {
+        transform: scale(1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="concept-container">
+    <div class="concept-hero" style="min-height: 25vh; padding-top: 140px; margin-bottom: 40px;">
+        <h1 style="font-size: 5rem; letter-spacing: -3px; margin:0;">CATÁLOGO</h1>
+    </div>
+
+    <div class="feed-container">
+        {% if user.is_superuser %}
+        <div class="feed-header-actions">
+            <a href="{% url 'create_post' %}" class="btn-create-post"><i class="bi bi-plus-circle"></i> NUEVA PUBLICACIÓN</a>
+        </div>
+        {% endif %}
+
+        {% for manga in recent_mangas %}
+        <div class="feed-card" id="manga-{{ manga.id }}">
+            <div class="feed-card-header">
+                <div class="feed-avatar"></div>
+                <div class="feed-username">{% if manga.publicado_por %}{{ manga.publicado_por }}{% else %}Surchaing Manga{% endif %}</div>
+                {% if user.is_superuser %}
+                <div class="dropdown">
+                    <div style="cursor: pointer; padding: 5px;"><i class="bi bi-three-dots-vertical"></i></div>
+                    <div class="dropdown-content">
+                        <a href="{% url 'vendido_toggle' manga_id=manga.id %}">Marcar Vendido</a>
+                        <a href="{% url 'delete_post' manga.id %}" style="color:#f00">Eliminar</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="feed-image-container {% if manga.is_3d_converted %}has-3d{% endif %}" 
+                 data-front="{{ manga.front_page.url }}" 
+                 data-depth="{{ manga.depth_map.url }}"
+                 onclick="openZoom('{{ manga.front_page.url }}')">
+                
+                {% if manga.is_3d_converted %}
+                <div class="manga-3d-badge">ULTRA 3D</div>
+                <canvas class="depth-3d-canvas"></canvas>
+                {% endif %}
+                
+                {% if manga.talla %}
+                <div class="manga-size-badge">Talla: {{ manga.talla }}</div>
+                {% endif %}
+
+                <img src="{{ manga.front_page.url }}" class="feed-image" alt="{{ manga.nombre_del_manga }}">
+            </div>
+
+            <div class="feed-actions">
+                <button class="action-btn" onclick="toggleLike({{ manga.id }})">
+                    <i class="bi bi-heart{% if request.user in manga.likes.all %}-fill liked{% endif %}"></i>
+                </button>
+                <button class="action-btn"><i class="bi bi-chat-left-text"></i></button>
+                <div style="margin-left: auto;"><i class="bi bi-bookmark-star"></i></div>
+            </div>
+
+            <div class="feed-caption">
+                <span class="price-tag">${{ manga.precio }}</span>
+                <strong>{{ manga.nombre_del_manga }}</strong>
+                <p style="color: #666; margin-top: 5px;">{% if manga.descripcion %}{{ manga.descripcion }}{% else %}Surchaing Premium Edition.{% endif %}</p>
+            </div>
+            
+            <form class="comment-form" action="{% url 'add_comment' manga.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="text" id="comment-input-{{ manga.id }}" placeholder="Añade un comentario..." required>
+                <button type="submit">Publicar</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Zoom Modal -->
+<div id="zoom-modal" onclick="closeZoom()">
+    <img id="zoom-img" src="" alt="Zoomed View">
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    const modal = document.getElementById('zoom-modal');
+    const zoomImg = document.getElementById('zoom-img');
+
+    function openZoom(url) {
+        zoomImg.src = url;
+        modal.classList.add('active');
+    }
+
+    function closeZoom() {
+        modal.classList.remove('active');
+    }
+
+    function initPerfect3D() {
+        const containers = document.querySelectorAll('.feed-image-container.has-3d');
+        containers.forEach(container => {
+            const canvas = container.querySelector('.depth-3d-canvas');
+            const frontUrl = container.dataset.front;
+            const depthUrl = container.dataset.depth;
+            if (!canvas) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
+            camera.position.z = 3.2;
+
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            const resize = () => {
+                const r = container.getBoundingClientRect();
+                renderer.setSize(r.width, r.height);
+                camera.updateProjectionMatrix();
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+            const light = new THREE.PointLight(0xffffff, 0.5);
+            light.position.set(0, 5, 5);
+            scene.add(light);
+
+            const loader = new THREE.TextureLoader();
+            Promise.all([
+                new Promise(r => loader.load(frontUrl, r)),
+                new Promise(r => loader.load(depthUrl, r))
+            ]).then(([tex, dTex]) => {
+                const segments = 180;
+                const geometry = new THREE.PlaneGeometry(2.02, 2.02, segments, segments);
+                
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTex: { value: tex },
+                        uDepth: { value: dTex },
+                        uTime: { value: 0 }
+                    },
+                    vertexShader: `
+                        varying vec2 vUv;
+                        varying vec3 vNormal;
+                        uniform sampler2D uDepth;
+
+                        void main() {
+                            vUv = uv;
+                            vNormal = normalize(normalMatrix * normal);
+                            
+                            float d = texture2D(uDepth, uv).r;
+                            float edge = 0.04;
+                            float mask = smoothstep(0.0, edge, uv.x) * smoothstep(1.0, 1.0 - edge, uv.x) * 
+                                         smoothstep(0.0, edge, uv.y) * smoothstep(1.0, 1.0 - edge, uv.y);
+                            
+                            vec3 pos = position;
+                            pos.z += d * 0.4 * mask;
+                            
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        varying vec2 vUv;
+                        varying vec3 vNormal;
+                        uniform sampler2D uTex;
+
+                        void main() {
+                            vec4 color = texture2D(uTex, vUv);
+                            if(color.a < 0.1) discard;
+
+                            vec3 n = normalize(vNormal);
+                            float diff = max(dot(n, vec3(0,0,1)), 0.0);
+                            float fresnel = pow(1.0 - max(dot(n, vec3(0,0,1)), 0.0), 4.0);
+                            
+                            gl_FragColor = vec4(color.rgb * (0.8 + 0.2*diff) + vec3(1.0)*fresnel*0.15, 1.0);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                const backGeo = new THREE.PlaneGeometry(2, 2, 1);
+                const backMat = new THREE.MeshBasicMaterial({ color: 0x050505, side: THREE.BackSide, transparent: true, opacity: 0.8 });
+                const backMesh = new THREE.Mesh(backGeo, backMat);
+                backMesh.position.z = -0.05;
+                scene.add(backMesh);
+
+                let targetX = 0, targetY = 0;
+                container.addEventListener('mousemove', e => {
+                    const r = container.getBoundingClientRect();
+                    targetX = ((e.clientX - r.left) / r.width) * 2 - 1;
+                    targetY = -(((e.clientY - r.top) / r.height) * 2 - 1);
+                });
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    const time = Date.now() * 0.0008;
+                    
+                    scene.rotation.y = Math.sin(time) * 0.3 + (targetX * 0.15);
+                    scene.rotation.x = Math.cos(time * 0.6) * 0.1 - (targetY * 0.1);
+                    
+                    renderer.render(scene, camera);
+                }
+                animate();
+            });
+        });
+    }
+    window.addEventListener('DOMContentLoaded', initPerfect3D);
+
+    function toggleLike(id) {
+        fetch(`/like/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+        .then(r => r.json()).then(d => {
+            const btn = document.querySelector(`#manga-${id} .action-btn i`);
+            btn.className = d.liked ? 'bi bi-heart-fill liked' : 'bi bi-heart';
+        });
+    }
+</script>
+{% endblock %}
+"""
+
+with open("c:/Users/Many/Desktop/Surchaing-Admin/Surchaing-manga/webcomics/templates/library.html", "w", encoding="utf-8") as f:
+    f.write(content)
