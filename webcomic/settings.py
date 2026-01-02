@@ -111,4 +111,4 @@ LOGOUT_REDIRECT_URL = '/'
 # Hugging Face API Configuration
 HUGGINGFACE_API_TOKEN = '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'
 HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
-HUGGINGFACE_API_URL = f'https://api-inference.huggingface.co/models/{HUGGINGFACE_DEPTH_MODEL}'
+HUGGINGFACE_API_URL = f'https://router.huggingface.co/hf-inference/models/{HUGGINGFACE_DEPTH_MODEL}'
