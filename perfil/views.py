@@ -9,10 +9,19 @@ def perfil_view(request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
-            messages.success(request, f'¡Tu cuenta ha sido actualizada!')
-            return redirect('perfil')
+            try:
+                u_form.save()
+                p_form.save()
+                messages.success(request, f'¡Tu cuenta ha sido actualizada!')
+                return redirect('perfil')
+            except Exception as e:
+                print(f"Error saving profile: {e}")
+                messages.error(request, f"Error al guardar: {e}")
+        else:
+            # Debugging: Print errors to console
+            print(f"User Form Errors: {u_form.errors}")
+            print(f"Profile Form Errors: {p_form.errors}")
+            messages.error(request, 'Por favor corrige los errores abajo.')
     else:
         u_form = UserUpdateForm(instance=request.user)
         # Ensure profile exists (it should via signals but double check prevents 500)

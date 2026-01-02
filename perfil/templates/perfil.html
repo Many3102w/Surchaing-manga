@@ -177,6 +177,11 @@
             <div class="form-group">
                 <label class="form-label">Imagen de Perfil</label>
                 {{ p_form.avatar }}
+                {% if p_form.avatar.errors %}
+                <div style="color: red; font-size: 0.9em; margin-top: 5px;">
+                    {{ p_form.avatar.errors }}
+                </div>
+                {% endif %}
             </div>
 
             <div class="form-group">
