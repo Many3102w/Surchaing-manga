@@ -493,9 +493,14 @@
         }
     };
 
-    // Run check on load
-    if (document.readyState === 'complete') window.checkMissingDepth();
-    else window.addEventListener('load', window.checkMissingDepth);
+    // Run check on load with DELAY to prevent browser freeze
+    if (document.readyState === 'complete') {
+        setTimeout(window.checkMissingDepth, 4000);
+    } else {
+        window.addEventListener('load', () => {
+            setTimeout(window.checkMissingDepth, 4000);
+        });
+    }
 
 </script>
 
