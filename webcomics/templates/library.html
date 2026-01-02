@@ -12,6 +12,27 @@
         padding: 20px;
     }
 
+    @media (max-width: 480px) {
+        .feed-container {
+            padding: 10px;
+            /* Minimize padding on mobile */
+            width: 100%;
+        }
+
+        .feed-card {
+            border-radius: 0;
+            /* Full bleed on very small screens? or just small radius */
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            /* Lighter shadow */
+        }
+
+        .feed-header-actions {
+            justify-content: center;
+            /* Center button on mobile */
+        }
+    }
+
     .feed-header-actions {
         display: flex;
         justify-content: flex-end;

@@ -105,3 +105,47 @@ a:hover {
     color: white;
     margin-left: 1rem;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .navbar .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .navbar-brand img {
+        margin: 0;
+        margin-bottom: 5px;
+        width: 120px;
+        /* Smaller logo */
+    }
+
+    .navbar-nav {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 1rem;
+    }
+
+    .navbar-icons {
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .user-greeting {
+        margin: 0;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-primary {
+        width: auto;
+        padding: 5px 15px;
+        font-size: 0.9rem;
+    }
+}

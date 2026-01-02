@@ -214,5 +214,42 @@ body.home-page {
     .concept-sidebar {
         margin-bottom: 40px;
         position: static;
+        flex: auto;
+        width: 100%;
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .concept-container {
+        padding: 0 20px;
+    }
+
+    .concept-hero {
+        min-height: 50vh;
+        margin-bottom: 40px;
+    }
+
+    .concept-hero h1 {
+        font-size: 2.5rem;
+        /* Much smaller for phones */
+        letter-spacing: -1px;
+    }
+
+    .concept-hero p {
+        font-size: 1rem;
+    }
+
+    .concept-sidebar h2 {
+        font-size: 2rem;
+    }
+
+    .concept-card img {
+        aspect-ratio: 3/4;
+        /* Taller on mobile looks better */
+    }
+
+    .handwritten {
+        font-size: 2.5rem;
     }
 }
