@@ -22,9 +22,9 @@ def generate_3d_mesh(image_file):
             shutil.copyfileobj(image_file, temp_img)
             temp_img_path = temp_img.name
 
-        print(f"Calling Trellis AI for high-fidelity 3D reconstruction (Anonymous Mode)...")
-        # Token eliminado temporalmente
-        client = Client("JeffreyXiang/TRELLIS")
+        print(f"Calling Trellis AI for high-fidelity 3D reconstruction...")
+        token = getattr(settings, 'HUGGINGFACE_API_TOKEN', None)
+        client = Client("JeffreyXiang/TRELLIS", token=token)
         
         # Step 1: Preprocess Image (Remove background, center, etc.)
         # predict(image, api_name="/preprocess_image") -> output_image_path
@@ -74,9 +74,17 @@ def generate_3d_mesh(image_file):
         
         return None
     except Exception as e:
-        print(f"Error in Trellis generate_3d_mesh: {e}")
+        error_msg = str(e)
+        if "401" in error_msg or "expired" in error_msg.lower():
+            reason = "Hugging Face Token EXPIRED or INVALID"
+        elif "quota" in error_msg.lower():
+            reason = "ZeroGPU Daily Quota Exhausted"
+        else:
+            reason = f"Unhandled Error: {error_msg}"
+            
+        print(f"Error in Trellis generate_3d_mesh: {reason}")
         with open('DEBUG_ERROR.txt', 'a') as f:
-            f.write(f"Trellis Error: {str(e)}\n")
+            f.write(f"Trellis Error ({time.strftime('%Y-%m-%d %H:%M:%S')}): {reason}\n")
         return None
 
 
@@ -92,9 +100,9 @@ def generate_depth_map(image_file):
             shutil.copyfileobj(image_file, temp_img)
             temp_img_path = temp_img.name
 
-        print(f"Calling Depth-Anything-V2 AI for true analysis (Anonymous Mode)...")
-        # Token eliminado temporalmente para evitar error "Expired"
-        client = Client("depth-anything/Depth-Anything-V2")
+        print(f"Calling Depth-Anything-V2 AI for true analysis...")
+        token = getattr(settings, 'HUGGINGFACE_API_TOKEN', None)
+        client = Client("depth-anything/Depth-Anything-V2", token=token)
         
         # Predict: image
         # Returns: (depth_map_slider, grayscale_depth_map, 16bit_raw)
@@ -117,9 +125,17 @@ def generate_depth_map(image_file):
             
         return None
     except Exception as e:
-        print(f"Error in generate_depth_map (AI): {e}")
+        error_msg = str(e)
+        if "401" in error_msg or "expired" in error_msg.lower():
+            reason = "Hugging Face Token EXPIRED or INVALID"
+        elif "quota" in error_msg.lower():
+            reason = "ZeroGPU Daily Quota Exhausted"
+        else:
+            reason = f"Unhandled Error: {error_msg}"
+            
+        print(f"Error in generate_depth_map (AI): {reason}")
         with open('DEBUG_ERROR.txt', 'a') as f:
-            f.write(f"Depth Error: {str(e)}\n")
+            f.write(f"Depth Error ({time.strftime('%Y-%m-%d %H:%M:%S')}): {reason}\n")
         return None
 
 
