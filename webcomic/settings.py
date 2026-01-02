@@ -109,6 +109,6 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Hugging Face API Configuration
-HUGGINGFACE_API_TOKEN = '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'
+HUGGINGFACE_API_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN', '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')
 HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
 HUGGINGFACE_API_URL = f'https://router.huggingface.co/hf-inference/models/{HUGGINGFACE_DEPTH_MODEL}'

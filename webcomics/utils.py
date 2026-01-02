@@ -73,14 +73,17 @@ def generate_depth_map(image_file):
         headers = {"Authorization": f"Bearer {api_token}"}
         
         # Retry logic if model is loading
-        for _ in range(3):
-            response = requests.post(api_url, headers=headers, data=image_data)
+        for i in range(3):
+            response = requests.post(api_url, headers=headers, data=image_data, timeout=20)
             if response.status_code == 200:
                 print("Successfully generated depth map via API.")
                 return ContentFile(response.content, name='depth_map.png')
+            elif response.status_code == 401:
+                print(f"ERROR: Hugging Face Token is expired or invalid. (Attempt {i+1})")
+                break # No point in retrying 401
             elif response.status_code == 503: # Model loading
-                print("Model loading, waiting 10s...")
-                time.sleep(10)
+                print(f"Model loading, waiting 15s... (Attempt {i+1}/3)")
+                time.sleep(15)
                 continue
             else:
                 print(f"API Error: {response.status_code} - {response.text}")

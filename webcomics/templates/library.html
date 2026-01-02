@@ -297,7 +297,7 @@
                 {% endif %}
             </div>
 
-            <div class="feed-image-container {% if manga.is_3d_converted and manga.front_page and manga.depth_map %}has-3d{% endif %}"
+            <div class="feed-image-container"
                 data-front="{% if manga.front_page %}{{ manga.front_page.url }}{% endif %}"
                 data-depth="{% if manga.depth_map %}{{ manga.depth_map.url }}{% endif %}"
                 onclick="{% if manga.front_page %}openZoom('{{ manga.front_page.url }}'){% endif %}">
@@ -424,9 +424,18 @@
             scene.add(light);
 
             const loader = new THREE.TextureLoader();
+
+            // Texture loading with explicit error handling
+            const loadTexture = (url) => new Promise((resolve, reject) => {
+                loader.load(url, resolve, undefined, (err) => {
+                    console.error("Texture load failed:", url, err);
+                    reject(err);
+                });
+            });
+
             Promise.all([
-                new Promise(r => loader.load(frontUrl, r)),
-                new Promise(r => loader.load(depthUrl, r))
+                loadTexture(frontUrl),
+                loadTexture(depthUrl)
             ]).then(([tex, dTex]) => {
                 const segments = 180;
                 const geometry = new THREE.PlaneGeometry(2.02, 2.02, segments, segments);
@@ -486,6 +495,10 @@
                 backMesh.position.z = -0.05;
                 scene.add(backMesh);
 
+                // ACTIVAR VISOR SOLO CUANDO TODO ESTÉ CARGADO
+                container.classList.add('has-3d');
+                canvas.style.display = 'block';
+
                 let targetX = 0, targetY = 0;
                 container.addEventListener('mousemove', e => {
                     const r = container.getBoundingClientRect();
@@ -502,7 +515,11 @@
 
                     renderer.render(scene, camera);
                 }
-                animate();
+                animate(); // START THE LOOP
+            }).catch(err => {
+                console.warn("Could not load 3D assets for manga:", frontUrl, "Falling back to 2D.");
+                // alert("Error 3D en " + frontUrl + ": " + err); // TEMP DEBUG
+                container.classList.remove('has-3d'); // Ensure 2D image is visible
             });
         });
     }
