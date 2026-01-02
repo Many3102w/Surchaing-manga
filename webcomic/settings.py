@@ -110,6 +110,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Render / Production Configuration
+# Trust the X-Forwarded-Proto header for SSL (Required for Render)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False # Set to True if you want to force SSL, but Render handles this usually. Safe to leave False to avoid loops if misconfigured.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # Hugging Face API Configuration
 HUGGINGFACE_API_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN')
 HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'

@@ -98,24 +98,35 @@ class CreatePostView(UserPassesTestMixin, CreateView):
 
                     # 4. Generate 3D Mesh (IA)
                     try:
+                        print(f"DEBUG: Starting 3D Mesh Generation for {form.instance.id}...")
                         mesh_file = generate_3d_mesh(form.instance.front_page.file)
                         if mesh_file:
+                            print(f"DEBUG: 3D Mesh generated. Saving as GLB...")
+                            # CRITICAL FIX: Save as .glb to match the actual binary format from Trellis
                             form.instance.mesh_3d.save(
-                                f'mesh_front_{form.instance.id}.obj',
+                                f'mesh_front_{form.instance.id}.glb',
                                 mesh_file,
                                 save=False
                             )
+                        else:
+                            print("DEBUG: generate_3d_mesh returned None.")
                     except Exception as e:
                         print(f"3D mesh generation failed: {e}")
+                        import traceback
+                        traceback.print_exc()
 
                     # Mark as 3D converted if something worked
                     if form.instance.depth_map or form.instance.mesh_3d:
                         form.instance.is_3d_converted = True
+                        print(f"DEBUG: Marked as 3D Converted.")
                     
                     form.instance.save()
+                    print("DEBUG: Final Save Complete.")
             except Exception as e:
                 # Global catch to ensure the redirect happens no matter what
                 print(f"Critical error in AI post processing for {form.instance.id}: {e}")
+                import traceback
+                traceback.print_exc()
 
             return response
             
