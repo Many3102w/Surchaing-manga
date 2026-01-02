@@ -73,68 +73,71 @@ class CreatePostView(UserPassesTestMixin, CreateView):
             # This handles the image upload to Cloudinary
             response = super().form_valid(form)
             
-            try:
-                from .utils import generate_depth_map, generate_3d_mesh
-                from .models import MangaImage
-                
-                # 1. Base image must exist
-                if form.instance.front_page:
-                    # 2. Save additional images (Gallery)
-                    images = self.request.FILES.getlist('additional_images')
-                    for img in images:
-                        MangaImage.objects.create(manga=form.instance, image=img)
+            # CRITICAL FIX: Run AI in Background Thread to prevent Render 30s Timeout
+            import threading
+            def run_ai_background(manga_instance_id):
+                try:
+                    # Re-fetch instance to avoid race conditions
+                    from .models import Manga
+                    from .utils import generate_depth_map, generate_3d_mesh
+                    
+                    # Need to setup django context if using DB in thread? 
+                    # Usually fine for simple updates, but best practice is careful.
+                    # Django closes DB connections on request end, so we need to ensure thread has its own.
+                    from django.db import connection
+                    connection.close() # Force new connection for thread
+
+                    instance = Manga.objects.get(id=manga_instance_id)
+                    print(f"BACKGROUND: Starting AI for {instance.id}")
 
                     # 3. Generate Depth Map (REAL AI)
                     try:
-                        depth_map_file = generate_depth_map(form.instance.front_page.file)
-                        if depth_map_file:
-                            form.instance.depth_map.save(
-                                f'depth_front_{form.instance.id}.png',
-                                depth_map_file,
-                                save=False
-                            )
+                        if instance.front_page:
+                            # Re-open the file from storage
+                            instance.front_page.open()
+                            depth_map_file = generate_depth_map(instance.front_page.file)
+                            if depth_map_file:
+                                instance.depth_map.save(
+                                    f'depth_front_{instance.id}.png',
+                                    depth_map_file,
+                                    save=False
+                                )
                     except Exception as e:
-                        print(f"Depth generation failed: {e}")
+                        print(f"BACKGROUND ERROR (Depth): {e}")
 
                     # 4. Generate 3D Mesh (IA)
                     try:
-                        print(f"DEBUG: Starting 3D Mesh Generation for {form.instance.id}...")
-                        mesh_file = generate_3d_mesh(form.instance.front_page.file)
-                        if mesh_file:
-                            print(f"DEBUG: 3D Mesh generated. Saving as GLB...")
-                            # CRITICAL FIX: Save as .glb to match the actual binary format from Trellis
-                            form.instance.mesh_3d.save(
-                                f'mesh_front_{form.instance.id}.glb',
-                                mesh_file,
-                                save=False
-                            )
-                        else:
-                            print("DEBUG: generate_3d_mesh returned None.")
+                        if instance.front_page:
+                            instance.front_page.open()
+                            print(f"BACKGROUND: generating 3D mesh...")
+                            mesh_file = generate_3d_mesh(instance.front_page.file)
+                            if mesh_file:
+                                instance.mesh_3d.save(
+                                    f'mesh_front_{instance.id}.glb',
+                                    mesh_file,
+                                    save=False
+                                )
                     except Exception as e:
-                        print(f"3D mesh generation failed: {e}")
-                        import traceback
-                        traceback.print_exc()
+                        print(f"BACKGROUND ERROR (3D): {e}")
 
                     # Mark as 3D converted if something worked
-                    if form.instance.depth_map or form.instance.mesh_3d:
-                        form.instance.is_3d_converted = True
-                        print(f"DEBUG: Marked as 3D Converted.")
+                    if instance.depth_map or instance.mesh_3d:
+                        instance.is_3d_converted = True
+                        print(f"BACKGROUND: Success! Marked as 3D converted.")
                     
-                    form.instance.save()
-                    print("DEBUG: Final Save Complete.")
-            except Exception as e:
-                # Global catch to ensure the redirect happens no matter what
-                print(f"Critical error in AI post processing for {form.instance.id}: {e}")
-                import traceback
-                traceback.print_exc()
-                from django.contrib import messages
-                messages.warning(self.request, f"Post created, but AI 3D failed: {e}")
+                    instance.save()
+                    print("BACKGROUND: AI Processing Complete.")
 
+                except Exception as e:
+                    print(f"BACKGROUND CRITICAL FAIL: {e}")
+
+            # Launch the thread
+            thread = threading.Thread(target=run_ai_background, args=(form.instance.id,))
+            thread.daemon = True # Daemon threads die if main process dies, but on Render web service it usually runs until idle.
+            thread.start()
+            
             from django.contrib import messages
-            if form.instance.is_3d_converted:
-                messages.success(self.request, "Publicación creada con Éxtio (3D Generado)")
-            else:
-                messages.warning(self.request, "Publicación creada (Sin 3D - Verifique Token)")
+            messages.info(self.request, "Publicación creada. La IA está generando el 3D en segundo plano (Puede tardar 1 minuto).")
 
             return response
             

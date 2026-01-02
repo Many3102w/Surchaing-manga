@@ -127,8 +127,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # Hugging Face API Configuration
-# Hardcoded to resolve ZeroGPU Quota issues on Render (Validated)
-HUGGINGFACE_API_TOKEN = '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'
+HUGGINGFACE_API_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN')
 HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
 HUGGINGFACE_API_URL = f'https://router.huggingface.co/hf-inference/models/{HUGGINGFACE_DEPTH_MODEL}'
 
