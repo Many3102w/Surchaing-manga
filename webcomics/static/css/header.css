@@ -66,29 +66,24 @@ a:hover {
     border-bottom: 2px solid #0056b3;
 }
 
-ul {
-    list-style-type: none;
-    padding-left: 0;
+/* 
+   Global List Styles removed to fix navbar alignment.
+   The previous rules (margin-bottom: 10px, padding-left: 20px) were shifting navbar items.
+*/
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-ul li {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    padding-left: 20px;
-    position: relative;
+/* Ensure form inside navbar doesn't break flex layout */
+.navbar-icons form {
+    margin: 0;
+    display: inline-block;
 }
 
-ul li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    color: #007bff;
-    font-size: 1.5rem;
-}
-
-.navbar-icons .nav-link {
-    color: #ffffff;
-    font-size: 1.2rem;
+color: #ffffff;
+font-size: 1.2rem;
 }
 
 .btn-outline-primary {
