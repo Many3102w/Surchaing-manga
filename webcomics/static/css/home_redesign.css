@@ -59,6 +59,18 @@ body.home-page {
     letter-spacing: -2px;
 }
 
+/* Moved from index.html for better responsiveness */
+.concept-container-hero {
+    position: relative;
+    z-index: 10;
+    text-align: left;
+    width: 100%;
+    max-width: 1400px;
+    padding: 180px 100px 80px 100px;
+    /* Desktop Padding */
+    margin-top: 0;
+}
+
 .concept-hero p {
     font-size: 1.2rem;
     color: var(--accent-gray);
@@ -228,6 +240,12 @@ body.home-page {
     .concept-hero {
         min-height: 50vh;
         margin-bottom: 40px;
+    }
+
+    /* Fix for text squashing on mobile */
+    .concept-container-hero {
+        padding: 100px 20px 40px 20px !important;
+        /* Reduce side padding drastically */
     }
 
     .concept-hero h1 {
