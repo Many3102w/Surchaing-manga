@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'webcomics',
     'ckeditor_uploader',  
     'perfil',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -112,3 +114,12 @@ LOGOUT_REDIRECT_URL = '/'
 HUGGINGFACE_API_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN')
 HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
 HUGGINGFACE_API_URL = f'https://router.huggingface.co/hf-inference/models/{HUGGINGFACE_DEPTH_MODEL}'
+
+# Cloudinary Storage Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='dfdrbs1gp'),
+    'API_KEY': env('CLOUDINARY_API_KEY', default='688516932845499'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default='3txYI7sSbcyqDAf4SVdjlEfIe9s'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

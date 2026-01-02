@@ -82,8 +82,9 @@ a:hover {
     display: inline-block;
 }
 
-color: #ffffff;
-font-size: 1.2rem;
+.navbar-icons .nav-link {
+    color: #ffffff;
+    font-size: 1.2rem;
 }
 
 .btn-outline-primary {
