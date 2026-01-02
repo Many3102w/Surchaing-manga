@@ -68,39 +68,47 @@ class CreatePostView(UserPassesTestMixin, CreateView):
     def form_valid(self, form):
         form.instance.fecha_de_carga = timezone.now()
         
-        # Save the instance first to get the uploaded image
+        # Save basic instance first to ensure the post is created even if AI fails
         response = super().form_valid(form)
-        from .utils import generate_depth_map, generate_3d_mesh
         
-        # Generate depth map for front_page if it exists
-        if form.instance.front_page:
-            depth_map_file = generate_depth_map(form.instance.front_page.file)
-            if depth_map_file:
-                form.instance.depth_map.save(
-                    f'depth_front_{form.instance.id}.png',
-                    depth_map_file,
-                    save=False
-                )
-        
-        # NEW: Generate True 3D Mesh for front page
-        if form.instance.front_page:
-            try:
-                mesh_file = generate_3d_mesh(form.instance.front_page.file)
-                if mesh_file:
-                    form.instance.mesh_3d.save(
-                        f'mesh_front_{form.instance.id}.obj',
-                        mesh_file,
-                        save=False
-                    )
-                    form.instance.is_3d_converted = True # Mark as 3D converted if mesh is generated
-            except Exception as e:
-                print(f"Failed to generate 3D mesh for manga {form.instance.id}: {e}")
+        try:
+            from .utils import generate_depth_map, generate_3d_mesh
+            
+            # 1. Base image must exist
+            if form.instance.front_page:
+                # 2. Generate Depth Map
+                try:
+                    depth_map_file = generate_depth_map(form.instance.front_page.file)
+                    if depth_map_file:
+                        form.instance.depth_map.save(
+                            f'depth_front_{form.instance.id}.png',
+                            depth_map_file,
+                            save=False
+                        )
+                except Exception as e:
+                    print(f"Depth generation failed for {form.instance.id}: {e}")
 
-        # Mark as 3D converted if at least one depth map or mesh was generated
-        if form.instance.depth_map or form.instance.mesh_3d:
-            form.instance.is_3d_converted = True
-        
-        form.instance.save()
+                # 3. Generate 3D Mesh (Stability API)
+                try:
+                    mesh_file = generate_3d_mesh(form.instance.front_page.file)
+                    if mesh_file:
+                        form.instance.mesh_3d.save(
+                            f'mesh_front_{form.instance.id}.obj',
+                            mesh_file,
+                            save=False
+                        )
+                except Exception as e:
+                    print(f"3D mesh generation failed for {form.instance.id}: {e}")
+
+                # Mark as 3D converted if something worked
+                if form.instance.depth_map or form.instance.mesh_3d:
+                    form.instance.is_3d_converted = True
+                
+                form.instance.save()
+        except Exception as e:
+            # Global catch to ensure the redirect happens no matter what
+            print(f"Critical error in post processing for {form.instance.id}: {e}")
+
         return response
 
 @login_required

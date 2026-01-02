@@ -288,18 +288,27 @@
                 <div class="dropdown">
                     <div style="cursor: pointer; padding: 5px;"><i class="bi bi-three-dots-vertical"></i></div>
                     <div class="dropdown-content">
-                        <a href="{% url 'vendido_toggle' manga_id=manga.id %}">Marcar Vendido</a>
+                        <a href="{% url 'vendido_toggle' manga_id=manga.id %}">
+                            {% if manga.vendido %}Marcar Disponible{% else %}Marcar Vendido{% endif %}
+                        </a>
                         <a href="{% url 'delete_post' manga.id %}" style="color:#f00">Eliminar</a>
                     </div>
                 </div>
                 {% endif %}
             </div>
 
-            <div class="feed-image-container {% if manga.is_3d_converted %}has-3d{% endif %}"
-                data-front="{{ manga.front_page.url }}" data-depth="{{ manga.depth_map.url }}"
-                onclick="openZoom('{{ manga.front_page.url }}')">
+            <div class="feed-image-container {% if manga.is_3d_converted and manga.front_page and manga.depth_map %}has-3d{% endif %}"
+                data-front="{% if manga.front_page %}{{ manga.front_page.url }}{% endif %}"
+                data-depth="{% if manga.depth_map %}{{ manga.depth_map.url }}{% endif %}"
+                onclick="{% if manga.front_page %}openZoom('{{ manga.front_page.url }}'){% endif %}">
 
-                {% if manga.is_3d_converted %}
+                {% if manga.vendido %}
+                <div class="sold-badge"
+                    style="position: absolute; top: 10px; right: 10px; background: #ff4d4d; color: #fff; padding: 5px 12px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; z-index: 100; box-shadow: 0 4px 10px rgba(255,77,77,0.4); text-transform: uppercase; letter-spacing: 1px;">
+                    VENDIDO</div>
+                {% endif %}
+
+                {% if manga.is_3d_converted and manga.front_page and manga.depth_map %}
                 <div class="manga-3d-badge">ULTRA 3D</div>
                 <canvas class="depth-3d-canvas"></canvas>
                 {% endif %}
@@ -308,7 +317,17 @@
                 <div class="manga-size-badge">Talla: {{ manga.talla }}</div>
                 {% endif %}
 
+                {% if manga.front_page %}
                 <img src="{{ manga.front_page.url }}" class="feed-image" alt="{{ manga.nombre_del_manga }}">
+                {% else %}
+                <div class="no-image-placeholder"
+                    style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f5f5f5; color:#ccc;">
+                    <div style="text-align: center;">
+                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                        <p style="font-size: 0.8rem; margin-top: 5px;">Sin imagen</p>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <div class="feed-actions">
@@ -325,8 +344,9 @@
             <div class="feed-caption">
                 <span class="price-tag">${{ manga.precio }}</span>
                 <strong>{{ manga.nombre_del_manga }}</strong>
-                <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">{% if manga.descripcion %}{{
-                    manga.descripcion }}{% else %}Surchaing Premium Edition.{% endif %}</p>
+                <p style="color: #666; margin-top: 5px; margin-bottom: 15px;">
+                    {% if manga.descripcion %}{{ manga.descripcion }}{% else %}Surchaing Premium Edition.{% endif %}
+                </p>
 
                 <!-- Lista de Comentarios -->
                 <div class="feed-comments-list"

@@ -3,3 +3,11 @@ environ
 django-environ
 pillow
 django-ckeditor
+gunicorn
+whitenoise
+dj-database-url
+psycopg2-binary
+requests
+gradio_client
+transformers
+torch --index-url https://download.pytorch.org/whl/cpu

@@ -165,7 +165,7 @@
 <div class="concept-container">
     <div class="form-container">
         <h1>Nuevo Post</h1>
-        <form method="post" enctype="multipart/form-data">
+        <form id="post-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             <div class="form-group">
@@ -243,7 +243,9 @@
     const frontPageInput = document.getElementById('id_front_page');
     const previewImage = document.getElementById('image-preview');
     const preview3D = document.getElementById('preview-3d');
-    const form = document.querySelector('form');
+    const form = document.getElementById('post-form');
+    // Ensure image is required
+    if (frontPageInput) frontPageInput.required = true;
     const overlay = document.getElementById('conversion-overlay');
     const progressBar = document.getElementById('progress-bar');
     const statusText = document.getElementById('status-text');
@@ -267,81 +269,67 @@
 
 
 
-    // Conversion Simulation Logic
+    // Real Upload and Processing logic
     form.addEventListener('submit', function (e) {
-        console.log('✨ Form submit intercepted!');
-
-        if (overlay.dataset.completed === "true") {
-            console.log('✅ Form already processed, allowing submission');
-            return;
-        }
-
         e.preventDefault();
-        console.log('🚀 Starting 3D conversion simulation...');
+        console.log('🚀 Starting real upload process...');
 
-        // Check if an image is selected, if not use a placeholder
-        if (!preview3D.src || preview3D.src === '' || preview3D.src === window.location.href + '#') {
-            console.log('⚠️ No image selected, creating placeholder');
-            // Create a placeholder with text
-            const canvas = document.createElement('canvas');
-            canvas.width = 200;
-            canvas.height = 280;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#2d2d2d';
-            ctx.fillRect(0, 0, 200, 280);
-            ctx.fillStyle = '#c5a059';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('PROCESANDO', 100, 130);
-            ctx.fillText('IMAGEN 3D', 100, 155);
-            preview3D.src = canvas.toDataURL();
-        }
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
 
         // Show Overlay
         overlay.style.display = 'flex';
         errorMsg.style.display = 'none';
         retryBtn.style.display = 'none';
         statusText.style.display = 'block';
-        statusText.innerText = 'PROCESANDO CAPAS 3D...';
-        console.log('🎬 Overlay displayed');
-
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 12 + 3;  // Progress between 3-15% each tick
-            if (progress > 100) progress = 100;
-
-            progressBar.style.width = progress + '%';
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                console.log('📊 Progress complete (100%)');
-
-                // Random failure simulation (15% chance)
-                if (Math.random() < 0.15) {
-                    console.log('❌ Simulated conversion error');
-                    statusText.style.display = 'none';
-                    errorMsg.style.display = 'block';
-                    retryBtn.style.display = 'inline-block';
-                    progressBar.style.backgroundColor = '#ff4d4d';
-                } else {
-                    console.log('✅ Conversion successful!');
-                    statusText.innerText = 'CONVERSIÓN COMPLETADA!';
-                    setTimeout(() => {
-                        console.log('📤 Submitting form to server...');
-                        overlay.dataset.completed = "true";
-                        form.submit();
-                    }, 1000);
-                }
-            }
-        }, 350);
-    });
-
-    retryBtn.addEventListener('click', () => {
-        console.log('🔄 Retry button clicked, closing overlay');
-        overlay.style.display = 'none';
+        statusText.innerText = 'PREPARANDO SUBIDA...';
         progressBar.style.width = '0%';
         progressBar.style.backgroundColor = '';
-        overlay.dataset.completed = '';
+
+        // Track Upload Progress
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                progressBar.style.width = percentComplete + '%';
+                statusText.innerText = `SUBIENDO ARCHIVO: ${Math.round(percentComplete)}%`;
+
+                if (percentComplete >= 100) {
+                    statusText.innerText = 'SUBIDA COMPLETA. PROCESANDO IA Y 3D...';
+                    progressBar.classList.add('progress-bar-striped', 'progress-bar-animated');
+                }
+            }
+        });
+
+        // Handle Completion
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('✅ Upload and processing successful!');
+                statusText.innerText = '¡PUBLICADO CON ÉXITO!';
+                progressBar.style.width = '100%';
+                progressBar.style.backgroundColor = '#4bb543';
+                setTimeout(() => {
+                    window.location.href = "{% url 'library' %}";
+                }, 800);
+            } else {
+                handleError('Error en el servidor: ' + xhr.statusText);
+            }
+        };
+
+        xhr.onerror = function () {
+            handleError('Error de red al intentar subir.');
+        };
+
+        function handleError(msg) {
+            console.error('❌ Upload error:', msg);
+            statusText.style.display = 'none';
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = msg;
+            retryBtn.style.display = 'inline-block';
+            progressBar.style.backgroundColor = '#ff4d4d';
+        }
+
+        xhr.open('POST', form.action, true);
+        xhr.send(formData);
     });
 
 </script>

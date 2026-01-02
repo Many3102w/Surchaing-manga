@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: surchaing-manga
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn webcomic.wsgi"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: surchaing-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: 3.12.10
+
+databases:
+  - name: surchaing-db
+    plan: free

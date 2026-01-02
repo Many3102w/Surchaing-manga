@@ -9,6 +9,7 @@ class Manga(models.Model):
     class Meta:
         app_label = 'webcomics'
         db_table = 'Mangas'
+        ordering = ['-id']
         db_table_comment = """
 Tabla para la gestión de mangas en la base de datos.
         """
