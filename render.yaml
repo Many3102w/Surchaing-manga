@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: surchaing-manga
+    name: moda-gomez
     plan: free
     env: python
     buildCommand: "./build.sh"
