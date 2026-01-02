@@ -73,10 +73,16 @@ class CreatePostView(UserPassesTestMixin, CreateView):
         
         try:
             from .utils import generate_depth_map, generate_3d_mesh
+            from .models import MangaImage
             
             # 1. Base image must exist
             if form.instance.front_page:
-                # 2. Generate Depth Map
+                # 2. Save additional images (Gallery)
+                images = self.request.FILES.getlist('additional_images')
+                for img in images:
+                    MangaImage.objects.create(manga=form.instance, image=img)
+
+                # 3. Generate Depth Map (REAL AI)
                 try:
                     depth_map_file = generate_depth_map(form.instance.front_page.file)
                     if depth_map_file:
@@ -88,7 +94,7 @@ class CreatePostView(UserPassesTestMixin, CreateView):
                 except Exception as e:
                     print(f"Depth generation failed for {form.instance.id}: {e}")
 
-                # 3. Generate 3D Mesh (Stability API)
+                # 4. Generate 3D Mesh (IA)
                 try:
                     mesh_file = generate_3d_mesh(form.instance.front_page.file)
                     if mesh_file:

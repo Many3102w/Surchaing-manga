@@ -12,35 +12,52 @@ django.setup()
 
 from webcomics.models import Manga
 
+from webcomics.utils import generate_depth_map, generate_3d_mesh
+
 def fix_all_flat_posts():
-    print("Iniciando reparación de publicaciones planas...")
-    mangas = Manga.objects.filter(is_3d_converted=False)
-    print(f"Revisando {mangas.count()} publicaciones.")
+    print("Iniciando generación MASIVA de 3D REAL (Trellis AI)...")
+    mangas = Manga.objects.all()
+    print(f"Procesando {mangas.count()} prendas para conversión 3D...")
 
     for manga in mangas:
-        if not manga.front_page:
+        if not manga.front_page or not os.path.exists(manga.front_page.path):
+            print(f"⚠️ Saltando ID {manga.id}: Archivo no encontrado.")
             continue
             
-        print(f"Reparando ID {manga.id}: {manga.nombre_del_manga} con relieve de emergencia...")
+        print(f"🚀 Procesando ID {manga.id}: {manga.nombre_del_manga}...")
         
-        # Generar Mock Depth Map
-        mock_depth = Image.new('L', (512, 512), color=128)
-        for y in range(512):
-            for x in range(512):
-                val = int(128 + 30 * (y / 512.0))
-                mock_depth.putpixel((x, y), val)
-        
-        buf = BytesIO()
-        mock_depth.save(buf, format='PNG')
-        
-        manga.depth_map.save(
-            f'depth_front_{manga.id}.png',
-            ContentFile(buf.getvalue()),
-            save=False
-        )
+        # 1. Depth Map (Base Analysis)
+        try:
+            depth_map_file = generate_depth_map(manga.front_page.file)
+            if depth_map_file:
+                manga.depth_map.save(
+                    f'depth_front_{manga.id}.png',
+                    depth_map_file,
+                    save=False
+                )
+        except Exception as e:
+            print(f"❌ Error Depth Map ID {manga.id}: {e}")
+
+        # 2. 3D GLB Model (Trellis AI - High Fidelity)
+        try:
+            print("   ⏳ Generando malla 3D de alta fidelidad...")
+            if not manga.mesh_3d: # Only if missing or forced
+                mesh_file = generate_3d_mesh(manga.front_page.file)
+                if mesh_file:
+                    manga.mesh_3d.save(
+                        f'mesh_trellis_{manga.id}.glb',
+                        mesh_file,
+                        save=False
+                    )
+                    print("   ✅ GLB Generado.")
+                else:
+                    print("   ⚠️ Falló generación de GLB (Trellis API ocupada?)")
+        except Exception as e:
+            print(f"   ❌ Error 3D Mesh ID {manga.id}: {e}")
+
         manga.is_3d_converted = True
         manga.save()
-        print(f"✅ ID {manga.id} ahora tiene relieve 3D.")
+        print(f"✨ ID {manga.id} actualizado.")
 
 if __name__ == "__main__":
     fix_all_flat_posts()

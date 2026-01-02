@@ -58,6 +58,14 @@ Tabla para la gestión de mangas en la base de datos.
     def __str__(self): #Método de modelo
         return self.nombre_del_manga
 
+class MangaImage(models.Model):
+    manga = models.ForeignKey(Manga, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='manga_gallery/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.manga.nombre_del_manga}"
+
 class Comment(models.Model):
     manga = models.ForeignKey(Manga, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE, null=True, blank=True)

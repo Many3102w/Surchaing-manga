@@ -203,10 +203,18 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Imagen (Portada)</label>
+                <label class="form-label">Imagen Principal (Analizada por IA para 3D)</label>
                 {{ form.front_page }}
                 <!-- Image Preview Element -->
                 <img id="image-preview" src="#" alt="Vista previa de portada" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Imágenes Adicionales (Galería)</label>
+                <input type="file" name="additional_images" class="form-control" multiple accept="image/*">
+                <p style="font-size: 0.75rem; color: #666; margin-top: 5px;">
+                    Puedes seleccionar varias imágenes para subirlas a la galería.
+                </p>
             </div>
 
 

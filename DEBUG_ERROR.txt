@@ -1,0 +1,19 @@
+Depth Error: 401 Client Error. (Request ID: Root=1-69579567-37fa2e0306ffc00907effa9c;08f15acd-8aea-43d0-b63a-8f5371e74c1d)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/depth-anything/Depth-Anything-V2.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+User Access Token "Many" is expired
+Trellis Error: 401 Client Error. (Request ID: Root=1-69579567-74ad461f5bf438ae723481d7;b004049a-85ac-4b34-99c7-5f082b6caac6)
+
+Repository Not Found for url: https://huggingface.co/api/spaces/JeffreyXiang/TRELLIS.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+User Access Token "Many" is expired
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
+Trellis Error: 'FileNotFoundError'
