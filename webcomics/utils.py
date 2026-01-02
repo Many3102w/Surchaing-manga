@@ -78,18 +78,18 @@ def generate_depth_map(image_file):
             if response.status_code == 200:
                 print("Successfully generated depth map via API.")
                 return ContentFile(response.content, name='depth_map.png')
-            elif response.status_code == 401:
-                print(f"ERROR: Hugging Face Token is expired or invalid. (Attempt {i+1})")
-                break # No point in retrying 401
-            elif response.status_code == 503: # Model loading
-                print(f"Model loading, waiting 15s... (Attempt {i+1}/3)")
-                time.sleep(15)
-                continue
-            else:
-                print(f"API Error: {response.status_code} - {response.text}")
-                break
+        print(f"La API de IA falló o no hay token. Generando relieve de emergencia (Mock)...")
+        # Generate a simple gradient depth map as fallback
+        mock_depth = Image.new('L', (512, 512), color=128)
+        # Add some variation so it's not totally flat
+        for y in range(512):
+            for x in range(512):
+                val = int(128 + 30 * (y / 512.0))
+                mock_depth.putpixel((x, y), val)
         
-        return None
+        buf = BytesIO()
+        mock_depth.save(buf, format='PNG')
+        return ContentFile(buf.getvalue(), name='depth_map_fallback.png')
             
     except Exception as e:
         print(f"Error in generate_depth_map (API): {e}")
