@@ -2,7 +2,8 @@ from gradio_client import Client, handle_file
 import requests
 import os
 
-token = "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"
+# Token provided by user
+token = "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"
 headers = {"Authorization": f"Bearer {token}"}
 
 def test_token():
