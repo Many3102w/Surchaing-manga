@@ -14,7 +14,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6j=2a07g#m8qi4xywd*e!
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'surchaing.edmateo.site', '.render.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'surchaing.edmateo.site', '.render.com', '.onrender.com']
+
+CSRF_TRUSTED_ORIGINS = ['https://*.render.com', 'https://*.onrender.com', 'https://surchaing.edmateo.site']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
