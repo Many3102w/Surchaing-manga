@@ -621,6 +621,7 @@
         const { container, scene, camera, renderer } = viewer;
         const frontUrl = container.dataset.front;
         const depthUrl = container.dataset.depth;
+        const canvas = renderer.domElement;
 
         if (!frontUrl || !depthUrl || viewer.isDisposed) return;
 
