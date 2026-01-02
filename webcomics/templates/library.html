@@ -593,23 +593,22 @@
     }
 
     function startAnimate(viewer, model, material) {
-        let framesRendered = 0;
+        let startTime = Date.now();
+        let activated = false;
         function frame() {
             if (viewer.isDisposed) return;
             viewer.animateId = requestAnimationFrame(frame);
             const time = Date.now() * 0.0008;
-            // MOVIMIENTO ULTRA-SUTIL: Casi imperceptible para máxima limpieza
+            // MOVIMIENTO ULTRA-SUTIL
             viewer.scene.rotation.y = Math.sin(time) * 0.08 + (viewer.targetX * 0.05);
             viewer.scene.rotation.x = Math.cos(time * 0.6) * 0.04 - (viewer.targetY * 0.03);
             if (material && material.uniforms.uTime) material.uniforms.uTime.value = time;
             viewer.renderer.render(viewer.scene, viewer.camera);
 
-            // Solo activamos la clase 3D cuando el renderer está listo
-            if (framesRendered < 5) {
-                framesRendered++;
-                if (framesRendered === 3) {
-                    viewer.container.classList.add('has-3d');
-                }
+            // Activamos el 3D tras 2 segundos para permitir ver la preview 2D
+            if (!activated && (Date.now() - startTime > 2000)) {
+                viewer.container.classList.add('has-3d');
+                activated = true;
             }
         }
         frame();
