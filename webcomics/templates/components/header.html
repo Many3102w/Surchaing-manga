@@ -29,17 +29,19 @@
             <!-- Iconos y botones de sesión -->
             <div class="navbar-icons d-flex align-items-center">
                 {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
+                <form method="post" action="{% url 'logout' %}" class="d-inline m-0">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-primary">Logout</button>
                 </form>
                 <span class="user-greeting">
                     {% if user.profile.avatar %}
                     <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}"
-                        style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 5px; object-fit: cover;">
+                        style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 8px; object-fit: cover; border: 1px solid #333;">
                     {% else %}
-                    <i class="bi bi-person-circle"
-                        style="font-size: 1.5rem; vertical-align: middle; margin-right: 5px;"></i>
+                    <div
+                        style="width: 35px; height: 35px; border-radius: 50%; background: #333; color: #fff; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 8px;">
+                        <i class="bi bi-person-fill" style="font-size: 1.2rem;"></i>
+                    </div>
                     {% endif %}
                     @{{ user.username }}
                 </span>
