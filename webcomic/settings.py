@@ -24,17 +24,19 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # Añadido para estáticos
+    'cloudinary_storage', # Añadido para Cloudinary
+    'whitenoise.runserver_nostatic', 
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'webcomics',
     'ckeditor_uploader',  
     'perfil',
+    'cloudinary', # Añadido para Cloudinary
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Añadido para estáticos en prod
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,20 +89,28 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'es-mx'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'webcomics/static')]
 
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dfdrbs1gp',
+    'API_KEY': '688516932845499',
+    'API_SECRET': '3txYl7sSbcyqDAf4SVdjlEfIe9s'
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# ... (Rest of settings)
+
 MEDIA_URL = '/media/'
+# MEDIA_ROOT no es necesario con Cloudinary, pero lo dejamos por compatibilidad local
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
