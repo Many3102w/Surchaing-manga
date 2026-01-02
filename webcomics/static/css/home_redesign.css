@@ -249,15 +249,14 @@ body.home-page {
     }
 
     .concept-hero h1 {
-        font-size: 1.8rem;
-        /* Significantly smaller to fit "PRENDAS" on one line */
-        letter-spacing: 0px;
-        /* Remove negative spacing on mobile */
+        font-size: 1.25rem !important;
+        /* Drastically reduced for paragraph flow */
+        letter-spacing: 0.5px;
         word-break: normal;
-        /* Restore normal word breaking */
         overflow-wrap: break-word;
-        /* Only break if absolutely necessary */
-        line-height: 1.2;
+        line-height: 1.5;
+        /* Paragraph spacing */
+        margin-bottom: 20px;
     }
 
     .concept-hero p {
