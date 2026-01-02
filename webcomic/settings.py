@@ -116,10 +116,11 @@ HUGGINGFACE_DEPTH_MODEL = 'LiheYoung/depth-anything-large-hf'
 HUGGINGFACE_API_URL = f'https://router.huggingface.co/hf-inference/models/{HUGGINGFACE_DEPTH_MODEL}'
 
 # Cloudinary Storage Configuration
+# Hardcoded to ensure it works on Render without Env conflicts
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default='dfdrbs1gp'),
-    'API_KEY': env('CLOUDINARY_API_KEY', default='688516932845499'),
-    'API_SECRET': env('CLOUDINARY_API_SECRET', default='3txYI7sSbcyqDAf4SVdjlEfIe9s'),
+    'CLOUD_NAME': 'dfdrbs1gp',
+    'API_KEY': '688516932845499',
+    'API_SECRET': '3txYI7sSbcyqDAf4SVdjlEfIe9s',
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
