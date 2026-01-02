@@ -8,5 +8,3 @@ dj-database-url
 psycopg2-binary
 requests
 gradio_client
-cloudinary
-django-cloudinary-storage
