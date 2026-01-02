@@ -479,15 +479,18 @@
     };
 
     // Auto-scan for items missing depth maps
+    // OPTIMIZATION: Only check the LATEST (First) post to avoid freezing the browser with multiple AI runs
     window.checkMissingDepth = () => {
-        document.querySelectorAll('.feed-image-container').forEach(container => {
+        const container = document.querySelector('.feed-image-container'); // Selects only the first one
+        if (container) {
             const front = container.dataset.front;
             const depth = container.dataset.depth;
             // If we have an image but NO depth map, try to generate it client-side
             if (front && (!depth || depth === "")) {
+                console.log("Checking latest post for 3D...");
                 window.generateClientSideDepth(front, container);
             }
-        });
+        }
     };
 
     // Run check on load
