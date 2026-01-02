@@ -391,6 +391,91 @@
 {% endblock %}
 
 {% block extra_js %}
+<script type="module">
+    // Import Transformers.js from CDN (Direct Web AI)
+    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.14.0';
+
+    // Skip local model checks to avoid 404s on checking for 'local' files
+    env.allowLocalModels = false;
+    env.useBrowserCache = true;
+
+    // Singleton for the depth model
+    let depthEstimator = null;
+
+    async function ensureModel() {
+        if (!depthEstimator) {
+            console.log("Loading Client-Side AI Model...");
+            // Use a small, fast quantization model properly cached in browser
+            depthEstimator = await pipeline('depth-estimation', 'Xenova/depth-anything-small-hf');
+        }
+        return depthEstimator;
+    }
+
+    // Expose generation function globally for the 3D viewer
+    window.generateClientSideDepth = async (imageUrl, container) => {
+        try {
+            const estimator = await ensureModel();
+            console.log("Generating Depth on Client...", imageUrl);
+
+            // Run inference
+            const result = await estimator(imageUrl);
+            // result is usually { depth: Tensor, predicted_depth: Tensor } 
+            // Transformers.js depth-estimation pipeline returns a raw object with a `depth` property that is a Greyscale Image (Tensor-like)
+            // Actually, the pipeline returns { depth: RawImage }
+
+            if (result && result.depth) {
+                // Convert to Canvas/DataURL
+                const canvas = document.createElement('canvas');
+                canvas.width = result.depth.width;
+                canvas.height = result.depth.height;
+                const ctx = canvas.getContext('2d');
+                const imageData = new ImageData(result.depth.data, result.depth.width, result.depth.height);
+                ctx.putImageData(imageData, 0, 0);
+
+                const dataUrl = canvas.toDataURL('image/png');
+                console.log("Client-Side Depth Generated!");
+
+                // Inject into container and restart viewer
+                container.dataset.depth = dataUrl;
+
+                // Add the 3D Badge explicitly since we forced it
+                if (!container.querySelector('.manga-3d-badge')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'manga-3d-badge';
+                    badge.innerHTML = '<i class="bi bi-cpu"></i> WEB AI 3D';
+                    container.appendChild(badge);
+
+                    const canvas3d = document.createElement('canvas');
+                    canvas3d.className = 'depth-3d-canvas';
+                    container.appendChild(canvas3d);
+                }
+
+                // Trigger global init if defined
+                if (window.initApp3D) window.initApp3D(container);
+            }
+        } catch (e) {
+            console.error("Client AI Error:", e);
+        }
+    };
+
+    // Auto-scan for items missing depth maps
+    window.checkMissingDepth = () => {
+        document.querySelectorAll('.feed-image-container').forEach(container => {
+            const front = container.dataset.front;
+            const depth = container.dataset.depth;
+            // If we have an image but NO depth map, try to generate it client-side
+            if (front && (!depth || depth === "")) {
+                window.generateClientSideDepth(front, container);
+            }
+        });
+    };
+
+    // Run check on load
+    if (document.readyState === 'complete') window.checkMissingDepth();
+    else window.addEventListener('load', window.checkMissingDepth);
+
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
@@ -422,9 +507,9 @@
         }, { threshold: 0.05, rootMargin: '200px' });
 
         containers.forEach(container => {
-            if (container.querySelector('.depth-3d-canvas')) {
-                observer.observe(container);
-            }
+            // Updated: Observe ALL containers, not just ones with existing canvases.
+            // Why? Because Client-Side AI might add the canvas later.
+            observer.observe(container);
         });
 
         window.addEventListener('resize', () => {
@@ -432,13 +517,23 @@
         });
     }
 
+    // Expose specifically for the Module script to call
+    window.initApp3D = (singleContainer) => {
+        createViewer(singleContainer);
+    };
+
     function createViewer(container) {
         if (activeViewers.has(container)) return;
 
-        const canvas = container.querySelector('.depth-3d-canvas');
+        // Check again for canvas (client AI might have added it)
+        let canvas = container.querySelector('.depth-3d-canvas');
+        if (!canvas) return; // Still no 3D available
+
         const meshUrl = container.dataset.mesh;
         const frontUrl = container.dataset.front;
-        const depthUrl = container.dataset.depth;
+        const depthUrl = container.dataset.depth; // This might be a Data URL now!
+
+        if (!frontUrl || !depthUrl) return;
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
@@ -486,6 +581,10 @@
 
                 canvas.style.display = 'block';
                 startAnimate(viewer, model, null);
+
+                // Show Badge if hidden (e.g. Server generated mesh but depth failed)
+                container.classList.add('has-3d');
+
             }, undefined, (err) => {
                 console.warn("Fallback displacement", err);
                 loadDisplacement(viewer);
@@ -499,11 +598,13 @@
         const { container, scene, camera, renderer } = viewer;
         const frontUrl = container.dataset.front;
         const depthUrl = container.dataset.depth;
-        const canvas = container.querySelector('.depth-3d-canvas');
 
         if (!frontUrl || !depthUrl || viewer.isDisposed) return;
 
         const loader = new THREE.TextureLoader();
+        // Allow Data URLs cross origin (safe for data urls)
+        loader.crossOrigin = 'Anonymous';
+
         const loadP = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
 
         try {
@@ -530,7 +631,6 @@
                                      smoothstep(0.0, 0.02, uv.y) * smoothstep(1.0, 0.98, uv.y);
                         vMask = mask;
                         vec3 pos = position;
-                        // VOLUMEN MAXIMO: Restaurado a 1.2
                         pos.z += d * 1.2 * mask; 
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
                     }
@@ -550,7 +650,6 @@
                         float dR = texture2D(uDepth, vUv + vec2(ps, 0.0)).r;
                         float dD = texture2D(uDepth, vUv + vec2(0.0, ps)).r;
                         vec3 normal = normalize(vec3((vDepth - dR)*5.0, (vDepth - dD)*5.0, 0.5));
-                        // Restaurado umbral bajo para máximo relleno
                         if (normal.z < 0.2) discard;
                         vec3 lightDir = normalize(vec3(-0.8, 0.5, 0.8)); 
                         float diff = max(dot(normal, lightDir), 0.0);
@@ -577,7 +676,6 @@
                     float dR = texture2D(uDepth, vUv + vec2(ps, 0.0)).r;
                     float dD = texture2D(uDepth, vUv + vec2(0.0, ps)).r;
                     if (normalize(vec3((vDepth - dR)*3.0, (vDepth - dD)*3.0, 0.4)).z < 0.2) discard;
-                    // SOMBRA SEMI-TRANSPARENTE
                     gl_FragColor = vec4(0.0, 0.0, 0.0, 0.35);
                 }
             `;
@@ -585,6 +683,9 @@
             shadow.position.set(0.15, -0.15, -0.15);
             shadow.scale.set(1, 1, 0.3);
             scene.add(shadow);
+
+            // Mark container has having 3d
+            container.classList.add('has-3d');
 
             canvas.style.display = 'block';
             startAnimate(viewer, mesh, material);
@@ -599,13 +700,11 @@
             if (viewer.isDisposed) return;
             viewer.animateId = requestAnimationFrame(frame);
             const time = Date.now() * 0.0008;
-            // MOVIMIENTO ULTRA-SUTIL
             viewer.scene.rotation.y = Math.sin(time) * 0.08 + (viewer.targetX * 0.05);
             viewer.scene.rotation.x = Math.cos(time * 0.6) * 0.04 - (viewer.targetY * 0.03);
             if (material && material.uniforms.uTime) material.uniforms.uTime.value = time;
             viewer.renderer.render(viewer.scene, viewer.camera);
 
-            // Activamos el 3D tras 2 segundos para permitir ver la preview 2D
             if (!activated && (Date.now() - startTime > 2000)) {
                 viewer.container.classList.add('has-3d');
                 activated = true;
@@ -621,7 +720,8 @@
         viewer.isDisposed = true;
         cancelAnimationFrame(viewer.animateId);
         container.removeEventListener('mousemove', viewer.onMouseMove);
-        container.classList.remove('has-3d');
+        // Only remove class if we are strictly managing it, but leaving it is fine
+        // container.classList.remove('has-3d');
 
         viewer.scene.traverse(obj => {
             if (obj.geometry) obj.geometry.dispose();
@@ -632,11 +732,9 @@
         });
 
         viewer.renderer.dispose();
-        // Eliminado forceContextLoss() para permitir reutilización del canvas al re-entrar en viewport
         activeViewers.delete(container);
     }
 
-    // Unificar la inicialización para evitar doble carga
     let isInitialized = false;
     function safeInit() {
         if (isInitialized) return;
