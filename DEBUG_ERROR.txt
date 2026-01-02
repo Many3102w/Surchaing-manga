@@ -26,3 +26,4 @@ Trellis Error: Unlogged user is runnning out of daily ZeroGPU quotas. Signup for
 Depth Error (2026-01-02 05:17:32): Unhandled Error: Client.__init__() got an unexpected keyword argument 'hf_token'
 Trellis Error (2026-01-02 05:17:32): Unhandled Error: Client.__init__() got an unexpected keyword argument 'hf_token'
 Trellis Error (2026-01-02 05:21:31): Unhandled Error: 'FileNotFoundError'
+Trellis Error (2026-01-02 05:29:52): Unhandled Error: 'FileNotFoundError'
