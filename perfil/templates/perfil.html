@@ -141,10 +141,10 @@
         {% if user.profile.avatar %}
         <img class="profile-img-preview" src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
         {% else %}
-        <!-- Default placeholder or generic avatar -->
+        <!-- Default placeholder -->
         <div class="profile-img-preview"
-            style="background: #333; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
-            <i class="bi bi-person"></i>
+            style="background: #111; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid #333;">
+            <i class="bi bi-person-fill" style="font-size: 4rem;"></i>
         </div>
         {% endif %}
         <div class="profile-title">

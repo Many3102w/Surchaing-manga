@@ -66,56 +66,64 @@ class CreatePostView(UserPassesTestMixin, CreateView):
         return self.request.user.is_superuser
 
     def form_valid(self, form):
-        form.instance.fecha_de_carga = timezone.now()
-        
-        # Save basic instance first to ensure the post is created even if AI fails
-        response = super().form_valid(form)
-        
         try:
-            from .utils import generate_depth_map, generate_3d_mesh
-            from .models import MangaImage
+            form.instance.fecha_de_carga = timezone.now()
             
-            # 1. Base image must exist
-            if form.instance.front_page:
-                # 2. Save additional images (Gallery)
-                images = self.request.FILES.getlist('additional_images')
-                for img in images:
-                    MangaImage.objects.create(manga=form.instance, image=img)
-
-                # 3. Generate Depth Map (REAL AI)
-                try:
-                    depth_map_file = generate_depth_map(form.instance.front_page.file)
-                    if depth_map_file:
-                        form.instance.depth_map.save(
-                            f'depth_front_{form.instance.id}.png',
-                            depth_map_file,
-                            save=False
-                        )
-                except Exception as e:
-                    print(f"Depth generation failed for {form.instance.id}: {e}")
-
-                # 4. Generate 3D Mesh (IA)
-                try:
-                    mesh_file = generate_3d_mesh(form.instance.front_page.file)
-                    if mesh_file:
-                        form.instance.mesh_3d.save(
-                            f'mesh_front_{form.instance.id}.obj',
-                            mesh_file,
-                            save=False
-                        )
-                except Exception as e:
-                    print(f"3D mesh generation failed for {form.instance.id}: {e}")
-
-                # Mark as 3D converted if something worked
-                if form.instance.depth_map or form.instance.mesh_3d:
-                    form.instance.is_3d_converted = True
+            # Save basic instance first to ensure the post is created even if AI fails
+            # This handles the image upload to Cloudinary
+            response = super().form_valid(form)
+            
+            try:
+                from .utils import generate_depth_map, generate_3d_mesh
+                from .models import MangaImage
                 
-                form.instance.save()
-        except Exception as e:
-            # Global catch to ensure the redirect happens no matter what
-            print(f"Critical error in post processing for {form.instance.id}: {e}")
+                # 1. Base image must exist
+                if form.instance.front_page:
+                    # 2. Save additional images (Gallery)
+                    images = self.request.FILES.getlist('additional_images')
+                    for img in images:
+                        MangaImage.objects.create(manga=form.instance, image=img)
 
-        return response
+                    # 3. Generate Depth Map (REAL AI)
+                    try:
+                        depth_map_file = generate_depth_map(form.instance.front_page.file)
+                        if depth_map_file:
+                            form.instance.depth_map.save(
+                                f'depth_front_{form.instance.id}.png',
+                                depth_map_file,
+                                save=False
+                            )
+                    except Exception as e:
+                        print(f"Depth generation failed: {e}")
+
+                    # 4. Generate 3D Mesh (IA)
+                    try:
+                        mesh_file = generate_3d_mesh(form.instance.front_page.file)
+                        if mesh_file:
+                            form.instance.mesh_3d.save(
+                                f'mesh_front_{form.instance.id}.obj',
+                                mesh_file,
+                                save=False
+                            )
+                    except Exception as e:
+                        print(f"3D mesh generation failed: {e}")
+
+                    # Mark as 3D converted if something worked
+                    if form.instance.depth_map or form.instance.mesh_3d:
+                        form.instance.is_3d_converted = True
+                    
+                    form.instance.save()
+            except Exception as e:
+                # Global catch to ensure the redirect happens no matter what
+                print(f"Critical error in AI post processing for {form.instance.id}: {e}")
+
+            return response
+            
+        except Exception as e:
+            # Catch primary save errors (like Cloudinary credentials missing)
+            print(f"CRITICAL: Failed to save post (Storage/DB error): {e}")
+            form.add_error(None, f"Error al guardar (Verificar Cloudinary): {e}")
+            return self.form_invalid(form)
 
 @login_required
 def delete_post(request, manga_id):
