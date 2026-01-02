@@ -1,6 +1,7 @@
 services:
   - type: web
     name: surchaing-manga
+    plan: free
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn webcomic.wsgi"
