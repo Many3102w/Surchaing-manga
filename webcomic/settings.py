@@ -95,10 +95,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'webcomics/static')]
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dfdrbs1gp',
+    'API_KEY': '688516932845499',
+    'API_SECRET': '3txYl7sSbcyqDAf4SVdjlEfIe9s'
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# ... (Rest of settings)
 
 MEDIA_URL = '/media/'
 # MEDIA_ROOT no es necesario con Cloudinary, pero lo dejamos por compatibilidad local
