@@ -495,10 +495,10 @@
 
     // Run check on load with DELAY to prevent browser freeze
     if (document.readyState === 'complete') {
-        setTimeout(window.checkMissingDepth, 2000);
+        setTimeout(window.checkMissingDepth, 4000);
     } else {
         window.addEventListener('load', () => {
-            setTimeout(window.checkMissingDepth, 2000);
+            setTimeout(window.checkMissingDepth, 4000);
         });
     }
 
