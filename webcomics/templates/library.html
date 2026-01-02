@@ -486,7 +486,6 @@
 
                 canvas.style.display = 'block';
                 startAnimate(viewer, model, null);
-                setTimeout(() => container.classList.add('has-3d'), 100);
             }, undefined, (err) => {
                 console.warn("Fallback displacement", err);
                 loadDisplacement(viewer);
@@ -589,12 +588,12 @@
 
             canvas.style.display = 'block';
             startAnimate(viewer, mesh, material);
-            setTimeout(() => container.classList.add('has-3d'), 100);
 
         } catch (e) { console.error("3D Error:", e); }
     }
 
     function startAnimate(viewer, model, material) {
+        let framesRendered = 0;
         function frame() {
             if (viewer.isDisposed) return;
             viewer.animateId = requestAnimationFrame(frame);
@@ -604,6 +603,14 @@
             viewer.scene.rotation.x = Math.cos(time * 0.6) * 0.04 - (viewer.targetY * 0.03);
             if (material && material.uniforms.uTime) material.uniforms.uTime.value = time;
             viewer.renderer.render(viewer.scene, viewer.camera);
+
+            // Solo activamos la clase 3D cuando el renderer está listo
+            if (framesRendered < 5) {
+                framesRendered++;
+                if (framesRendered === 3) {
+                    viewer.container.classList.add('has-3d');
+                }
+            }
         }
         frame();
     }
@@ -626,7 +633,7 @@
         });
 
         viewer.renderer.dispose();
-        viewer.renderer.forceContextLoss();
+        // Eliminado forceContextLoss() para permitir reutilización del canvas al re-entrar en viewport
         activeViewers.delete(container);
     }
 
