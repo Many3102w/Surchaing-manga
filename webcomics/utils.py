@@ -24,6 +24,10 @@ def generate_3d_mesh(image_file):
 
         print(f"Calling Trellis AI for high-fidelity 3D reconstruction...")
         token = getattr(settings, 'HUGGINGFACE_API_TOKEN', None)
+        if token:
+            print("DEBUG: Using HF Token for authentication.")
+        else:
+            print("DEBUG: No HF Token found. Using public/anonymous quota (High Risk of Failure).")
         client = Client("JeffreyXiang/TRELLIS", token=token)
         
         # Step 1: Preprocess Image (Remove background, center, etc.)
