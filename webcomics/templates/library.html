@@ -206,6 +206,9 @@
         gap: 24px;
         font-size: 1.6rem;
         color: #1a1a1a;
+        /* Ensure it's above any 3D canvas overflow */
+        position: relative;
+        z-index: 50;
     }
 
     .action-btn {
@@ -214,6 +217,8 @@
         cursor: pointer;
         color: inherit;
         transition: 0.2s;
+        /* Remove tap delay on mobile */
+        touch-action: manipulation;
     }
 
     .liked {

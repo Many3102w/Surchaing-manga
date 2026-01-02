@@ -77,14 +77,17 @@ class Comment(models.Model):
 
 class Like(models.Model):
     manga = models.ForeignKey(Manga, on_delete=models.CASCADE, related_name='likes')
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('manga', 'user')
+        # We handle uniqueness in the view to support both cases
+        pass
 
     def __str__(self):
-        return f'{self.user.username} likes {self.manga}'
+        who = self.user.username if self.user else f"Session {self.session_key}"
+        return f'{who} likes {self.manga}'
 
 class Favorite(models.Model):
     manga = models.ForeignKey(Manga, on_delete=models.CASCADE, related_name='favorited_by')

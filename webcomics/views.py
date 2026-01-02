@@ -169,16 +169,33 @@ def toggle_favorite(request, manga_id):
         return JsonResponse({'favorited': favorited})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-@login_required
+# @login_required  <-- Removed to allow anonymous likes
 def like_manga(request, manga_id):
     if request.method == 'POST':
+        # Ensure session exists for anonymous users
+        if not request.session.session_key:
+            request.session.create()
+            
         manga = get_object_or_404(Manga, id=manga_id)
-        like, created = Like.objects.get_or_create(user=request.user, manga=manga)
+        
+        # Determine identifier
+        if request.user.is_authenticated:
+            # User Like
+            like, created = Like.objects.get_or_create(user=request.user, manga=manga)
+        else:
+            # Anonymous Session Like
+            session_key = request.session.session_key
+            # Check if this session already liked this manga
+            # We filter explicitly because get_or_create with nullable user might get confused if we don't specify user=None clearly
+            like, created = Like.objects.get_or_create(session_key=session_key, manga=manga, defaults={'user': None})
+
         if not created:
+            # If it existed, toggle off
             like.delete()
             liked = False
         else:
             liked = True
+            
         return JsonResponse({'liked': liked, 'count': manga.likes.count()})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
