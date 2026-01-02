@@ -1,7 +1,5 @@
 django
 django-environ
-cloudinary
-django-cloudinary-storage
 pillow
 django-ckeditor
 gunicorn
