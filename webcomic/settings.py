@@ -123,4 +123,13 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': '3txYI7sSbcyqDAf4SVdjlEfIe9s',
 }
 
+# Add standard Cloudinary config to force HTTPS
+import cloudinary
+cloudinary.config(
+    cloud_name = 'dfdrbs1gp',
+    api_key = '688516932845499',
+    api_secret = '3txYI7sSbcyqDAf4SVdjlEfIe9s',
+    secure = True
+)
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

@@ -6,21 +6,29 @@ from .forms import UserUpdateForm, ProfileUpdateForm
 @login_required
 def perfil_view(request):
     if request.method == 'POST':
+        print(f"DEBUG: Profile Update POST received. User: {request.user.username}")
+        print(f"DEBUG: FILES received: {request.FILES.keys()}")
+        
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        
         if u_form.is_valid() and p_form.is_valid():
             try:
+                print("DEBUG: Forms valid. Attempting save...")
                 u_form.save()
                 p_form.save()
+                print("DEBUG: Save successful.")
                 messages.success(request, f'¡Tu cuenta ha sido actualizada!')
                 return redirect('perfil')
             except Exception as e:
-                print(f"Error saving profile: {e}")
+                print(f"CRITICAL ERROR saving profile: {e}")
+                import traceback
+                traceback.print_exc()
                 messages.error(request, f"Error al guardar: {e}")
         else:
             # Debugging: Print errors to console
-            print(f"User Form Errors: {u_form.errors}")
-            print(f"Profile Form Errors: {p_form.errors}")
+            print(f"DEBUG: User Form Errors: {u_form.errors}")
+            print(f"DEBUG: Profile Form Errors: {p_form.errors}")
             messages.error(request, 'Por favor corrige los errores abajo.')
     else:
         u_form = UserUpdateForm(instance=request.user)
