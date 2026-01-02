@@ -6,25 +6,8 @@ import tempfile
 import shutil
 from django.core.files.base import ContentFile
 from django.conf import settings
-from transformers import pipeline
 from gradio_client import Client
 import time
-
-
-# Initialize the depth estimation pipeline (loaded once)
-_depth_estimator = None
-
-def get_depth_estimator():
-    """Lazy-load the depth estimation model."""
-    global _depth_estimator
-    if _depth_estimator is None:
-        print("Loading depth estimation model...")
-        _depth_estimator = pipeline(
-            "depth-estimation",
-            model="LiheYoung/depth-anything-small-hf",  # Using small model for faster loading
-        )
-        print("Model loaded successfully!")
-    return _depth_estimator
 
 
 def generate_3d_mesh(image_file):
@@ -65,68 +48,58 @@ def generate_3d_mesh(image_file):
         return None
     except Exception as e:
         print(f"Error in generate_3d_mesh: {e}")
-        import traceback
-        traceback.print_exc()
         return None
 
 
 def generate_depth_map(image_file):
     """
-    Generate a depth map from a 2D image using local Hugging Face model.
-    No API calls needed - runs entirely on the server.
+    Generate a depth map from a 2D image using Hugging Face API.
+    Calls external API instead of running locally to save memory/space.
     """
     try:
+        # Get settings
+        api_url = getattr(settings, 'HUGGINGFACE_API_URL', 'https://api-inference.huggingface.co/models/LiheYoung/depth-anything-small-hf')
+        api_token = getattr(settings, 'HUGGINGFACE_API_TOKEN', None)
+        
+        if not api_token:
+            print("No Hugging Face token found, skipping depth map.")
+            return None
+
         # Read image data
         image_file.seek(0)
-        image = Image.open(image_file)
+        image_data = image_file.read()
         
-        # Convert to RGB if needed
-        if image.mode != 'RGB':
-            image = image.convert('RGB')
+        print(f"Calling Hugging Face API for depth map...")
+        headers = {"Authorization": f"Bearer {api_token}"}
         
-        print(f"Generating depth map for image of size {image.size}...")
+        # Retry logic if model is loading
+        for _ in range(3):
+            response = requests.post(api_url, headers=headers, data=image_data)
+            if response.status_code == 200:
+                print("Successfully generated depth map via API.")
+                return ContentFile(response.content, name='depth_map.png')
+            elif response.status_code == 503: # Model loading
+                print("Model loading, waiting 10s...")
+                time.sleep(10)
+                continue
+            else:
+                print(f"API Error: {response.status_code} - {response.text}")
+                break
         
-        # Get the depth estimator
-        depth_estimator = get_depth_estimator()
-        
-        # Generate depth map
-        result = depth_estimator(image)
-        depth_map_image = result["depth"]
-        
-        # Convert to RGB for saving
-        if depth_map_image.mode != 'RGB':
-            depth_map_image = depth_map_image.convert('RGB')
-        
-        # Save to BytesIO
-        output = BytesIO()
-        depth_map_image.save(output, format='PNG')
-        output.seek(0)
-        
-        print("Successfully generated depth map locally.")
-        return ContentFile(output.read(), name='depth_map.png')
+        return None
             
     except Exception as e:
-        print(f"Error in generate_depth_map: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error in generate_depth_map (API): {e}")
         return None
 
 
 def create_3d_effect_data(original_image_path, depth_map_path):
     """
     Create metadata for 3D effect rendering.
-    Returns a dict with paths and settings for frontend 3D display.
-    
-    Args:
-        original_image_path: Path to the original image
-        depth_map_path: Path to the depth map image
-        
-    Returns:
-        dict with 3D effect configuration
     """
     return {
         'original': original_image_path,
         'depth_map': depth_map_path,
-        'parallax_strength': 0.3,  # Adjustable parallax effect strength
-        'depth_scale': 1.0  # Adjustable depth scale
+        'parallax_strength': 0.3,
+        'depth_scale': 1.0
     }

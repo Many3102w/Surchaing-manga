@@ -1,5 +1,4 @@
 django
-environ
 django-environ
 pillow
 django-ckeditor
@@ -9,5 +8,3 @@ dj-database-url
 psycopg2-binary
 requests
 gradio_client
-transformers
-torch --index-url https://download.pytorch.org/whl/cpu
