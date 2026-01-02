@@ -430,7 +430,26 @@
                 canvas.width = result.depth.width;
                 canvas.height = result.depth.height;
                 const ctx = canvas.getContext('2d');
-                const imageData = new ImageData(result.depth.data, result.depth.width, result.depth.height);
+
+                // FIXED: Convert output (likely grayscale/RGB) to RGBA for ImageData configuration
+                const rawData = result.depth.data; // Uint8Array or Float32Array
+                const width = result.depth.width;
+                const height = result.depth.height;
+                const channels = result.depth.channels || 1; // Usually 1 for depth
+
+                // Create strict RGBA buffer (4 channels)
+                const rgbaData = new Uint8ClampedArray(width * height * 4);
+
+                for (let i = 0; i < width * height; i++) {
+                    const val = rawData[i * channels]; // Get pixel value
+                    // Set R, G, B to the value (Grayscale)
+                    rgbaData[i * 4] = val;     // R
+                    rgbaData[i * 4 + 1] = val; // G
+                    rgbaData[i * 4 + 2] = val; // B
+                    rgbaData[i * 4 + 3] = 255; // Alpha (Opaque)
+                }
+
+                const imageData = new ImageData(rgbaData, width, height);
                 ctx.putImageData(imageData, 0, 0);
 
                 const dataUrl = canvas.toDataURL('image/png');
