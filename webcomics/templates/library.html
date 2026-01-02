@@ -413,113 +413,114 @@
 
 {% block extra_js %}
 <script type="module">
-    // Import Transformers.js from CDN (Direct Web AI)
-    // Updated to v2.17.2 to support 'depth-anything' models
-    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+    // --- WORKER & CACHE LOGIC ---
 
-    // Skip local model checks to avoid 404s on checking for 'local' files
-    env.allowLocalModels = false;
-    env.useBrowserCache = true;
+    // Initialize Worker
+    const workerUrl = '{% static "js/depth-worker.js" %}';
+    const depthWorker = new Worker(workerUrl, { type: 'module' });
 
-    // Singleton for the depth model
-    let depthEstimator = null;
+    // Handle Worker Responses
+    depthWorker.onmessage = (e) => {
+        const { status, id, width, height, buffer, error } = e.data;
+        const container = document.querySelector(`.feed-image-container[data-manga-id="${id}"]`); // Use data-manga-id
 
-    async function ensureModel() {
-        if (!depthEstimator) {
-            console.log("Loading Client-Side AI Model...");
-            // Use a small, fast quantization model properly cached in browser
-            depthEstimator = await pipeline('depth-estimation', 'Xenova/depth-anything-small-hf');
+        if (!container) return;
+
+        if (status === 'error') {
+            console.error("Worker Error:", error);
+            // Hide badge or show error
+            return;
         }
-        return depthEstimator;
-    }
 
-    // Expose generation function globally for the 3D viewer
-    window.generateClientSideDepth = async (imageUrl, container) => {
-        try {
-            const estimator = await ensureModel();
-            console.log("Generating Depth on Client...", imageUrl);
+        if (status === 'success') {
+            console.log(`Worker finished for ${id}`);
 
-            // Run inference
-            const result = await estimator(imageUrl);
-            // result is usually { depth: Tensor, predicted_depth: Tensor } 
-            // Transformers.js depth-estimation pipeline returns a raw object with a `depth` property that is a Greyscale Image (Tensor-like)
-            // Actually, the pipeline returns { depth: RawImage }
+            // 1. Create Canvas from Buffer
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            const imageData = new ImageData(new Uint8ClampedArray(buffer), width, height);
+            ctx.putImageData(imageData, 0, 0);
 
-            if (result && result.depth) {
-                // Convert to Canvas/DataURL
-                const canvas = document.createElement('canvas');
-                canvas.width = result.depth.width;
-                canvas.height = result.depth.height;
-                const ctx = canvas.getContext('2d');
+            // 2. Mark as Web AI
+            const badge = document.createElement('div');
+            badge.className = 'manga-3d-badge'; // Use existing badge class
+            badge.innerHTML = '<i class="bi bi-cpu"></i> WEB AI 3D';
+            container.appendChild(badge);
 
-                // FIXED: Convert output (likely grayscale/RGB) to RGBA for ImageData configuration
-                const rawData = result.depth.data; // Uint8Array or Float32Array
-                const width = result.depth.width;
-                const height = result.depth.height;
-                const channels = result.depth.channels || 1; // Usually 1 for depth
+            // 3. Add to DOM (hidden) for 3D Viewer to find
+            canvas.className = 'depth-3d-canvas';
+            canvas.style.display = 'none'; // Viewer will show it
+            container.appendChild(canvas);
 
-                // Create strict RGBA buffer (4 channels)
-                const rgbaData = new Uint8ClampedArray(width * height * 4);
+            // 4. Update Dataset for viewer
+            const dataUrl = canvas.toDataURL('image/png');
+            container.dataset.depth = dataUrl;
 
-                for (let i = 0; i < width * height; i++) {
-                    const val = rawData[i * channels]; // Get pixel value
-                    // Set R, G, B to the value (Grayscale)
-                    rgbaData[i * 4] = val;     // R
-                    rgbaData[i * 4 + 1] = val; // G
-                    rgbaData[i * 4 + 2] = val; // B
-                    rgbaData[i * 4 + 3] = 255; // Alpha (Opaque)
-                }
-
-                const imageData = new ImageData(rgbaData, width, height);
-                ctx.putImageData(imageData, 0, 0);
-
-                const dataUrl = canvas.toDataURL('image/png');
-                console.log("Client-Side Depth Generated!");
-
-                // Inject into container and restart viewer
-                container.dataset.depth = dataUrl;
-
-                // Add the 3D Badge explicitly since we forced it
-                if (!container.querySelector('.manga-3d-badge')) {
-                    const badge = document.createElement('div');
-                    badge.className = 'manga-3d-badge';
-                    badge.innerHTML = '<i class="bi bi-cpu"></i> WEB AI 3D';
-                    container.appendChild(badge);
-
-                    const canvas3d = document.createElement('canvas');
-                    canvas3d.className = 'depth-3d-canvas';
-                    container.appendChild(canvas3d);
-                }
-
-                // Trigger global init if defined
-                if (window.initApp3D) window.initApp3D(container);
+            // 5. CACHE IT! (Save DataURL to LocalStorage)
+            try {
+                const cacheKey = `depth_cache_${id}`; // Simple cache key by Post ID
+                localStorage.setItem(cacheKey, dataUrl);
+            } catch (err) {
+                console.warn("Storage full, cannot cache depth map", err);
             }
-        } catch (e) {
-            console.error("Client AI Error:", e);
+
+            // 6. Init Viewer if user is looking at it
+            if (window.initApp3D) window.initApp3D(container);
         }
     };
 
-    // Auto-scan for items missing depth maps
-    // OPTIMIZATION: Only check the LATEST (First) post to avoid freezing the browser with multiple AI runs
+    // Main Function to Check/Generate
     window.checkMissingDepth = () => {
-        const container = document.querySelector('.feed-image-container'); // Selects only the first one
-        if (container) {
+        // Optimized: Only check visible or recent posts? 
+        // For now, let's check the first few to avoid queueing 100 jobs.
+        const containers = document.querySelectorAll('.feed-image-container');
+
+        let count = 0;
+        for (const container of containers) {
+            if (count > 2) break; // Only check top 3 for performance
+            count++;
+
+            const id = container.dataset.mangaId; // Use data-manga-id
             const front = container.dataset.front;
             const depth = container.dataset.depth;
-            // If we have an image but NO depth map, try to generate it client-side
+
+            // If depth is missing
             if (front && (!depth || depth === "")) {
-                console.log("Checking latest post for 3D...");
-                window.generateClientSideDepth(front, container);
+
+                // A. CHECK CACHE FIRST
+                const cacheKey = `depth_cache_${id}`;
+                const cachedDepth = localStorage.getItem(cacheKey);
+
+                if (cachedDepth) {
+                    console.log(`Restoring ${id} from Cache...`);
+                    container.dataset.depth = cachedDepth;
+                    // Trigger 3D init immediately
+                    if (window.initApp3D) window.initApp3D(container);
+                    continue; // Skip AI generation
+                }
+
+                // B. ASK WORKER
+                console.log(`Queueing ${id} for Worker AI...`);
+                // Add unique ID to container if not present (using dataset hack if needed)
+                container.dataset.id = id;
+
+                depthWorker.postMessage({
+                    action: 'generate',
+                    imageUrl: front,
+                    id: id
+                });
             }
         }
     };
 
-    // Run check on load with DELAY to prevent browser freeze
+    // Start with delay
     if (document.readyState === 'complete') {
-        setTimeout(window.checkMissingDepth, 4000);
+        setTimeout(window.checkMissingDepth, 1000); // 1s delay is enough with worker
     } else {
         window.addEventListener('load', () => {
-            setTimeout(window.checkMissingDepth, 4000);
+            setTimeout(window.checkMissingDepth, 1000);
         });
     }
 
@@ -549,6 +550,8 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     createViewer(entry.target);
+                    // Also trigger cache check if entering view? 
+                    // Maybe later optimization. 
                 } else {
                     disposeViewer(entry.target);
                 }
@@ -556,8 +559,6 @@
         }, { threshold: 0.05, rootMargin: '200px' });
 
         containers.forEach(container => {
-            // Updated: Observe ALL containers, not just ones with existing canvases.
-            // Why? Because Client-Side AI might add the canvas later.
             observer.observe(container);
         });
 
@@ -566,7 +567,7 @@
         });
     }
 
-    // Expose specifically for the Module script to call
+    // Expose for Worker Callback
     window.initApp3D = (singleContainer) => {
         createViewer(singleContainer);
     };
@@ -574,15 +575,29 @@
     function createViewer(container) {
         if (activeViewers.has(container)) return;
 
-        // Check again for canvas (client AI might have added it)
-        let canvas = container.querySelector('.depth-3d-canvas');
-        if (!canvas) return; // Still no 3D available
-
         const meshUrl = container.dataset.mesh;
         const frontUrl = container.dataset.front;
-        const depthUrl = container.dataset.depth; // This might be a Data URL now!
+        const depthUrl = container.dataset.depth; // Worker sets this now!
 
-        if (!frontUrl || !depthUrl) return;
+        if (!frontUrl || !depthUrl) return; // Wait for Worker/Cache
+
+        // Check again for canvas (client AI might have added it)
+        // But with Worker, we rely on dataset.depth DataURL mostly
+        // Unless we want to reuse the specific canvas element the worker result created?
+        // Actually, loadDisplacement logic below uses TextureLoader.
+        // TextureLoader can load DataURLs.
+        // So we don't strict need the canvas element if dataset.depth is set.
+
+        let canvas = container.querySelector('.depth-3d-canvas');
+        if (!canvas) {
+            // Create a canvas for ThreeJS if it doesn't exist (Server-side case)
+            // If Worker ran, it appended a canvas, so we use that.
+            // If we loaded from cache, we only have DataURL.
+            // So we need to create a dedicated canvas for the Renderer.
+            canvas = document.createElement('canvas');
+            canvas.className = 'depth-3d-canvas';
+            container.appendChild(canvas);
+        }
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
@@ -630,8 +645,6 @@
 
                 canvas.style.display = 'block';
                 startAnimate(viewer, model, null);
-
-                // Show Badge if hidden (e.g. Server generated mesh but depth failed)
                 container.classList.add('has-3d');
 
             }, undefined, (err) => {
@@ -652,7 +665,6 @@
         if (!frontUrl || !depthUrl || viewer.isDisposed) return;
 
         const loader = new THREE.TextureLoader();
-        // Allow Data URLs cross origin (safe for data urls)
         loader.crossOrigin = 'Anonymous';
 
         const loadP = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
@@ -734,9 +746,7 @@
             shadow.scale.set(1, 1, 0.3);
             scene.add(shadow);
 
-            // Mark container has having 3d
             container.classList.add('has-3d');
-
             canvas.style.display = 'block';
             startAnimate(viewer, mesh, material);
 
@@ -770,15 +780,10 @@
         viewer.isDisposed = true;
         cancelAnimationFrame(viewer.animateId);
         container.removeEventListener('mousemove', viewer.onMouseMove);
-        // Only remove class if we are strictly managing it, but leaving it is fine
-        // container.classList.remove('has-3d');
 
         viewer.scene.traverse(obj => {
             if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) {
-                if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
-                else obj.material.dispose();
-            }
+            if (obj.material) obj.material.dispose();
         });
 
         viewer.renderer.dispose();

@@ -234,6 +234,9 @@ body.home-page {
         font-size: 2.5rem;
         /* Much smaller for phones */
         letter-spacing: -1px;
+        word-break: break-word;
+        /* Prevents "TUSPRENDAS..." overflow */
+        line-height: 1.1;
     }
 
     .concept-hero p {
