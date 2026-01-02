@@ -412,29 +412,89 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+    /* Loading Pulse Animation */
+    @keyframes ai-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+    }
+
+    .ai-loading-active {
+        position: relative;
+    }
+
+    .ai-loading-active::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 8px;
+        animation: ai-pulse 2s infinite;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .ai-badge-appear {
+        animation: fadeScale 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeScale {
+        from {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
+
 <script type="module">
-    // --- WORKER & CACHE LOGIC ---
+    // --- SMART WORKER & CACHE LOGIC ---
 
     // Initialize Worker
     const workerUrl = '{% static "js/depth-worker.js" %}';
     const depthWorker = new Worker(workerUrl, { type: 'module' });
 
+    // Preload model immediately (low priority background)
+    depthWorker.postMessage({ action: 'preload' });
+
     // Handle Worker Responses
     depthWorker.onmessage = (e) => {
         const { status, id, width, height, buffer, error } = e.data;
-        const container = document.querySelector(`.feed-image-container[data-manga-id="${id}"]`); // Use data-manga-id
 
+        if (status === 'preloaded') {
+            console.log("Worker: Model Preloaded & Ready.");
+            return;
+        }
+
+        const container = document.querySelector(`.feed-image-container[data-manga-id="${id}"]`);
         if (!container) return;
+
+        // Remove loading state
+        container.classList.remove('ai-loading-active');
 
         if (status === 'error') {
             console.error("Worker Error:", error);
-            // Hide badge or show error
+            // Optional: Show error state
             return;
         }
 
         if (status === 'success') {
-            console.log(`Worker finished for ${id}`);
-
             // 1. Create Canvas from Buffer
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -443,9 +503,9 @@
             const imageData = new ImageData(new Uint8ClampedArray(buffer), width, height);
             ctx.putImageData(imageData, 0, 0);
 
-            // 2. Mark as Web AI
+            // 2. Mark as Web AI with Animation
             const badge = document.createElement('div');
-            badge.className = 'manga-3d-badge'; // Use existing badge class
+            badge.className = 'manga-3d-badge ai-badge-appear';
             badge.innerHTML = '<i class="bi bi-cpu"></i> WEB AI 3D';
             container.appendChild(badge);
 
@@ -458,70 +518,77 @@
             const dataUrl = canvas.toDataURL('image/png');
             container.dataset.depth = dataUrl;
 
-            // 5. CACHE IT! (Save DataURL to LocalStorage)
+            // 5. CACHE IT!
             try {
-                const cacheKey = `depth_cache_${id}`; // Simple cache key by Post ID
+                const cacheKey = `depth_cache_${id}`;
                 localStorage.setItem(cacheKey, dataUrl);
             } catch (err) {
-                console.warn("Storage full, cannot cache depth map", err);
+                console.warn("Storage full", err);
             }
 
-            // 6. Init Viewer if user is looking at it
+            // 6. Init Viewer immediately
             if (window.initApp3D) window.initApp3D(container);
         }
     };
 
-    // Main Function to Check/Generate
-    window.checkMissingDepth = () => {
-        // Optimized: Only check visible or recent posts? 
-        // For now, let's check the first few to avoid queueing 100 jobs.
+    // --- SMART LAZY LOADING OBSERVER ---
+    // Only triggers AI when the user actually SCROLLS to the image.
+    function initSmartAI() {
         const containers = document.querySelectorAll('.feed-image-container');
 
-        let count = 0;
-        for (const container of containers) {
-            if (count > 2) break; // Only check top 3 for performance
-            count++;
+        const aiObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const container = entry.target;
+                    const id = container.dataset.mangaId;
+                    const front = container.dataset.front;
+                    const depth = container.dataset.depth;
 
-            const id = container.dataset.mangaId; // Use data-manga-id
-            const front = container.dataset.front;
-            const depth = container.dataset.depth;
+                    // Stop observing this one immediately so we don't trigger twice
+                    observer.unobserve(container);
 
-            // If depth is missing
-            if (front && (!depth || depth === "")) {
+                    // Logic: If needed, generate 3D
+                    if (front && (!depth || depth === "")) {
 
-                // A. CHECK CACHE FIRST
-                const cacheKey = `depth_cache_${id}`;
-                const cachedDepth = localStorage.getItem(cacheKey);
+                        // A. Check Cache First (Super Fast)
+                        const cacheKey = `depth_cache_${id}`;
+                        const cachedDepth = localStorage.getItem(cacheKey);
 
-                if (cachedDepth) {
-                    console.log(`Restoring ${id} from Cache...`);
-                    container.dataset.depth = cachedDepth;
-                    // Trigger 3D init immediately
-                    if (window.initApp3D) window.initApp3D(container);
-                    continue; // Skip AI generation
+                        if (cachedDepth) {
+                            console.log(`SmartAI: Restored ${id} from Cache.`);
+                            container.dataset.depth = cachedDepth;
+                            if (window.initApp3D) window.initApp3D(container);
+                        }
+                        // B. Not in cache? Ask Worker.
+                        else {
+                            console.log(`SmartAI: Requesting Worker for ${id}`);
+
+                            // Visual Feedback: "Thinking..."
+                            container.classList.add('ai-loading-active');
+                            container.dataset.id = id; // Ensure ID matches worker expectation
+
+                            depthWorker.postMessage({
+                                action: 'generate',
+                                imageUrl: front,
+                                id: id
+                            });
+                        }
+                    }
                 }
-
-                // B. ASK WORKER
-                console.log(`Queueing ${id} for Worker AI...`);
-                // Add unique ID to container if not present (using dataset hack if needed)
-                container.dataset.id = id;
-
-                depthWorker.postMessage({
-                    action: 'generate',
-                    imageUrl: front,
-                    id: id
-                });
-            }
-        }
-    };
-
-    // Start with delay
-    if (document.readyState === 'complete') {
-        setTimeout(window.checkMissingDepth, 1000); // 1s delay is enough with worker
-    } else {
-        window.addEventListener('load', () => {
-            setTimeout(window.checkMissingDepth, 1000);
+            });
+        }, {
+            rootMargin: '50px', // Trigger slightly before it comes into view
+            threshold: 0.1
         });
+
+        containers.forEach(c => aiObserver.observe(c));
+    }
+
+    // Initialize on load
+    if (document.readyState === 'complete') {
+        initSmartAI();
+    } else {
+        window.addEventListener('load', initSmartAI);
     }
 
 </script>

@@ -23,6 +23,13 @@ async function initModel() {
 self.onmessage = async (e) => {
     const { action, imageUrl, id } = e.data;
 
+    if (action === 'preload') {
+        // Just load the model into memory
+        await initModel();
+        self.postMessage({ status: 'preloaded' });
+        return;
+    }
+
     if (action === 'generate') {
         try {
             await initModel();
@@ -33,11 +40,11 @@ self.onmessage = async (e) => {
             // Let's use the URL.
 
             const result = await depthModel(imageUrl);
-            
+
             // result.depth is the tensor/raw image data
             // We need to send back transferable data to keep it fast
             // The result.depth is usually { data, width, height, channels }
-            
+
             // Convert to RGBA for canvas
             const rawData = result.depth.data;
             const width = result.depth.width;
@@ -45,7 +52,7 @@ self.onmessage = async (e) => {
             const channels = result.depth.channels || 1;
 
             const rgbaData = new Uint8ClampedArray(width * height * 4);
-            
+
             for (let i = 0; i < width * height; i++) {
                 const val = rawData[i * channels];
                 rgbaData[i * 4] = val;
