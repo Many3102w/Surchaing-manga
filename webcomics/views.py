@@ -127,6 +127,14 @@ class CreatePostView(UserPassesTestMixin, CreateView):
                 print(f"Critical error in AI post processing for {form.instance.id}: {e}")
                 import traceback
                 traceback.print_exc()
+                from django.contrib import messages
+                messages.warning(self.request, f"Post created, but AI 3D failed: {e}")
+
+            from django.contrib import messages
+            if form.instance.is_3d_converted:
+                messages.success(self.request, "Publicación creada con Éxtio (3D Generado)")
+            else:
+                messages.warning(self.request, "Publicación creada (Sin 3D - Verifique Token)")
 
             return response
             

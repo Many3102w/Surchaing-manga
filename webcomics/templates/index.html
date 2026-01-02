@@ -54,7 +54,8 @@
 
     .bg-panel {
         flex: 1;
-        background: url('{% static "images/home_bg.jpg" %}') no-repeat center center/cover;
+        /* FIXED: Removed missing 'images/home_bg.jpg' which caused 500 Error */
+        background: #111;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
         filter: brightness(0.6) contrast(1.1);
     }
@@ -212,7 +213,7 @@
                     {% if manga.front_page %}
                     <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
                     {% else %}
-                    <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                    <img src="{% static 'images/logo/logo_v2.png' %}" alt="Placeholder">
                     {% endif %}
                     <div class="meta">
                         <h3>{{ manga.nombre_del_manga }}</h3>
@@ -238,7 +239,7 @@
                     {% if manga.front_page %}
                     <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
                     {% else %}
-                    <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                    <img src="{% static 'images/logo/logo_v2.png' %}" alt="Placeholder">
                     {% endif %}
                     <div class="meta">
                         <h3>{{ manga.nombre_del_manga }}</h3>
@@ -264,7 +265,7 @@
                     {% if manga.front_page %}
                     <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
                     {% else %}
-                    <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                    <img src="{% static 'images/logo/logo_v2.png' %}" alt="Placeholder">
                     {% endif %}
                     <div class="meta">
                         <h3>{{ manga.nombre_del_manga }}</h3>
@@ -290,7 +291,7 @@
                     {% if manga.front_page %}
                     <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}">
                     {% else %}
-                    <img src="{% static 'images/logo/light_logo.webp' %}" alt="Placeholder">
+                    <img src="{% static 'images/logo/logo_v2.png' %}" alt="Placeholder">
                     {% endif %}
                     <div class="meta">
                         <h3>{{ manga.nombre_del_manga }}</h3>
