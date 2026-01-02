@@ -157,6 +157,10 @@
         height: 100%;
         display: none;
         z-index: 5;
+        /* Allow clicks to pass through to image (e.g. for zooming) */
+        pointer-events: none;
+        /* Allow vertical scrolling on mobile even if touching canvas */
+        touch-action: pan-y;
     }
 
     .has-3d .depth-3d-canvas {
@@ -872,16 +876,34 @@
     }
 
     function toggleLike(id) {
+        const icon = document.querySelector(`#like-icon-${id}`);
+        // Optimistic UI: Toggle immediately without waiting for server
+        const isLiked = icon.classList.contains('liked');
+
+        // Immediate visual feedback
+        if (isLiked) {
+            icon.className = 'bi bi-heart';
+            // Optional: Reduce count locally if you want strictly instant feedback
+            // But usually just the heart is enough.
+        } else {
+            icon.className = 'bi bi-heart-fill liked';
+        }
+
+        // Send request in background
         fetch(`/like/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
             .then(r => r.json()).then(d => {
                 if (d.error) {
                     alert("Debes iniciar sesión para dar me gusta.");
+                    // Revert on error
+                    icon.className = isLiked ? 'bi bi-heart-fill liked' : 'bi bi-heart';
                     return;
                 }
-                const icon = document.querySelector(`#like-icon-${id}`);
+                // Sync count from server
                 const count = document.querySelector(`#like-count-${id}`);
-                icon.className = d.liked ? 'bi bi-heart-fill liked' : 'bi bi-heart';
-                count.innerText = d.count;
+                if (count) count.innerText = d.count;
+            }).catch(err => {
+                // Revert network error
+                icon.className = isLiked ? 'bi bi-heart-fill liked' : 'bi bi-heart';
             });
     }
 </script>
