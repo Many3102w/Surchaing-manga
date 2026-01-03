@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Manga, Like, Comment, Favorite, WarehouseItem, WarehouseEntry
+from django.db.models import Sum, Max, Q
+from .models import Manga, Like, Comment, Favorite, WarehouseItem, WarehouseEntry, ChatMessage
 from .forms import MangaForm, CommentForm
 
 class HomeView(TemplateView):
@@ -475,7 +476,6 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         ]
 
         # 6. Active Chats for Support
-        from django.db.models import Max
         context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
             last_msg=Max('created_at')
         ).order_by('-last_msg')
@@ -492,7 +492,7 @@ def get_chat_messages(request):
     if request.user.is_superuser and (s_key or u_id):
         # Admin fetching a conversation
         if u_id and u_id != 'None':
-            messages = ChatMessage.objects.filter(models.Q(user_id=u_id) | models.Q(session_key=s_key))
+            messages = ChatMessage.objects.filter(Q(user_id=u_id) | Q(session_key=s_key))
         else:
             messages = ChatMessage.objects.filter(session_key=s_key, user=None)
     else:
@@ -502,7 +502,7 @@ def get_chat_messages(request):
         
         session_key = request.session.session_key
         if request.user.is_authenticated:
-            messages = ChatMessage.objects.filter(models.Q(user=request.user) | models.Q(session_key=session_key))
+            messages = ChatMessage.objects.filter(Q(user=request.user) | Q(session_key=session_key))
         else:
             messages = ChatMessage.objects.filter(session_key=session_key, user=None)
     
