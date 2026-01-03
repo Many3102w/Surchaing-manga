@@ -1,41 +1,27 @@
 {
-    "expo": {
-        "name": "DERSSGM Manga",
-        "slug": "derssgm-manga",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "dark",
-        "splash": {
-            "image": "./assets/splash.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#000000"
-        },
-        "assetBundlePatterns": [
-            "**/*"
-        ],
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#000000"
-            },
-            "package": "com.surchaing.derssgm"
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": [
-            [
-                "expo-build-properties",
-                {
-                    "android": {
-                        "usesCleartextTraffic": true
-                    }
-                }
-            ]
-        ]
-    }
+  "expo": {
+    "name": "DERSSGM Manga",
+    "slug": "derssgm-manga",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "sdkVersion": "49.0.0",
+    "platforms": [
+      "android"
+    ],
+    "android": {
+      "package": "com.surchaing.derssgm",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "permissions": []
+    },
+    "extra": {
+      "eas": {
+        "projectId": "333b05ae-9d9d-4bb9-aa1d-3d97ce209993"
+      }
+    },
+    "owner": "egwegfdf"
+  }
 }

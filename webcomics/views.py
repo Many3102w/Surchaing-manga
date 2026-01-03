@@ -56,6 +56,11 @@ class LibraryView(TemplateView):
         context['comment_form'] = CommentForm()
         return context
 
+def product_detail(request, manga_id):
+    """Dedicated product detail page for sharing"""
+    manga = get_object_or_404(Manga, id=manga_id)
+    return render(request, 'product_detail.html', {'manga': manga})
+
 class CreatePostView(UserPassesTestMixin, CreateView):
     model = Manga
     form_class = MangaForm

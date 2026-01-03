@@ -1,0 +1,284 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ manga.nombre_del_manga }} - DERSSG'M{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        min-height: 100vh;
+    }
+
+    .product-detail-container {
+        max-width: 800px;
+        margin: 100px auto 60px;
+        padding: 0 20px;
+    }
+
+    .product-card {
+        background: #ffffff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .product-image-wrapper {
+        position: relative;
+        width: 100%;
+        background: #000;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        max-height: 600px;
+    }
+
+        {
+        % if manga.is_3d_converted %
+    }
+
+    .product-3d-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 900;
+        backdrop-filter: blur(8px);
+    }
+
+        {
+        % endif %
+    }
+
+    .product-info {
+        padding: 40px;
+    }
+
+    .product-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+    }
+
+    .product-type {
+        display: inline-block;
+        background: #f0f0f0;
+        color: #666;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .product-price {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #bfa37c;
+        margin: 20px 0;
+    }
+
+    .product-description {
+        color: #555;
+        line-height: 1.8;
+        margin: 20px 0;
+        font-size: 1rem;
+    }
+
+    .requirements-section {
+        background: #f9f9f9;
+        padding: 25px;
+        border-radius: 12px;
+        margin: 30px 0;
+    }
+
+    .requirements-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .requirement-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 12px 0;
+        color: #555;
+    }
+
+    .requirement-item i {
+        color: #bfa37c;
+        font-size: 1.1rem;
+    }
+
+    .size-badge {
+        display: inline-block;
+        background: #000;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 800;
+        margin: 10px 0;
+    }
+
+    .buy-button {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #bfa37c 0%, #8b7355 100%);
+        color: #fff;
+        border: none;
+        padding: 18px 30px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 900;
+        cursor: pointer;
+        margin-top: 30px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .buy-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(191, 163, 124, 0.4);
+    }
+
+    .buy-button:active {
+        transform: translateY(0);
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #fff;
+        margin-bottom: 20px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: opacity 0.2s;
+    }
+
+    .back-link:hover {
+        opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+        .product-detail-container {
+            margin-top: 80px;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+        }
+
+        .product-price {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <a href="{% url 'library' %}" class="back-link">
+        <i class="bi bi-arrow-left"></i> Volver al catálogo
+    </a>
+
+    <div class="product-card">
+        <div class="product-image-wrapper">
+            {% if manga.front_page %}
+            <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}" class="product-image">
+            {% if manga.is_3d_converted %}
+            <div class="product-3d-badge">
+                <i class="bi bi-robot"></i> IA 3D ANALYSIS
+            </div>
+            {% endif %}
+            {% else %}
+            <div style="color: #666; text-align: center;">
+                <i class="bi bi-image" style="font-size: 4rem;"></i>
+                <p>Sin imagen disponible</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="product-info">
+            <h1 class="product-title">{{ manga.nombre_del_manga }}</h1>
+            <span class="product-type">{{ manga.type_of_manga }}</span>
+
+            {% if manga.precio %}
+            <div class="product-price">${{ manga.precio }}</div>
+            {% endif %}
+
+            {% if manga.descripcion %}
+            <p class="product-description">{{ manga.descripcion }}</p>
+            {% endif %}
+
+            {% if manga.talla %}
+            <div class="size-badge">
+                Talla: {{ manga.talla }}
+            </div>
+            {% endif %}
+
+            <div class="requirements-section">
+                <h3 class="requirements-title">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Requisitos de Compra
+                </h3>
+                <div class="requirement-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Contacto previo para confirmar disponibilidad</span>
+                </div>
+                <div class="requirement-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Ubicación en México para envíos nacionales</span>
+                </div>
+                <div class="requirement-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Pago anticipado del 50% para reservar</span>
+                </div>
+                <div class="requirement-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Envío incluido en CDMX, costos adicionales en otros estados</span>
+                </div>
+            </div>
+
+            <button class="buy-button" onclick="initiatepurchase()">
+                <i class="bi bi-bag-check-fill"></i> Quiero Comprar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initiatepurchase() {
+        // Open WhatsApp or contact method
+        const productName = "{{ manga.nombre_del_manga|escapejs }}";
+        const productPrice = "{{ manga.precio }}";
+        const message = `Hola, estoy interesado en comprar: ${productName} - $${productPrice}`;
+
+        // Replace with your WhatsApp number
+        const whatsappNumber = "525512345678"; // Update this with actual number
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappUrl, '_blank');
+    }
+</script>
+{% endblock %}

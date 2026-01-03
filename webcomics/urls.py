@@ -5,7 +5,7 @@ from .views import (
     IndexView, HomeView, IngresarView, LibraryView, TeamView,
     SearchView, AboutView, LoginView, CreatePostView, like_manga,
     toggle_favorite, add_comment, delete_post, toggle_vendido,
-    update_warehouse, SuperUserDashboardView
+    update_warehouse, SuperUserDashboardView, product_detail
 )
 from django.contrib.auth.views import LogoutView
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('ingresar/', IngresarView.as_view(), name='ingresar'),
 
     path("library/", LibraryView.as_view(), name='library'),
+    path('product/<int:manga_id>/', product_detail, name='product_detail'),
     path("team/", TeamView.as_view(), name='team'),
 
     path("search/", SearchView.as_view(), name='search'),
