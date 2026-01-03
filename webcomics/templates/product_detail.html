@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block title %}{{ manga.nombre_del_manga }} - DERSSG'M{% endblock %}
+{% block title %}{{ manga.nombre_del_manga }} - DERSSG'M Moda{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -40,10 +40,6 @@
         max-height: 600px;
     }
 
-        {
-        % if manga.is_3d_converted %
-    }
-
     .product-3d-badge {
         position: absolute;
         top: 20px;
@@ -55,10 +51,7 @@
         font-size: 0.75rem;
         font-weight: 900;
         backdrop-filter: blur(8px);
-    }
-
-        {
-        % endif %
+        z-index: 10;
     }
 
     .product-info {
@@ -159,10 +152,6 @@
         box-shadow: 0 10px 30px rgba(191, 163, 124, 0.4);
     }
 
-    .buy-button:active {
-        transform: translateY(0);
-    }
-
     .back-link {
         display: inline-block;
         color: #fff;
@@ -174,6 +163,14 @@
 
     .back-link:hover {
         opacity: 0.7;
+    }
+
+    .sold-out {
+        background: #ffebee !important;
+        color: #c62828 !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
 
     @media (max-width: 768px) {
@@ -199,7 +196,7 @@
 {% block content %}
 <div class="product-detail-container">
     <a href="{% url 'library' %}" class="back-link">
-        <i class="bi bi-arrow-left"></i> Volver al catálogo
+        <i class="bi bi-arrow-left"></i> Volver a la Tienda
     </a>
 
     <div class="product-card">
@@ -208,13 +205,13 @@
             <img src="{{ manga.front_page.url }}" alt="{{ manga.nombre_del_manga }}" class="product-image">
             {% if manga.is_3d_converted %}
             <div class="product-3d-badge">
-                <i class="bi bi-robot"></i> IA 3D ANALYSIS
+                <i class="bi bi-robot"></i> TECNOLOGÍA IA 3D
             </div>
             {% endif %}
             {% else %}
             <div style="color: #666; text-align: center;">
                 <i class="bi bi-image" style="font-size: 4rem;"></i>
-                <p>Sin imagen disponible</p>
+                <p>Imagen no disponible</p>
             </div>
             {% endif %}
         </div>
@@ -224,7 +221,14 @@
             <span class="product-type">{{ manga.type_of_manga }}</span>
 
             {% if manga.precio %}
-            <div class="product-price">${{ manga.precio }}</div>
+            <div class="product-price">${{ manga.precio }} MXN</div>
+            {% endif %}
+
+            {% if manga.vendido %}
+            <div
+                style="background: #ffebee; color: #c62828; padding: 10px 20px; border-radius: 10px; font-weight: 800; display: inline-block; margin-bottom: 20px;">
+                CERRADO / VENDIDO
+            </div>
             {% endif %}
 
             {% if manga.descripcion %}
@@ -232,37 +236,41 @@
             {% endif %}
 
             {% if manga.talla %}
-            <div class="size-badge">
-                Talla: {{ manga.talla }}
-            </div>
+            <div class="size-badge">Talla: {{ manga.talla }}</div>
             {% endif %}
 
             <div class="requirements-section">
                 <h3 class="requirements-title">
-                    <i class="bi bi-info-circle-fill"></i>
-                    Requisitos de Compra
+                    <i class="bi bi-shield-check"></i>
+                    Garantía y Requisitos DERSSG'M
                 </h3>
                 <div class="requirement-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Contacto previo para confirmar disponibilidad</span>
+                    <span><strong>Autenticidad:</strong> Prenda 100% verificada por nuestros expertos.</span>
                 </div>
                 <div class="requirement-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Ubicación en México para envíos nacionales</span>
+                    <span><strong>Envíos:</strong> Entrega segura en CDMX y envíos a todo México.</span>
                 </div>
                 <div class="requirement-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Pago anticipado del 50% para reservar</span>
+                    <span><strong>Apartado:</strong> Reserva con el 50% para prendas exclusivas.</span>
                 </div>
                 <div class="requirement-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Envío incluido en CDMX, costos adicionales en otros estados</span>
+                    <span><strong>Seguridad:</strong> Proceso de preventa y compra protegida.</span>
                 </div>
             </div>
 
+            {% if not manga.vendido %}
             <button class="buy-button" onclick="initiatepurchase()">
-                <i class="bi bi-bag-check-fill"></i> Quiero Comprar
+                <i class="bi bi-whatsapp"></i> Quiero Comprar Ahora
             </button>
+            {% else %}
+            <button class="buy-button sold-out" disabled>
+                PRODUCTO AGOTADO
+            </button>
+            {% endif %}
         </div>
     </div>
 </div>

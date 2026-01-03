@@ -920,13 +920,13 @@
     }
 
     function shareManga(title, id) {
-        // Construct URL to specific post (or just site root if no hash routing yet)
-        const url = `${window.location.origin}/library#manga-${id}`;
-        const text = `Check out "${title}" on DERSSG'M!`;
+        // Link to dedicated product detail page
+        const url = `${window.location.origin}/producto/${id}/`;
+        const text = `Mira "${title}" en DERSSG'M Moda!`;
 
         if (navigator.share) {
             navigator.share({
-                title: 'DERSSG\'M Manga',
+                title: `${title} - DERSSG'M Moda`,
                 text: text,
                 url: url,
             })

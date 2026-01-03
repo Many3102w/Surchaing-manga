@@ -16,7 +16,7 @@ urlpatterns = [
     path('ingresar/', IngresarView.as_view(), name='ingresar'),
 
     path("library/", LibraryView.as_view(), name='library'),
-    path('product/<int:manga_id>/', product_detail, name='product_detail'),
+    path('producto/<int:manga_id>/', product_detail, name='product_detail'),
     path("team/", TeamView.as_view(), name='team'),
 
     path("search/", SearchView.as_view(), name='search'),
