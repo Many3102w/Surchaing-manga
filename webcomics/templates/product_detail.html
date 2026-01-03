@@ -264,7 +264,7 @@
 
             {% if not manga.vendido %}
             <button class="buy-button" onclick="initiatepurchase()">
-                <i class="bi bi-whatsapp"></i> Quiero Comprar Ahora
+                <i class="bi bi-chat-left-dots-fill"></i> Preguntar Disponibilidad
             </button>
             {% else %}
             <button class="buy-button sold-out" disabled>
@@ -277,16 +277,17 @@
 
 <script>
     function initiatepurchase() {
-        // Open WhatsApp or contact method
+        // Inquiry via internal chat system
         const productName = "{{ manga.nombre_del_manga|escapejs }}";
         const productPrice = "{{ manga.precio }}";
-        const message = `Hola, estoy interesado en comprar: ${productName} - $${productPrice}`;
+        const message = `¡Hola! Me interesa este producto: ${productName} ($${productPrice} MXN). ¿Podrías darme más información?`;
 
-        // Replace with your WhatsApp number
-        const whatsappNumber = "525512345678"; // Update this with actual number
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-        window.open(whatsappUrl, '_blank');
+        if (window.openProductInquiry) {
+            window.openProductInquiry(message);
+        } else {
+            console.error("Chat widget not loaded yet");
+            alert("El sistema de chat se está cargando, por favor intenta de nuevo en un momento.");
+        }
     }
 </script>
 {% endblock %}

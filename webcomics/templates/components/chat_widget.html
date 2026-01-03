@@ -265,6 +265,15 @@
         } catch (e) { console.error("Chat send error", e); }
     }
 
+    // Global function for product inquiries
+    window.openProductInquiry = async function (message) {
+        if (!chatOpen) toggleChat();
+
+        const input = document.getElementById('chat-input');
+        input.value = message;
+        await sendChatMessage();
+    };
+
     // Poll for new messages every 5 seconds
     setInterval(() => {
         if (document.visibilityState === 'visible') {
