@@ -475,11 +475,14 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             max(0, total_exp_revenue - total_inv_cost)
         ]
 
-        # 6. Active Chats for Support (Grouped by User or Session)
+        # 6. Active Chats for Support (Better Grouping: User-first, then Session)
         latest_msg_subquery = ChatMessage.objects.filter(
-            Q(user_id=OuterRef('user')) | Q(session_key=OuterRef('session_key'))
+            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key'))
         ).order_by('-created_at')
 
+        # We group by 'user' if it exists, otherwise by 'session_key'
+        # To do this in ORM simply, we can fetch all and post-process or use distinct
+        # Simplified: Group by user OR session, but prioritize the newest for each
         context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
             last_msg_time=Max('created_at'),
             last_msg_text=Subquery(latest_msg_subquery.values('message')[:1]),

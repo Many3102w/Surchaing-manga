@@ -196,7 +196,8 @@
 
 <script>
     let chatOpen = false;
-    let lastMsgCount = 0;
+    let lastMsgCount = -1; // Force first render
+    let isSending = false;
 
     function toggleChat() {
         chatOpen = !chatOpen;
@@ -218,7 +219,7 @@
             const data = await resp.json();
             const container = document.getElementById('chat-messages');
 
-            if (data.messages.length !== lastMsgCount || container.children.length <= 1) {
+            if (data.messages.length !== lastMsgCount) {
                 // Personalised greeting based on user status
                 const userName = "{{ user.username|default:'' }}";
                 const greeting = userName ? `¡Hola ${userName}! ¿En qué podemos ayudarte hoy?` : "¡Hola! ¿En qué podemos ayudarte hoy?";
@@ -244,21 +245,26 @@
 
                     container.appendChild(div);
                 });
-                container.scrollTop = container.scrollHeight;
 
-                if (!chatOpen && data.messages.length > lastMsgCount) {
+                if (!chatOpen && data.messages.length > lastMsgCount && lastMsgCount !== -1) {
                     document.getElementById('chat-notification').classList.remove('hidden');
                 }
                 lastMsgCount = data.messages.length;
+            }
+            // Always scroll to bottom when loading messages if open
+            if (chatOpen) {
+                container.scrollTop = container.scrollHeight;
             }
         } catch (e) { console.error("Chat load error", e); }
     }
 
     async function sendChatMessage() {
+        if (isSending) return;
         const input = document.getElementById('chat-input');
         const msg = input.value.trim();
         if (!msg) return;
 
+        isSending = true;
         input.value = '';
         try {
             const formData = new FormData();
@@ -270,8 +276,13 @@
                     'X-CSRFToken': '{{ csrf_token }}'
                 }
             });
-            loadMessages();
-        } catch (e) { console.error("Chat send error", e); }
+            await loadMessages();
+        } catch (e) {
+            console.error("Chat send error", e);
+            input.value = msg; // Restore message on error
+        } finally {
+            isSending = false;
+        }
     }
 
     // Global function for product inquiries

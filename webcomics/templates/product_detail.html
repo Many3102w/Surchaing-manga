@@ -276,14 +276,20 @@
 </div>
 
 <script>
+    let isProcessing = false;
     function initiatepurchase() {
+        if (isProcessing) return;
+
         // Inquiry via internal chat system
         const productName = "{{ manga.nombre_del_manga|escapejs }}";
         const productPrice = "{{ manga.precio }}";
         const message = `¡Hola! Me interesa este producto: ${productName} ($${productPrice} MXN). ¿Podrías darme más información?`;
 
         if (window.openProductInquiry) {
-            window.openProductInquiry(message);
+            isProcessing = true;
+            window.openProductInquiry(message).finally(() => {
+                isProcessing = false;
+            });
         } else {
             console.error("Chat widget not loaded yet");
             alert("El sistema de chat se está cargando, por favor intenta de nuevo en un momento.");
