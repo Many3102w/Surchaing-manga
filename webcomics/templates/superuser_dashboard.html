@@ -529,6 +529,67 @@
         </table>
     </div>
 
+    <!-- Support Chats Section -->
+    <h2 class="section-title" style="margin-top: 60px;"><i class="bi bi-chat-left-text-fill"
+            style="color: var(--gold);"></i>
+        Mensajes de Soporte</h2>
+    <div class="inventory-preview" style="margin-bottom: 50px; background: #fff;">
+        <div style="display: flex; height: 500px;">
+            <!-- Chat List -->
+            <div style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa;">
+                {% for chat in active_chats %}
+                <div class="chat-item" data-session="{{ chat.session_key }}" data-user="{{ chat.user|default:'' }}"
+                    data-name="{{ chat.user__username|default:'Anónimo' }}" onclick="handleChatItemClick(this)"
+                    style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <span style="font-weight: 800; color: #333;">{{ chat.user__username|default:"Anónimo" }}</span>
+                        <small style="color: #999;">{{ chat.last_msg|date:"H:i" }}</small>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #888;">ID: {{ chat.session_key|truncatechars:12 }}</div>
+                </div>
+                {% empty %}
+                <div style="padding: 20px; color: #999; text-align: center;">No hay mensajes aún.</div>
+                {% endfor %}
+            </div>
+
+            <!-- Chat Content -->
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <div id="admin-chat-header"
+                    style="padding: 20px; border-bottom: 1px solid #eee; font-weight: 900; background: #fff;">
+                    Seleccionar una conversación para responder
+                </div>
+                <div id="admin-chat-messages"
+                    style="flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="color: #999; text-align: center; margin-top: 100px;">
+                        <i class="bi bi-chat-quote" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p>Haz clic en un cliente para ver el chat</p>
+                    </div>
+                </div>
+                <div id="admin-chat-input-area"
+                    style="padding: 20px; border-top: 1px solid #eee; display: none; gap: 15px; background: #fff;">
+                    <input type="text" id="admin-chat-input" class="form-control-custom"
+                        placeholder="Escribe mensaje..."
+                        style="flex: 1; padding: 12px 20px; border: 1px solid #ddd; border-radius: 10px;"
+                        onkeypress="handleAdminChatKey(event)">
+                    <button class="btn btn-dark" onclick="sendAdminReply()" style="padding: 0 30px;">RESPONDER</button>
+                    <input type="hidden" id="current-chat-session">
+                    <input type="hidden" id="current-chat-user">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .chat-item:hover {
+            background: #f0f0f0;
+        }
+
+        .chat-item.active {
+            background: #fff;
+            border-left: 4px solid var(--gold);
+        }
+    </style>
+
     <!-- Operations Section -->
     <h2 class="section-title"><i class="bi bi-lightning-charge-fill" style="color: #ecc94b;"></i> Acciones Rápidas</h2>
     <div class="actions-grid">
@@ -847,5 +908,91 @@
                 alert('Error de conexión al servidor');
             });
     });
+    // Admin Chat Logic
+    let activeSession = '';
+    let activeUser = '';
+
+    function handleAdminChatKey(e) { if (e.key === 'Enter') sendAdminReply(); }
+
+    function handleChatItemClick(el) {
+        const session_key = el.dataset.session;
+        const user_id = el.dataset.user;
+        const name = el.dataset.name;
+        openAdminChat(session_key, user_id, name, el);
+    }
+
+    async function openAdminChat(session_key, user_id, name, el) {
+        activeSession = session_key;
+        activeUser = user_id;
+
+        document.getElementById('admin-chat-header').innerText = `Chateando con: ${name}`;
+        document.getElementById('admin-chat-input-area').style.display = 'flex';
+        document.getElementById('current-chat-session').value = session_key;
+        document.getElementById('current-chat-user').value = user_id;
+
+        // Visual selection
+        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        loadAdminMessages();
+    }
+
+    async function loadAdminMessages() {
+        if (!activeSession && !activeUser) return;
+
+        try {
+            const resp = await fetch(`/chat/get/?s_key=${activeSession}&u_id=${activeUser}`);
+            const data = await resp.json();
+            const container = document.getElementById('admin-chat-messages');
+            container.innerHTML = '';
+
+            data.messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.style.cssText = `max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4;`;
+                if (msg.is_from_admin) {
+                    div.style.background = '#000';
+                    div.style.color = '#fff';
+                    div.style.alignSelf = 'flex-end';
+                    div.style.borderBottomRightRadius = '2px';
+                } else {
+                    div.style.background = '#e9ecef';
+                    div.style.color = '#333';
+                    div.style.alignSelf = 'flex-start';
+                    div.style.borderBottomLeftRadius = '2px';
+                }
+                div.innerText = msg.message;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        } catch (e) { console.error("Admin chat load error", e); }
+    }
+
+    async function sendAdminReply() {
+        const input = document.getElementById('admin-chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        input.value = '';
+        const formData = new FormData();
+        formData.append('message', msg);
+        formData.append('session_key', activeSession);
+        formData.append('user_id', activeUser);
+
+        try {
+            await fetch('/chat/reply/', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            });
+            loadAdminMessages();
+        } catch (e) { console.error("Reply error", e); }
+    }
+
+    // Polling for admin
+    setInterval(() => {
+        if (document.visibilityState === 'visible' && (activeSession || activeUser)) {
+            loadAdminMessages();
+        }
+    }, 5000);
 </script>
 {% endblock %}

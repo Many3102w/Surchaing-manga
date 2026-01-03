@@ -474,7 +474,83 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             max(0, total_exp_revenue - total_inv_cost)
         ]
 
+        # 6. Active Chats for Support
+        from django.db.models import Max
+        context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
+            last_msg=Max('created_at')
+        ).order_by('-last_msg')
+
         return context
 
 class IndexView(TemplateView):
     template_name = "index.html"
+
+def get_chat_messages(request):
+    s_key = request.GET.get('s_key')
+    u_id = request.GET.get('u_id')
+    
+    if request.user.is_superuser and (s_key or u_id):
+        # Admin fetching a conversation
+        if u_id and u_id != 'None':
+            messages = ChatMessage.objects.filter(models.Q(user_id=u_id) | models.Q(session_key=s_key))
+        else:
+            messages = ChatMessage.objects.filter(session_key=s_key, user=None)
+    else:
+        # User/Anon fetching their own
+        if not request.session.session_key:
+            request.session.create()
+        
+        session_key = request.session.session_key
+        if request.user.is_authenticated:
+            messages = ChatMessage.objects.filter(models.Q(user=request.user) | models.Q(session_key=session_key))
+        else:
+            messages = ChatMessage.objects.filter(session_key=session_key, user=None)
+    
+    data = [{
+        'message': m.message,
+        'is_from_admin': m.is_from_admin,
+        'timestamp': m.created_at.strftime('%H:%M'),
+    } for m in messages]
+    return JsonResponse({'messages': data})
+
+def send_chat_message(request):
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+        if not message_text:
+            return JsonResponse({'error': 'Message empty'}, status=400)
+            
+        if not request.session.session_key:
+            request.session.create()
+        
+        session_key = request.session.session_key
+        ChatMessage.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key,
+            message=message_text,
+            is_from_admin=False
+        )
+        return JsonResponse({'status': 'sent'})
+    return JsonResponse({'error': 'Invalid'}, status=400)
+
+@login_required
+def admin_chat_reply(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error'}, status=403)
+    
+    if request.method == 'POST':
+        msg = request.POST.get('message')
+        s_key = request.POST.get('session_key')
+        u_id = request.POST.get('user_id')
+        
+        target_user = None
+        if u_id:
+            target_user = get_object_or_404(User, id=u_id)
+            
+        ChatMessage.objects.create(
+            user=target_user,
+            session_key=s_key,
+            message=msg,
+            is_from_admin=True
+        )
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'invalid'}, status=400)

@@ -1,0 +1,251 @@
+<div id="chat-widget-container" class="{% if user.is_superuser %}hidden{% endif %}">
+    <!-- Chat Bubble -->
+    <div id="chat-bubble" onclick="toggleChat()">
+        <i class="bi bi-chat-dots-fill"></i>
+        <div id="chat-notification" class="hidden"></div>
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chat-window" class="hidden">
+        <div class="chat-header">
+            <span><i class="bi bi-headset"></i> Soporte DERSSG'M</span>
+            <button onclick="toggleChat()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div id="chat-messages">
+            <!-- Messages load here -->
+            <div class="chat-msg system">
+                Hola! ¿En qué podemos ayudarte hoy?
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Escribe un mensaje..." onkeypress="handleChatKey(event)">
+            <button onclick="sendChatMessage()"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+</div>
+
+<style>
+    #chat-widget-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        z-index: 10000;
+        font-family: 'Inter', sans-serif;
+    }
+
+    #chat-bubble {
+        width: 60px;
+        height: 60px;
+        background: #000;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s;
+        position: relative;
+    }
+
+    #chat-bubble:hover {
+        transform: scale(1.1);
+    }
+
+    #chat-notification {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 15px;
+        height: 15px;
+        background: #ff4d4d;
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+
+    #chat-window {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 320px;
+        height: 450px;
+        background: #fff;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
+
+    .chat-header {
+        background: #000;
+        color: #fff;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .chat-header button {
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    #chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #f8f9fa;
+    }
+
+    .chat-msg {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .chat-msg.user {
+        align-self: flex-end;
+        background: #bfa37c;
+        color: #fff;
+        border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.admin {
+        align-self: flex-start;
+        background: #e9e9eb;
+        color: #000;
+        border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg.system {
+        align-self: center;
+        background: none;
+        color: #888;
+        font-size: 0.8rem;
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .chat-input-area {
+        padding: 15px;
+        display: flex;
+        gap: 10px;
+        background: #fff;
+        border-top: 1px solid #eee;
+    }
+
+    #chat-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 8px 15px;
+        outline: none;
+    }
+
+    .chat-input-area button {
+        background: #000;
+        color: #fff;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (max-width: 768px) {
+        #chat-window {
+            width: 90vw;
+            right: -10px;
+            bottom: 70px;
+        }
+    }
+</style>
+
+<script>
+    let chatOpen = false;
+    let lastMsgCount = 0;
+
+    function toggleChat() {
+        chatOpen = !chatOpen;
+        const window = document.getElementById('chat-window');
+        window.classList.toggle('hidden', !chatOpen);
+        if (chatOpen) {
+            loadMessages();
+            document.getElementById('chat-notification').classList.add('hidden');
+        }
+    }
+
+    function handleChatKey(e) {
+        if (e.key === 'Enter') sendChatMessage();
+    }
+
+    async function loadMessages() {
+        try {
+            const resp = await fetch('/chat/get/');
+            const data = await resp.json();
+            const container = document.getElementById('chat-messages');
+
+            // Only update if count changed
+            if (data.messages.length !== lastMsgCount) {
+                container.innerHTML = '';
+                data.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `chat-msg ${msg.is_from_admin ? 'admin' : 'user'}`;
+                    div.innerText = msg.message;
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
+
+                if (!chatOpen && data.messages.length > lastMsgCount) {
+                    document.getElementById('chat-notification').classList.remove('hidden');
+                }
+                lastMsgCount = data.messages.length;
+            }
+        } catch (e) { console.error("Chat load error", e); }
+    }
+
+    async function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        input.value = '';
+        try {
+            const formData = new FormData();
+            formData.append('message', msg);
+            await fetch('/chat/send/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+            loadMessages();
+        } catch (e) { console.error("Chat send error", e); }
+    }
+
+    // Poll for new messages every 5 seconds
+    setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            loadMessages();
+        }
+    }, 5000);
+</script>

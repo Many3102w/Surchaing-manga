@@ -118,3 +118,17 @@ class WarehouseEntry(models.Model):
 
     def __str__(self):
         return f"+{self.quantity} {self.warehouse_item.category} ({self.created_at.date()})"
+
+class ChatMessage(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    message = models.TextField()
+    is_from_admin = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        sender = "Admin" if self.is_from_admin else (self.user.username if self.user else f"Anon {self.session_key[:8]}")
+        return f"From {sender} at {self.created_at}"

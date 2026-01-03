@@ -5,7 +5,8 @@ from .views import (
     IndexView, HomeView, IngresarView, LibraryView, TeamView,
     SearchView, AboutView, LoginView, CreatePostView, like_manga,
     toggle_favorite, add_comment, delete_post, toggle_vendido,
-    update_warehouse, SuperUserDashboardView, product_detail
+    update_warehouse, SuperUserDashboardView, product_detail,
+    get_chat_messages, send_chat_message, admin_chat_reply
 )
 from django.contrib.auth.views import LogoutView
 
@@ -31,4 +32,9 @@ urlpatterns = [
     path('delete_post/<int:manga_id>/', delete_post, name='delete_post'),
     path('update_warehouse/', update_warehouse, name='update_warehouse'),
     path('superuser/', SuperUserDashboardView.as_view(), name='superuser_dashboard'),
+
+    # Chat Support
+    path('chat/get/', get_chat_messages, name='get_chat_messages'),
+    path('chat/send/', send_chat_message, name='send_chat_message'),
+    path('chat/reply/', admin_chat_reply, name='admin_chat_reply'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
