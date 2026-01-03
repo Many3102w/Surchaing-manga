@@ -475,7 +475,7 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             max(0, total_exp_revenue - total_inv_cost)
         ]
 
-        # 6. Active Chats for Support
+        # 6. Active Chats for Support (Grouped by User or Session)
         context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
             last_msg=Max('created_at')
         ).order_by('-last_msg')

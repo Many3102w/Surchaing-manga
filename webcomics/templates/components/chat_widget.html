@@ -219,7 +219,16 @@
             const container = document.getElementById('chat-messages');
 
             if (data.messages.length !== lastMsgCount) {
-                container.innerHTML = '<div class="chat-msg system">Hola! ¿En qué podemos ayudarte hoy?</div>';
+                // Personalised greeting based on user status
+                const userName = "{{ user.username|default:'' }}";
+                const greeting = userName ? `¡Hola ${userName}! ¿En qué podemos ayudarte hoy?` : "¡Hola! ¿En qué podemos ayudarte hoy?";
+
+                container.innerHTML = `
+            <div class="chat-msg system">
+                <span class="chat-txt">${greeting}</span>
+                <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+        `;
                 data.messages.forEach(msg => {
                     const div = document.createElement('div');
                     div.className = `chat-msg ${msg.is_from_admin ? 'admin' : 'user'}`;

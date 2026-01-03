@@ -539,13 +539,34 @@
             <div style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa;">
                 {% for chat in active_chats %}
                 <div class="chat-item" data-session="{{ chat.session_key }}" data-user="{{ chat.user|default:'' }}"
-                    data-name="{{ chat.user__username|default:'Anónimo' }}" onclick="handleChatItemClick(this)"
-                    style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s;">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <span style="font-weight: 800; color: #333;">{{ chat.user__username|default:"Anónimo" }}</span>
-                        <small style="color: #999;">{{ chat.last_msg|date:"H:i" }}</small>
+                    data-name="{{ chat.user__username|default:'Invitado Anónimo' }}" onclick="handleChatItemClick(this)"
+                    style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div
+                            style="width: 40px; height: 40px; border-radius: 50%; background: {% if chat.user %}'#000'{% else %}'#ccc'{% endif %}; display: flex; align-items: center; justify-content: center; color: #fff;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div style="flex: 1; overflow: hidden;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 800; color: #333; font-size: 0.9rem;">
+                                    {% if chat.user %}
+                                    {{ chat.user__username }}
+                                    {% else %}
+                                    Invitado Anónimo
+                                    {% endif %}
+                                </span>
+                                <small style="color: #999; font-size: 0.7rem;">{{ chat.last_msg|date:"H:i" }}</small>
+                            </div>
+                            <div
+                                style="font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {% if chat.user %}
+                                <i class="bi bi-patch-check-fill" style="color: #4c51bf;"></i> Cliente Registrado
+                                {% else %}
+                                ID: {{ chat.session_key|truncatechars:10 }}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <div style="font-size: 0.75rem; color: #888;">ID: {{ chat.session_key|truncatechars:12 }}</div>
                 </div>
                 {% empty %}
                 <div style="padding: 20px; color: #999; text-align: center;">No hay mensajes aún.</div>
