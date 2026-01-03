@@ -1,4 +1,4 @@
-<div id="chat-widget-container" class="{% if user.is_superuser %}hidden{% endif %}">
+<div id="chat-widget-container">
     <!-- Chat Bubble -->
     <div id="chat-bubble" onclick="toggleChat()">
         <i class="bi bi-chat-dots-fill"></i>
@@ -36,7 +36,7 @@
     #chat-bubble {
         width: 60px;
         height: 60px;
-        background: #000;
+        background: #bfa37c;
         color: #fff;
         border-radius: 50%;
         display: flex;
@@ -200,8 +200,8 @@
 
     function toggleChat() {
         chatOpen = !chatOpen;
-        const window = document.getElementById('chat-window');
-        window.classList.toggle('hidden', !chatOpen);
+        const chatWin = document.getElementById('chat-window');
+        chatWin.classList.toggle('hidden', !chatOpen);
         if (chatOpen) {
             loadMessages();
             document.getElementById('chat-notification').classList.add('hidden');
@@ -218,7 +218,7 @@
             const data = await resp.json();
             const container = document.getElementById('chat-messages');
 
-            if (data.messages.length !== lastMsgCount) {
+            if (data.messages.length !== lastMsgCount || container.children.length <= 1) {
                 // Personalised greeting based on user status
                 const userName = "{{ user.username|default:'' }}";
                 const greeting = userName ? `¡Hola ${userName}! ¿En qué podemos ayudarte hoy?` : "¡Hola! ¿En qué podemos ayudarte hoy?";

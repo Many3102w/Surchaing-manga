@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.db.models import Sum, Max, Q
+from django.db.models import Sum, Max, Q, OuterRef, Subquery
 from .models import Manga, Like, Comment, Favorite, WarehouseItem, WarehouseEntry, ChatMessage
 from .forms import MangaForm, CommentForm
 
@@ -476,9 +476,15 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         ]
 
         # 6. Active Chats for Support (Grouped by User or Session)
+        latest_msg_subquery = ChatMessage.objects.filter(
+            Q(user_id=OuterRef('user')) | Q(session_key=OuterRef('session_key'))
+        ).order_by('-created_at')
+
         context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
-            last_msg=Max('created_at')
-        ).order_by('-last_msg')
+            last_msg_time=Max('created_at'),
+            last_msg_text=Subquery(latest_msg_subquery.values('message')[:1]),
+            last_msg_is_admin=Subquery(latest_msg_subquery.values('is_from_admin')[:1])
+        ).order_by('-last_msg_time')
 
         return context
 

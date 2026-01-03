@@ -555,10 +555,18 @@
                                     Invitado Anónimo
                                     {% endif %}
                                 </span>
-                                <small style="color: #999; font-size: 0.7rem;">{{ chat.last_msg|date:"H:i" }}</small>
+                                <small style="color: #999; font-size: 0.7rem;">{{ chat.last_msg_time|date:"H:i"
+                                    }}</small>
                             </div>
                             <div
-                                style="font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                style="font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">
+                                {% if not chat.last_msg_is_admin %}
+                                <span
+                                    style="background: #25d366; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: 900; margin-right: 5px;">NUEVO</span>
+                                {% endif %}
+                                {{ chat.last_msg_text|default:"(Sin mensaje)" }}
+                            </div>
+                            <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">
                                 {% if chat.user %}
                                 <i class="bi bi-patch-check-fill" style="color: #4c51bf;"></i> Cliente Registrado
                                 {% else %}
