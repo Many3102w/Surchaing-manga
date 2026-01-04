@@ -214,16 +214,30 @@
     }
 
     function formatChatMessage(message) {
-        const regex = /MOSTRAR_IMAGEN:\s*(https?:\/\/[^\s|]+)\s*\|\s*NOMBRE:\s*([^]*?)$/i;
+        // Robust regex to find the tag anywhere and handle possible AI artifacts
+        const regex = /MOSTRAR_IMAGEN:\s*(\S+)\s*\|\s*NOMBRE:\s*([^\n\r*.]+)/i;
         const match = message.match(regex);
         const wrapper = document.createElement('div');
 
         if (match) {
-            const url = match[1].trim();
-            const name = match[2].trim();
-            const cleanMessage = message.replace(regex, '').trim();
+            let url = match[1].trim();
+            // Remove trailing symbols typically added by AI (dots, commas, asterisks)
+            url = url.replace(/[*.,\s)]+$/, "");
 
-            if (cleanMessage) {
+            // Basic URL validation
+            if (!url.startsWith('http')) {
+                // If the AI messed up the URL prefix, let's just show text
+                const txt = document.createElement('div');
+                txt.className = 'chat-txt';
+                txt.textContent = message;
+                wrapper.appendChild(txt);
+                return wrapper.innerHTML;
+            }
+
+            const name = match[2].trim();
+            const cleanMessage = message.replace(match[0], '').trim();
+
+            if (cleanMessage && cleanMessage !== '...') {
                 const txt = document.createElement('div');
                 txt.className = 'chat-txt';
                 txt.textContent = cleanMessage;
@@ -231,26 +245,36 @@
             }
 
             const imgContainer = document.createElement('div');
+            imgContainer.className = "chat-img-card";
             imgContainer.style.marginTop = "8px";
             imgContainer.style.borderRadius = "8px";
             imgContainer.style.overflow = "hidden";
             imgContainer.style.border = "1px solid rgba(0,0,0,0.1)";
-            imgContainer.style.background = "#eee";
+            imgContainer.style.background = "#f0f0f0";
+            imgContainer.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
 
             const img = document.createElement('img');
             img.src = url;
             img.alt = name;
             img.style.width = "100%";
             img.style.height = "auto";
+            img.style.minHeight = "100px";
             img.style.display = "block";
             img.style.objectFit = "cover";
 
+            // Error handling for broken images
+            img.onerror = function () {
+                this.parentElement.style.padding = "20px";
+                this.parentElement.innerHTML = `<div style="text-align:center; color:#888;"><i class="bi bi-image"></i><br><small>Imagen no disponible</small></div>`;
+            };
+
             const label = document.createElement('div');
-            label.style.padding = "6px";
+            label.style.padding = "8px";
             label.style.fontWeight = "bold";
-            label.style.fontSize = "0.75rem";
+            label.style.fontSize = "0.8rem";
             label.style.textAlign = "center";
             label.style.background = "#fff";
+            label.style.color = "#333";
             label.textContent = name;
 
             imgContainer.appendChild(img);
