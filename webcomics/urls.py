@@ -7,12 +7,14 @@ from .views import (
     toggle_favorite, add_comment, delete_post, toggle_vendido,
     update_warehouse, SuperUserDashboardView, product_detail,
     get_chat_messages, send_chat_message, admin_chat_reply,
-    get_dm_messages, send_dm_message, get_unread_dm_notifications
+    get_dm_messages, send_dm_message, get_unread_dm_notifications,
+    health_check
 )
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('toggle_vendido/<int:manga_id>/', toggle_vendido, name='vendido_toggle'),
+    path('ping/', health_check, name='health_check'), # Bot Keep-Alive
     path("", IndexView.as_view(), name="index"),
     path('home/', HomeView.as_view(), name="home"),
     path('ingresar/', IngresarView.as_view(), name='ingresar'),

@@ -734,3 +734,7 @@ def send_dm_message(request):
         )
         return JsonResponse({'status': 'sent'})
     return JsonResponse({'status': 'error'}, status=400)
+
+def health_check(request):
+    """Simple view to keep the server alive."""
+    return JsonResponse({'status': 'ok', 'message': 'I am alive!'})
