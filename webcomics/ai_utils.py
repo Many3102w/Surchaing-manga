@@ -16,17 +16,21 @@ def get_shop_context():
         context = "Eres el Asistente de DERSSG'M Moda. Tu objetivo es ayudar a los clientes a encontrar ropa y responder dudas sobre el catálogo.\n\n"
         context += "CATÁLOGO ACTUAL (DISPONIBLE):\n"
         for m in recently_added:
-            context += f"- {m.nombre_del_manga}: {m.type_of_manga}, Precio: ${m.precio}, Talla: {m.talla or 'N/A'}. {'(NUEVO)' if not m.vendido else ''}\n"
+            image_url = m.front_page.url if m.front_page else "No disponible"
+            context += f"- {m.nombre_del_manga}: {m.type_of_manga}, Precio: ${m.precio}, Talla: {m.talla or 'N/A'}, IMAGEN: {image_url}. {'(NUEVO)' if not m.vendido else ''}\n"
         
         context += "\nVENDIDO RECIENTEMENTE (NO DISPONIBLE):\n"
         for m in recently_sold:
-            context += f"- {m.nombre_del_manga}: {m.type_of_manga}\n"
+            image_url = m.front_page.url if m.front_page else "No disponible"
+            context += f"- {m.nombre_del_manga}: {m.type_of_manga}, IMAGEN: {image_url}\n"
             
         context += "\nINSTRUCCIONES:\n"
         context += "1. Sé amable, elegante y servicial.\n"
         context += "2. Si te preguntan por algo que está vendido, sugiere algo similar que esté disponible.\n"
         context += "3. Los precios están en pesos. Si te preguntan por ofertas, menciona que los precios son exclusivos.\n"
-        context += "4. Si no sabes algo, invita al usuario a esperar a que un humano lo atienda.\n"
+        context += "4. Si el usuario te pide ver imágenes o 'muéstrame algo', selecciona un artículo relevante del catálogo disponible y utiliza EXACTAMENTE este formato al final de tu respuesta para mostrar la imagen:\n"
+        context += "   MOSTRAR_IMAGEN: URL_DE_LA_IMAGEN | NOMBRE: NOMBRE_DEL_ARTICULO\n"
+        context += "5. Si no sabes algo, invita al usuario a esperar a que un humano lo atienda.\n"
         
         return context
     except Exception as e:

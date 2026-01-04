@@ -213,6 +213,58 @@
         if (e.key === 'Enter') sendChatMessage();
     }
 
+    function formatChatMessage(message) {
+        const regex = /MOSTRAR_IMAGEN:\s*(https?:\/\/[^\s|]+)\s*\|\s*NOMBRE:\s*([^]*?)$/i;
+        const match = message.match(regex);
+        const wrapper = document.createElement('div');
+
+        if (match) {
+            const url = match[1].trim();
+            const name = match[2].trim();
+            const cleanMessage = message.replace(regex, '').trim();
+
+            if (cleanMessage) {
+                const txt = document.createElement('div');
+                txt.className = 'chat-txt';
+                txt.textContent = cleanMessage;
+                wrapper.appendChild(txt);
+            }
+
+            const imgContainer = document.createElement('div');
+            imgContainer.style.marginTop = "8px";
+            imgContainer.style.borderRadius = "8px";
+            imgContainer.style.overflow = "hidden";
+            imgContainer.style.border = "1px solid rgba(0,0,0,0.1)";
+            imgContainer.style.background = "#eee";
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = name;
+            img.style.width = "100%";
+            img.style.height = "auto";
+            img.style.display = "block";
+            img.style.objectFit = "cover";
+
+            const label = document.createElement('div');
+            label.style.padding = "6px";
+            label.style.fontWeight = "bold";
+            label.style.fontSize = "0.75rem";
+            label.style.textAlign = "center";
+            label.style.background = "#fff";
+            label.textContent = name;
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(label);
+            wrapper.appendChild(imgContainer);
+        } else {
+            const txt = document.createElement('div');
+            txt.className = 'chat-txt';
+            txt.textContent = message;
+            wrapper.appendChild(txt);
+        }
+        return wrapper.innerHTML;
+    }
+
     async function loadMessages() {
         try {
             const resp = await fetch('/chat/get/');
@@ -234,13 +286,11 @@
                     const div = document.createElement('div');
                     div.className = `chat-msg ${msg.is_from_admin ? 'admin' : 'user'}`;
 
-                    const text = document.createElement('span');
-                    text.innerText = msg.message;
-                    div.appendChild(text);
-
                     const time = document.createElement('span');
                     time.className = 'chat-time';
                     time.innerText = msg.timestamp || '';
+
+                    div.innerHTML = formatChatMessage(msg.message);
                     div.appendChild(time);
 
                     container.appendChild(div);
