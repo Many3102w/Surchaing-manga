@@ -126,6 +126,15 @@ export default function App() {
                 allowsBackForwardNavigationGestures={true}
                 cacheEnabled={true}
                 onMessage={handleMessage}
+                onLoadEnd={() => {
+                    // Inject token even if loaded after initial mount
+                    if (window.expoPushToken && webViewRef.current) {
+                        webViewRef.current.injectJavaScript(`
+                            window.EXPO_PUSH_TOKEN = '${window.expoPushToken}';
+                            if(window.registerToken) window.registerToken('${window.expoPushToken}');
+                        `);
+                    }
+                }}
             />
         </View>
     );
