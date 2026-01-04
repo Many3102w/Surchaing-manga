@@ -546,21 +546,17 @@
             <div style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa;">
                 {% for chat in active_chats %}
                 <div class="chat-item" data-session="{{ chat.session_key }}" data-user="{{ chat.user|default:'' }}"
-                    data-name="{{ chat.user__username|default:'Invitado Anónimo' }}" onclick="handleChatItemClick(this)"
+                    data-name="{{ chat.display_name }}" onclick="handleChatItemClick(this)"
                     style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative;">
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <div
-                            style="width: 40px; height: 40px; border-radius: 50%; background: {% if chat.user %}'#000'{% else %}'#ccc'{% endif %}; display: flex; align-items: center; justify-content: center; color: #fff;">
+                            style="width: 40px; height: 40px; border-radius: 50%; background: {% if chat.user %}#000{% else %}#ccc{% endif %}; display: flex; align-items: center; justify-content: center; color: #fff;">
                             <i class="bi bi-person-fill"></i>
                         </div>
                         <div style="flex: 1; overflow: hidden;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: 800; color: #333; font-size: 0.9rem;">
-                                    {% if chat.user %}
-                                    {{ chat.user__username }}
-                                    {% else %}
-                                    Invitado Anónimo
-                                    {% endif %}
+                                    {{ chat.display_name }}
                                 </span>
                                 <small style="color: #999; font-size: 0.7rem;">{{ chat.last_msg_time|date:"H:i"
                                     }}</small>

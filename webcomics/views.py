@@ -481,14 +481,25 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key'))
         ).order_by('-created_at')
 
-        # We group by 'user' if it exists, otherwise by 'session_key'
-        # To do this in ORM simply, we can fetch all and post-process or use distinct
-        # Simplified: Group by user OR session, but prioritize the newest for each
-        context['active_chats'] = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
+        active_chats_raw = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
             last_msg_time=Max('created_at'),
             last_msg_text=Subquery(latest_msg_subquery.values('message')[:1]),
             last_msg_is_admin=Subquery(latest_msg_subquery.values('is_from_admin')[:1])
         ).order_by('-last_msg_time')
+
+        active_chats = []
+        for chat in active_chats_raw:
+            display_name = chat['user__username']
+            if not display_name:
+                s_key = chat['session_key'] or ""
+                # Use last 4 chars of session key as ID
+                short_id = s_key[-4:].upper() if len(s_key) >= 4 else "TEMP"
+                display_name = f"Anónimo {short_id}"
+            
+            chat['display_name'] = display_name
+            active_chats.append(chat)
+
+        context['active_chats'] = active_chats
 
         return context
 
