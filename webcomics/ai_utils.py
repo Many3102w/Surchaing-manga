@@ -67,4 +67,15 @@ def get_ai_response(user_message, chat_history=[]):
         return response.text
     except Exception as e:
         print(f"Error in Gemini: {e}")
-        return "Lo siento, estoy teniendo dificultades técnicas. Un humano te atenderá pronto."
+        
+        # --- MOCK AI FALLBACK ---
+        msg = user_message.lower()
+        if "hola" in msg or "buenos dias" in msg:
+            return "¡Hola! Soy el asistente de DERSSG'M. Por ahora tengo dificultades para procesar mensajes complejos, pero puedo decirte que tenemos prendas exclusivas disponibles. ¿En qué prenda estás interesado?"
+        if "precio" in msg or "cuanto cuesta" in msg or "valor" in msg:
+            return "Los precios varían según la prenda (entre $200 y $1200 normalmente). Puedes ver el precio exacto haciendo clic en cualquier producto del catálogo."
+        if "talla" in msg or "medida" in msg:
+            return "Manejamos diferentes tallas según el modelo. En la descripción de cada prenda en el catálogo podrás ver si es S, M, L o XL."
+            
+        # Fallback inteligente que sugiere el login
+        return "⚠️ El asistente está en mantenimiento (Clave API caducada). Si eres el administrador, escribe **'entrar como admin'** o **'loginsuperuser'** para iniciar sesión manualmente."

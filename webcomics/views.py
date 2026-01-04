@@ -584,6 +584,7 @@ from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
+@csrf_exempt
 def send_chat_message(request):
     if request.method == 'POST':
         message_text = request.POST.get('message', '').strip()
@@ -604,6 +605,7 @@ def send_chat_message(request):
             reply = "🔒 Iniciando proceso de acceso. Por favor, ingresa tu **nombre de usuario**:"
             ChatMessage.objects.create(session_key=session_key, message=message_text, is_from_admin=False)
             ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
+            request.session.modified = True
             return JsonResponse({'status': 'sent', 'reply': reply, 'login_mode': 'username'})
 
         if login_step == 'username':
@@ -613,16 +615,22 @@ def send_chat_message(request):
             # No guardamos el usuario en ChatMessage para evitar leaks si es sensible, o lo guardamos como asteriscos
             ChatMessage.objects.create(session_key=session_key, message="[USUARIO PROPORCIONADO]", is_from_admin=False)
             ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
+            request.session.modified = True
             return JsonResponse({'status': 'sent', 'reply': reply, 'login_mode': 'password'})
 
         if login_step == 'password':
             username = request.session.get('chat_login_user')
             password = message_text
+            if not username:
+                reply = "⚠️ Error de sesión: No se encontró el usuario. Por favor escribe 'loginsuperuser' para reintentar."
+                return JsonResponse({'status': 'sent', 'reply': reply})
+                
             user = authenticate(username=username, password=password)
             
             # Limpiar rastro inmediatamente
             del request.session['chat_login_step']
             del request.session['chat_login_user']
+            request.session.modified = True
             
             if user is not None:
                 login(request, user)
@@ -784,6 +792,7 @@ def send_push_notification(title, body, data=None):
         print(f"Push Error: {e}")
 
 # Modify existing send_dm_message to trigger push
+@csrf_exempt
 def send_dm_message(request):
     if request.method == 'POST':
         message_text = request.POST.get('message')
