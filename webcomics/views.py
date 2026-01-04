@@ -477,29 +477,44 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         ]
 
         # 6. Active Chats for Support (Better Grouping: User-first, then Session)
-        latest_msg_subquery = ChatMessage.objects.filter(
-            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key'))
+        support_latest = ChatMessage.objects.filter(
+            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key')),
+            is_dm=False
         ).order_by('-created_at')
 
-        active_chats_raw = ChatMessage.objects.values('session_key', 'user', 'user__username').annotate(
+        support_chats_raw = ChatMessage.objects.filter(is_dm=False).values('session_key', 'user', 'user__username').annotate(
             last_msg_time=Max('created_at'),
-            last_msg_text=Subquery(latest_msg_subquery.values('message')[:1]),
-            last_msg_is_admin=Subquery(latest_msg_subquery.values('is_from_admin')[:1])
+            last_msg_text=Subquery(support_latest.values('message')[:1]),
+            last_msg_is_admin=Subquery(support_latest.values('is_from_admin')[:1])
         ).order_by('-last_msg_time')
 
-        active_chats = []
-        for chat in active_chats_raw:
-            display_name = chat['user__username']
-            if not display_name:
-                s_key = chat['session_key'] or ""
-                # Use last 4 chars of session key as ID
-                short_id = s_key[-4:].upper() if len(s_key) >= 4 else "TEMP"
-                display_name = f"Anónimo {short_id}"
-            
-            chat['display_name'] = display_name
-            active_chats.append(chat)
+        # DMs (Direct Messages from products)
+        dm_latest = ChatMessage.objects.filter(
+            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key')),
+            is_dm=True
+        ).order_by('-created_at')
 
-        context['active_chats'] = active_chats
+        dm_chats_raw = ChatMessage.objects.filter(is_dm=True).values('session_key', 'user', 'user__username').annotate(
+            last_msg_time=Max('created_at'),
+            last_msg_text=Subquery(dm_latest.values('message')[:1]),
+            last_msg_is_admin=Subquery(dm_latest.values('is_from_admin')[:1])
+        ).order_by('-last_msg_time')
+
+        def process_chats(raw_list):
+            processed = []
+            for chat in raw_list:
+                display_name = chat['user__username']
+                if not display_name:
+                    s_key = chat['session_key'] or ""
+                    short_id = s_key[-4:].upper() if len(s_key) >= 4 else "TEMP"
+                    display_name = f"Anónimo {short_id}"
+                chat['display_name'] = display_name
+                processed.append(chat)
+            return processed
+
+        context['support_chats'] = process_chats(support_chats_raw)
+        context['dm_chats'] = process_chats(dm_chats_raw)
+        context['active_chats'] = context['support_chats'] # For backward compatible template usage if needed
 
         return context
 
@@ -509,13 +524,14 @@ class IndexView(TemplateView):
 def get_chat_messages(request):
     s_key = request.GET.get('s_key')
     u_id = request.GET.get('u_id')
+    is_dm = request.GET.get('is_dm') == 'true'
     
     if request.user.is_superuser and (s_key or u_id):
         # Admin fetching a conversation
         if u_id and u_id != 'None':
-            messages = ChatMessage.objects.filter(Q(user_id=u_id) | Q(session_key=s_key))
+            messages = ChatMessage.objects.filter(Q(user_id=u_id) | Q(session_key=s_key), is_dm=is_dm)
         else:
-            messages = ChatMessage.objects.filter(session_key=s_key, user=None)
+            messages = ChatMessage.objects.filter(session_key=s_key, user=None, is_dm=is_dm)
     else:
         # User/Anon fetching their own
         if not request.session.session_key:
@@ -635,6 +651,7 @@ def admin_chat_reply(request):
         msg = request.POST.get('message')
         s_key = request.POST.get('session_key')
         u_id = request.POST.get('user_id')
+        is_dm = request.POST.get('is_dm') == 'true'
         
         target_user = None
         if u_id:
@@ -644,7 +661,46 @@ def admin_chat_reply(request):
             user=target_user,
             session_key=s_key,
             message=msg,
-            is_from_admin=True
+            is_from_admin=True,
+            is_dm=is_dm
         )
         return JsonResponse({'status': 'ok'})
     return JsonResponse({'status': 'invalid'}, status=400)
+
+def get_dm_messages(request):
+    session_key = request.session.session_key
+    if not session_key:
+        request.session.create()
+        session_key = request.session.session_key
+    
+    messages = ChatMessage.objects.filter(
+        Q(user=request.user) if request.user.is_authenticated else Q(session_key=session_key),
+        is_dm=True
+    ).order_by('created_at')
+    
+    return JsonResponse({
+        'messages': [
+            {
+                'message': m.message,
+                'is_from_admin': m.is_from_admin,
+                'timestamp': m.created_at.strftime("%H:%M")
+            } for m in messages
+        ]
+    })
+
+def send_dm_message(request):
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+            
+        ChatMessage.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key,
+            message=message_text,
+            is_dm=True
+        )
+        return JsonResponse({'status': 'sent'})
+    return JsonResponse({'status': 'error'}, status=400)

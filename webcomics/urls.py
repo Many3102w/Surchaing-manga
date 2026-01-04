@@ -6,7 +6,8 @@ from .views import (
     SearchView, AboutView, LoginView, CreatePostView, like_manga,
     toggle_favorite, add_comment, delete_post, toggle_vendido,
     update_warehouse, SuperUserDashboardView, product_detail,
-    get_chat_messages, send_chat_message, admin_chat_reply
+    get_chat_messages, send_chat_message, admin_chat_reply,
+    get_dm_messages, send_dm_message
 )
 from django.contrib.auth.views import LogoutView
 
@@ -37,4 +38,6 @@ urlpatterns = [
     path('chat/get/', get_chat_messages, name='get_chat_messages'),
     path('chat/send/', send_chat_message, name='send_chat_message'),
     path('chat/reply/', admin_chat_reply, name='admin_chat_reply'),
+    path('chat/dm/get/', get_dm_messages, name='get_dm_messages'),
+    path('chat/dm/send/', send_dm_message, name='send_dm_message'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

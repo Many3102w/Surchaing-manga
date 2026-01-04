@@ -139,18 +139,18 @@
 
     async function loadInlineMessages() {
         try {
-            const resp = await fetch('/chat/get/');
+            const resp = await fetch('/chat/dm/get/');
             const data = await resp.json();
             const container = document.getElementById('inline-chat-messages');
 
             if (data.messages.length !== inlineLastCount) {
                 container.innerHTML = '';
 
-                // Add initial AI greeting if no messages
+                // Add initial DM greeting if no messages
                 if (data.messages.length === 0) {
                     const greeting = document.createElement('div');
                     greeting.className = 'chat-msg admin';
-                    greeting.innerHTML = `¡Hola! Soy el asistente de DERSSG'M. ¿En qué puedo ayudarte con esta prenda? <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+                    greeting.innerHTML = `¡Hola! Esta es una bandeja de mensajes directos para hablar con el equipo de DERSSG'M. ¿Tienes alguna duda sobre esta prenda? <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
                     container.appendChild(greeting);
                 }
 
@@ -188,15 +188,15 @@
         try {
             const formData = new FormData();
             formData.append('message', msg);
-            const resp = await fetch('/chat/send/', {
+            const resp = await fetch('/chat/dm/send/', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-CSRFToken': '{{ csrf_token }}' }
             });
             const data = await resp.json();
 
-            // Sync with global widget if it exists
-            if (window.loadMessages) window.loadMessages();
+            // DO NOT sync with global widget anymore as they are independent
+            // if (window.loadMessages) window.loadMessages();
 
             await loadInlineMessages();
         } catch (e) {

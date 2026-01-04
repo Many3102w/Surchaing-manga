@@ -539,14 +539,25 @@
     <!-- Support Chats Section -->
     <h2 class="section-title" style="margin-top: 60px;"><i class="bi bi-chat-left-text-fill"
             style="color: var(--gold);"></i>
-        Mensajes de Soporte</h2>
+        Centro de Mensajes</h2>
+
+    <div class="chat-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="chat-tab-btn active" onclick="switchChatTab('support')" id="btn-tab-support">
+            <i class="bi bi-robot"></i> ASISTENTE AI
+        </button>
+        <button class="chat-tab-btn" onclick="switchChatTab('dm')" id="btn-tab-dm">
+            <i class="bi bi-bag-check-fill"></i> DMs DE PRODUCTOS
+        </button>
+    </div>
+
     <div class="inventory-preview" style="margin-bottom: 50px; background: #fff;">
-        <div style="display: flex; height: 500px;">
-            <!-- Chat List -->
-            <div style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa;">
-                {% for chat in active_chats %}
+        <div style="display: flex; height: 550px;">
+            <!-- Chat List Support -->
+            <div id="list-support" class="chat-sidebar-list"
+                style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa;">
+                {% for chat in support_chats %}
                 <div class="chat-item" data-session="{{ chat.session_key }}" data-user="{{ chat.user|default:'' }}"
-                    data-name="{{ chat.display_name }}" onclick="handleChatItemClick(this)"
+                    data-name="{{ chat.display_name }}" data-type="support" onclick="handleChatItemClick(this)"
                     style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative;">
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <div
@@ -569,18 +580,47 @@
                                 {% endif %}
                                 {{ chat.last_msg_text|default:"(Sin mensaje)" }}
                             </div>
-                            <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">
-                                {% if chat.user %}
-                                <i class="bi bi-patch-check-fill" style="color: #4c51bf;"></i> Cliente Registrado
-                                {% else %}
-                                ID: {{ chat.session_key|truncatechars:10 }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding: 20px; color: #999; text-align: center;">No hay chats de soporte.</div>
+                {% endfor %}
+            </div>
+
+            <!-- Chat List DMs (Hidden initially) -->
+            <div id="list-dm" class="chat-sidebar-list"
+                style="width: 300px; border-right: 1px solid #eee; overflow-y: auto; background: #fafafa; display: none;">
+                {% for chat in dm_chats %}
+                <div class="chat-item" data-session="{{ chat.session_key }}" data-user="{{ chat.user|default:'' }}"
+                    data-name="{{ chat.display_name }}" data-type="dm" onclick="handleChatItemClick(this)"
+                    style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div
+                            style="width: 40px; height: 40px; border-radius: 50%; background: #bfa37c; display: flex; align-items: center; justify-content: center; color: #fff;">
+                            <i class="bi bi-cart-check-fill"></i>
+                        </div>
+                        <div style="flex: 1; overflow: hidden;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 800; color: #333; font-size: 0.9rem;">
+                                    {{ chat.display_name }}
+                                </span>
+                                <small style="color: #999; font-size: 0.7rem;">{{ chat.last_msg_time|date:"H:i"
+                                    }}</small>
+                            </div>
+                            <div
+                                style="font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">
+                                {% if not chat.last_msg_is_admin %}
+                                <span
+                                    style="background: #25d366; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; font-weight: 900; margin-right: 5px;">NUEVO</span>
                                 {% endif %}
+                                {{ chat.last_msg_text|default:"(Sin mensaje)" }}
                             </div>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <div style="padding: 20px; color: #999; text-align: center;">No hay mensajes aún.</div>
+                <div style="padding: 20px; color: #999; text-align: center;">No hay mensajes directos.</div>
                 {% endfor %}
             </div>
 
@@ -606,6 +646,7 @@
                     <button class="btn btn-dark" onclick="sendAdminReply()" style="padding: 0 30px;">RESPONDER</button>
                     <input type="hidden" id="current-chat-session">
                     <input type="hidden" id="current-chat-user">
+                    <input type="hidden" id="current-chat-type">
                 </div>
             </div>
         </div>
@@ -657,6 +698,31 @@
             right: 8px;
             font-size: 0.7rem;
             color: rgba(0, 0, 0, 0.45);
+        }
+
+        /* Chat Tabs */
+        .chat-tab-btn {
+            background: #eee;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-tab-btn.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .chat-tab-btn:hover:not(.active) {
+            background: #ddd;
         }
     </style>
 
@@ -981,24 +1047,51 @@
     // Admin Chat Logic
     let activeSession = '';
     let activeUser = '';
+    let activeType = 'support';
 
     function handleAdminChatKey(e) { if (e.key === 'Enter') sendAdminReply(); }
+
+    function switchChatTab(tab) {
+        activeType = tab;
+        document.querySelectorAll('.chat-tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.chat-sidebar-list').forEach(list => list.style.display = 'none');
+
+        if (tab === 'support') {
+            document.getElementById('btn-tab-support').classList.add('active');
+            document.getElementById('list-support').style.display = 'block';
+        } else {
+            document.getElementById('btn-tab-dm').classList.add('active');
+            document.getElementById('list-dm').style.display = 'block';
+        }
+
+        // Reset chat content
+        document.getElementById('admin-chat-header').innerText = 'Seleccionar una conversación';
+        document.getElementById('admin-chat-input-area').style.display = 'none';
+        document.getElementById('admin-chat-messages').innerHTML = `
+            <div style="color: #999; text-align: center; margin-top: 100px;">
+                <i class="bi bi-chat-quote" style="font-size: 3rem; opacity: 0.3;"></i>
+                <p>Haz clic en un cliente para ver el chat</p>
+            </div>`;
+    }
 
     function handleChatItemClick(el) {
         const session_key = el.dataset.session;
         const user_id = el.dataset.user;
         const name = el.dataset.name;
-        openAdminChat(session_key, user_id, name, el);
+        const type = el.dataset.type;
+        openAdminChat(session_key, user_id, name, type, el);
     }
 
-    async function openAdminChat(session_key, user_id, name, el) {
+    async function openAdminChat(session_key, user_id, name, type, el) {
         activeSession = session_key;
         activeUser = user_id;
+        activeType = type;
 
-        document.getElementById('admin-chat-header').innerText = `Chateando con: ${name}`;
+        document.getElementById('admin-chat-header').innerText = `[${type.toUpperCase()}] Chateando con: ${name}`;
         document.getElementById('admin-chat-input-area').style.display = 'flex';
         document.getElementById('current-chat-session').value = session_key;
         document.getElementById('current-chat-user').value = user_id;
+        document.getElementById('current-chat-type').value = type;
 
         // Visual selection
         document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
@@ -1011,7 +1104,8 @@
         if (!activeSession && !activeUser) return;
 
         try {
-            const resp = await fetch(`/chat/get/?s_key=${activeSession}&u_id=${activeUser}`);
+            const isDm = activeType === 'dm';
+            const resp = await fetch(`/chat/get/?s_key=${activeSession}&u_id=${activeUser}&is_dm=${isDm}`);
             const data = await resp.json();
             const container = document.getElementById('admin-chat-messages');
             container.innerHTML = '';
@@ -1045,6 +1139,7 @@
         formData.append('message', msg);
         formData.append('session_key', activeSession);
         formData.append('user_id', activeUser);
+        formData.append('is_dm', activeType === 'dm');
 
         try {
             await fetch('/chat/reply/', {
