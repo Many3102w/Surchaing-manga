@@ -125,6 +125,7 @@ class ChatMessage(models.Model):
     message = models.TextField()
     is_from_admin = models.BooleanField(default=False)
     is_dm = models.BooleanField(default=False, verbose_name="Es Mensaje Directo")
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

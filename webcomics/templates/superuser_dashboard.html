@@ -1233,10 +1233,38 @@
         } catch (e) { console.error("Reply error", e); }
     }
 
+    // Notifications for Mobile App (APK)
+    let lastNotifiedMsgId = 0;
+
+    async function checkDmNotifications() {
+        if (!window.ReactNativeWebView) return; // Only if inside Expo mobile app
+
+        try {
+            const resp = await fetch('/chat/dm/notifications/');
+            const data = await resp.json();
+
+            if (data.unread_count > 0) {
+                const latest = data.notifications[data.notifications.length - 1];
+                if (latest.id > lastNotifiedMsgId) {
+                    lastNotifiedMsgId = latest.id;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'notification',
+                        title: 'Nuevo Mensaje de Producto',
+                        body: `${latest.sender}: ${latest.message}`,
+                        data: { msg_id: latest.id }
+                    }));
+                }
+            }
+        } catch (e) { console.error("Notification check error", e); }
+    }
+
     // Polling for admin
     setInterval(() => {
-        if (document.visibilityState === 'visible' && (activeSession || activeUser)) {
-            loadAdminMessages();
+        if (document.visibilityState === 'visible') {
+            if (activeSession || activeUser) {
+                loadAdminMessages();
+            }
+            checkDmNotifications();
         }
     }, 5000);
 </script>
