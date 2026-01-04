@@ -38,7 +38,7 @@ export default function App() {
 
             // Get the token
             const tokenData = await Notifications.getExpoPushTokenAsync({
-                projectId: 'e0e0e0e0-e0e0-e0e0-e0e0-e0e0e0e0e0e0', // Replace with actual ID if using EAS
+                projectId: '01acf82b-dfe7-4a94-ba30-500db0961d9c',
             });
             const token = tokenData.data;
             console.log('Expo Push Token:', token);
