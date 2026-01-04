@@ -112,7 +112,8 @@
         }
     </style>
 
-    {% if request.resolver_match.url_name != 'product_detail' %}
+    {% if request.resolver_match.url_name != 'product_detail' and request.resolver_match.url_name !=
+    'superuser_dashboard' %}
     {% include "../components/chat_widget.html" %}
     {% endif %}
     {% include "../components/footer.html" %}
