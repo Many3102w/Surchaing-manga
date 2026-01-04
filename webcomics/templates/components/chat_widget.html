@@ -8,13 +8,13 @@
     <!-- Chat Window -->
     <div id="chat-window" class="hidden">
         <div class="chat-header">
-            <span><i class="bi bi-headset"></i> Soporte DERSSG'M</span>
+            <span><i class="bi bi-robot"></i> Asistente DERSSG'M</span>
             <button onclick="toggleChat()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div id="chat-messages">
             <!-- Messages load here -->
             <div class="chat-msg system">
-                Hola! ¿En qué podemos ayudarte hoy?
+                Hola! Soy tu asistente de moda. ¿En qué puedo ayudarte hoy?
             </div>
         </div>
         <div class="chat-input-area">
@@ -222,7 +222,7 @@
             if (data.messages.length !== lastMsgCount) {
                 // Personalised greeting based on user status
                 const userName = "{{ user.username|default:'' }}";
-                const greeting = userName ? `¡Hola ${userName}! ¿En qué podemos ayudarte hoy?` : "¡Hola! ¿En qué podemos ayudarte hoy?";
+                const greeting = userName ? `¡Hola ${userName}! Soy tu asistente de moda. ¿En qué puedo ayudarte hoy?` : "¡Hola! Soy tu asistente de moda. ¿En qué puedo ayudarte hoy?";
 
                 container.innerHTML = `
             <div class="chat-msg system">

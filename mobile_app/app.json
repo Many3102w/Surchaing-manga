@@ -13,12 +13,17 @@
     },
     "sdkVersion": "49.0.0",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ],
     "android": {
       "package": "com.surchaing.derssgm",
       "versionCode": 4,
       "permissions": []
+    },
+    "ios": {
+      "bundleIdentifier": "com.surchaing.derssgm",
+      "buildNumber": "1.0.0"
     },
     "extra": {
       "eas": {

@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.db.models import Sum, Max, Q, OuterRef, Subquery
 from .models import Manga, Like, Comment, Favorite, WarehouseItem, WarehouseEntry, ChatMessage
 from .forms import MangaForm, CommentForm
+from .ai_utils import get_ai_response
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -532,13 +533,43 @@ def send_chat_message(request):
             request.session.create()
         
         session_key = request.session.session_key
+        
+        # 1. Save User Message
         ChatMessage.objects.create(
             user=request.user if request.user.is_authenticated else None,
             session_key=session_key,
             message=message_text,
             is_from_admin=False
         )
-        return JsonResponse({'status': 'sent'})
+
+        # 2. Get AI Response
+        # Fetch recent history for this session/user
+        if request.user.is_authenticated:
+            history_objs = ChatMessage.objects.filter(Q(user=request.user) | Q(session_key=session_key)).order_by('-created_at')[:6]
+        else:
+            history_objs = ChatMessage.objects.filter(session_key=session_key, user=None).order_by('-created_at')[:6]
+        
+        # Format history for Gemini
+        chat_history = []
+        for h in reversed(history_objs):
+            chat_history.append({
+                'message': h.message,
+                'is_from_admin': h.is_from_admin
+            })
+
+        # Generate response in background? No, let's do it synchronously for now 
+        # but better in thread if it takes > 10s. Gemini Flash is fast.
+        ai_reply = get_ai_response(message_text, chat_history)
+
+        # 3. Save AI Response as Admin
+        ChatMessage.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key,
+            message=ai_reply,
+            is_from_admin=True
+        )
+
+        return JsonResponse({'status': 'sent', 'reply': ai_reply})
     return JsonResponse({'error': 'Invalid'}, status=400)
 
 @login_required
