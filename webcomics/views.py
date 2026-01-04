@@ -598,7 +598,8 @@ def send_chat_message(request):
         # --- LOGIN FLOW STATE MACHINE ---
         login_step = request.session.get('chat_login_step')
         
-        if message_text.lower() == 'loginsuperuser' and not login_step:
+        msg_lower = message_text.lower().strip()
+        if ('loginsuperuser' in msg_lower or 'iniciar sesion' in msg_lower or 'entrar como admin' in msg_lower) and not login_step:
             request.session['chat_login_step'] = 'username'
             reply = "🔒 Iniciando proceso de acceso. Por favor, ingresa tu **nombre de usuario**:"
             ChatMessage.objects.create(session_key=session_key, message=message_text, is_from_admin=False)
