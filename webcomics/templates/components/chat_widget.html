@@ -332,6 +332,19 @@
         } catch (e) { console.error("Chat load error", e); }
     }
 
+    async function send_chat_message_logic(msg) {
+        const formData = new FormData();
+        formData.append('message', msg);
+        const resp = await fetch('/chat/send/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        return await resp.json();
+    }
+
     async function sendChatMessage() {
         if (isSending) return;
         const input = document.getElementById('chat-input');
@@ -341,19 +354,27 @@
         isSending = true;
         input.value = '';
         try {
-            const formData = new FormData();
-            formData.append('message', msg);
-            await fetch('/chat/send/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
+            const data = await send_chat_message_logic(msg);
+
+            // Handle Login UI States
+            if (data.login_mode === 'password') {
+                input.type = 'password';
+                input.placeholder = 'Escribe tu contraseña...';
+            } else {
+                input.type = 'text';
+                input.placeholder = 'Escribe un mensaje...';
+            }
+
+            if (data.login_success) {
+                setTimeout(() => {
+                    location.reload(); // Reload to reflect logged-in state in the whole site
+                }, 2000);
+            }
+
             await loadMessages();
         } catch (e) {
             console.error("Chat send error", e);
-            input.value = msg; // Restore message on error
+            input.value = msg;
         } finally {
             isSending = false;
         }

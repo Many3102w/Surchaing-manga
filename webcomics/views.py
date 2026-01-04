@@ -523,9 +523,12 @@ def get_chat_messages(request):
     } for m in messages]
     return JsonResponse({'messages': data})
 
+from django.contrib.auth import authenticate, login
+from django.contrib import auth
+
 def send_chat_message(request):
     if request.method == 'POST':
-        message_text = request.POST.get('message')
+        message_text = request.POST.get('message', '').strip()
         if not message_text:
             return JsonResponse({'error': 'Message empty'}, status=400)
             
@@ -534,6 +537,46 @@ def send_chat_message(request):
         
         session_key = request.session.session_key
         
+        # --- LOGIN FLOW STATE MACHINE ---
+        login_step = request.session.get('chat_login_step')
+        
+        if message_text.lower() == 'loginsuperuser' and not login_step:
+            request.session['chat_login_step'] = 'username'
+            reply = "🔒 Iniciando proceso de acceso. Por favor, ingresa tu **nombre de usuario**:"
+            ChatMessage.objects.create(session_key=session_key, message=message_text, is_from_admin=False)
+            ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
+            return JsonResponse({'status': 'sent', 'reply': reply, 'login_mode': 'username'})
+
+        if login_step == 'username':
+            request.session['chat_login_user'] = message_text
+            request.session['chat_login_step'] = 'password'
+            reply = f"Usuario '{message_text}' recibido. Ahora, por favor ingresa tu **contraseña**:"
+            # No guardamos el usuario en ChatMessage para evitar leaks si es sensible, o lo guardamos como asteriscos
+            ChatMessage.objects.create(session_key=session_key, message="[USUARIO PROPORCIONADO]", is_from_admin=False)
+            ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
+            return JsonResponse({'status': 'sent', 'reply': reply, 'login_mode': 'password'})
+
+        if login_step == 'password':
+            username = request.session.get('chat_login_user')
+            password = message_text
+            user = authenticate(username=username, password=password)
+            
+            # Limpiar rastro inmediatamente
+            del request.session['chat_login_step']
+            del request.session['chat_login_user']
+            
+            if user is not None:
+                login(request, user)
+                reply = f"✅ ¡Acceso concedido! Bienvenido de nuevo, **{user.username}**. Ya puedes cerrar el chat o seguir navegando."
+                ChatMessage.objects.create(session_key=session_key, message="[CONTRASEÑA PROPORCIONADA]", is_from_admin=False)
+                ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
+                return JsonResponse({'status': 'sent', 'reply': reply, 'login_success': True})
+            else:
+                reply = "❌ Credenciales incorrectas. El proceso de login se ha cancelado por seguridad. Inténtalo de nuevo escribiendo 'loginsuperuser'."
+                ChatMessage.objects.create(session_key=session_key, message="[ACCESO FALLIDO]", is_from_admin=True)
+                return JsonResponse({'status': 'sent', 'reply': reply})
+        # ---------------------------------
+
         # 1. Save User Message
         ChatMessage.objects.create(
             user=request.user if request.user.is_authenticated else None,
