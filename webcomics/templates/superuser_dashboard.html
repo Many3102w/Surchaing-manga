@@ -625,25 +625,28 @@
             </div>
 
             <!-- Chat Content -->
-            <div style="flex: 1; display: flex; flex-direction: column;">
+            <div id="admin-chat-content" style="flex: 1; display: flex; flex-direction: column;">
                 <div id="admin-chat-header"
-                    style="padding: 20px; border-bottom: 1px solid #eee; font-weight: 900; background: #fff;">
-                    Seleccionar una conversación para responder
+                    style="padding: 15px 20px; border-bottom: 1px solid #eee; font-weight: 900; background: #fff; display: flex; align-items: center; gap: 15px;">
+                    <button class="btn btn-sm btn-outline-dark mobile-only" onclick="closeAdminChatMobile()">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span id="admin-chat-header-text">Seleccionar una conversación</span>
                 </div>
                 <div id="admin-chat-messages"
                     style="flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="color: #999; text-align: center; margin-top: 100px;">
-                        <i class="bi bi-chat-quote" style="font-size: 3rem; opacity: 0.3;"></i>
-                        <p>Haz clic en un cliente para ver el chat</p>
+                    <div class="text-center text-muted mt-5">
+                        <i class="bi bi-chat-square-text fs-1"></i>
+                        <p class="mt-2">Selecciona un chat para comenzar</p>
                     </div>
                 </div>
                 <div id="admin-chat-input-area"
-                    style="padding: 20px; border-top: 1px solid #eee; display: none; gap: 15px; background: #fff;">
-                    <input type="text" id="admin-chat-input" class="form-control-custom"
-                        placeholder="Escribe mensaje..."
-                        style="flex: 1; padding: 12px 20px; border: 1px solid #ddd; border-radius: 10px;"
+                    style="padding: 15px; border-top: 1px solid #eee; display: none; gap: 10px; background: #fff;">
+                    <input type="text" id="admin-chat-input" class="form-control-custom" placeholder="Mensaje..."
+                        style="flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.9rem;"
                         onkeypress="handleAdminChatKey(event)">
-                    <button class="btn btn-dark" onclick="sendAdminReply()" style="padding: 0 30px;">RESPONDER</button>
+                    <button class="btn btn-dark" onclick="sendAdminReply()"
+                        style="padding: 0 15px; font-size: 0.8rem; font-weight: 800;">ENVIAR</button>
                     <input type="hidden" id="current-chat-session">
                     <input type="hidden" id="current-chat-user">
                     <input type="hidden" id="current-chat-type">
@@ -723,6 +726,71 @@
 
         .chat-tab-btn:hover:not(.active) {
             background: #ddd;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: block;
+            }
+
+            .chat-tabs {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .chat-tab-btn {
+                flex: 1;
+                white-space: nowrap;
+                font-size: 0.7rem;
+                padding: 12px 10px;
+                justify-content: center;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .chat-tab-btn i {
+                font-size: 1.2rem;
+            }
+
+            .chat-sidebar-list {
+                width: 100% !important;
+                border-right: none !important;
+            }
+
+            #admin-chat-content {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 10001;
+                background: #fff;
+                display: none !important;
+                /* Managed by JS */
+            }
+
+            #admin-chat-content.show-mobile {
+                display: flex !important;
+            }
+
+            .inventory-preview {
+                margin-left: -15px;
+                margin-right: -15px;
+                border-radius: 0;
+            }
+
+            #admin-chat-messages {
+                padding: 10px;
+            }
+
+            .wa-bubble {
+                max-width: 85%;
+            }
         }
     </style>
 
@@ -1065,12 +1133,12 @@
         }
 
         // Reset chat content
-        document.getElementById('admin-chat-header').innerText = 'Seleccionar una conversación';
+        document.getElementById('admin-chat-header-text').innerText = 'Seleccionar una conversación';
         document.getElementById('admin-chat-input-area').style.display = 'none';
         document.getElementById('admin-chat-messages').innerHTML = `
-            <div style="color: #999; text-align: center; margin-top: 100px;">
-                <i class="bi bi-chat-quote" style="font-size: 3rem; opacity: 0.3;"></i>
-                <p>Haz clic en un cliente para ver el chat</p>
+            <div class="text-center text-muted mt-5">
+                <i class="bi bi-chat-square-text fs-1"></i>
+                <p class="mt-2">Selecciona un chat para comenzar</p>
             </div>`;
     }
 
@@ -1082,12 +1150,20 @@
         openAdminChat(session_key, user_id, name, type, el);
     }
 
+    function closeAdminChatMobile() {
+        document.getElementById('admin-chat-content').classList.remove('show-mobile');
+    }
+
     async function openAdminChat(session_key, user_id, name, type, el) {
         activeSession = session_key;
         activeUser = user_id;
-        activeType = type;
 
-        document.getElementById('admin-chat-header').innerText = `[${type.toUpperCase()}] Chateando con: ${name}`;
+        const headerText = document.getElementById('admin-chat-header-text');
+        headerText.innerText = name;
+        if (window.innerWidth > 768) {
+            headerText.innerText = `[${type.toUpperCase()}] Chateando con: ${name}`;
+        }
+
         document.getElementById('admin-chat-input-area').style.display = 'flex';
         document.getElementById('current-chat-session').value = session_key;
         document.getElementById('current-chat-user').value = user_id;
@@ -1096,6 +1172,11 @@
         // Visual selection
         document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
+
+        // Mobile transition
+        if (window.innerWidth <= 768) {
+            document.getElementById('admin-chat-content').classList.add('show-mobile');
+        }
 
         loadAdminMessages();
     }
@@ -1151,10 +1232,38 @@
         } catch (e) { console.error("Reply error", e); }
     }
 
+    // Notifications for Mobile App (APK)
+    let lastNotifiedMsgId = 0;
+
+    async function checkDmNotifications() {
+        if (!window.ReactNativeWebView) return; // Only if inside Expo mobile app
+
+        try {
+            const resp = await fetch('/chat/dm/notifications/');
+            const data = await resp.json();
+
+            if (data.unread_count > 0) {
+                const latest = data.notifications[data.notifications.length - 1];
+                if (latest.id > lastNotifiedMsgId) {
+                    lastNotifiedMsgId = latest.id;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'notification',
+                        title: 'Nuevo Mensaje de Producto',
+                        body: `${latest.sender}: ${latest.message}`,
+                        data: { msg_id: latest.id }
+                    }));
+                }
+            }
+        } catch (e) { console.error("Notification check error", e); }
+    }
+
     // Polling for admin
     setInterval(() => {
-        if (document.visibilityState === 'visible' && (activeSession || activeUser)) {
-            loadAdminMessages();
+        if (document.visibilityState === 'visible') {
+            if (activeSession || activeUser) {
+                loadAdminMessages();
+            }
+            checkDmNotifications();
         }
     }, 5000);
 </script>

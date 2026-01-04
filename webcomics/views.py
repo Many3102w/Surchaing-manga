@@ -532,6 +532,9 @@ def get_chat_messages(request):
             messages = ChatMessage.objects.filter(Q(user_id=u_id) | Q(session_key=s_key), is_dm=is_dm)
         else:
             messages = ChatMessage.objects.filter(session_key=s_key, user=None, is_dm=is_dm)
+        
+        # Mark as read
+        messages.filter(is_from_admin=False).update(is_read=True)
     else:
         # User/Anon fetching their own
         if not request.session.session_key:
@@ -549,6 +552,33 @@ def get_chat_messages(request):
         'timestamp': m.created_at.strftime('%H:%M'),
     } for m in messages]
     return JsonResponse({'messages': data})
+
+@login_required
+def get_unread_dm_notifications(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    
+    unread_dms = ChatMessage.objects.filter(is_dm=True, is_from_admin=False, is_read=False)
+    count = unread_dms.count()
+    
+    notifications = []
+    if count > 0:
+        for msg in unread_dms:
+            # We skip marking as read here, dashboard will do it via get_chat_messages
+            # but we return them once. The dashboard will handle deduplication or 
+            # we just return the latest.
+            notifications.append({
+                'id': msg.id,
+                'message': msg.message,
+                'sender': msg.user.username if msg.user else f"Anónimo {msg.session_key[-4:].upper() if msg.session_key else 'TEMP'}",
+                'timestamp': msg.created_at.strftime('%H:%M')
+            })
+            
+    return JsonResponse({
+        'unread_count': count,
+        'notifications': notifications
+    })
+
 
 from django.contrib.auth import authenticate, login
 from django.contrib import auth
