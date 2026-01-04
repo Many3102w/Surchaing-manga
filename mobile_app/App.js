@@ -5,31 +5,9 @@ import React, { useRef, useEffect } from 'react';
 
 const { width } = Dimensions.get('window');
 
-import * as Notifications from 'expo-notifications';
-
-// Configure notification behavior
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-    }),
-});
-
 export default function App() {
     const webViewRef = useRef(null);
     const SERVER_URL = 'https://moda-gomez.onrender.com';
-
-    // Request Permissions on load
-    useEffect(() => {
-        const checkPermissions = async () => {
-            const { status } = await Notifications.getPermissionsAsync();
-            if (status !== 'granted') {
-                await Notifications.requestPermissionsAsync();
-            }
-        };
-        checkPermissions();
-    }, []);
 
     // Handle Android Back Button
     useEffect(() => {
@@ -46,24 +24,6 @@ export default function App() {
             return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
         }
     }, []);
-
-    const handleMessage = async (event) => {
-        try {
-            const data = JSON.parse(event.nativeEvent.data);
-            if (data.type === 'notification') {
-                await Notifications.scheduleNotificationAsync({
-                    content: {
-                        title: data.title,
-                        body: data.body,
-                        data: data.data || {},
-                    },
-                    trigger: null, // immediate
-                });
-            }
-        } catch (e) {
-            console.warn("WebView Message Error", e);
-        }
-    };
 
     const LoadingScreen = () => (
         <View style={styles.loadingContainer}>
@@ -91,7 +51,6 @@ export default function App() {
                 scalesPageToFit={true}
                 allowsBackForwardNavigationGestures={true}
                 cacheEnabled={true}
-                onMessage={handleMessage}
             />
         </View>
     );
