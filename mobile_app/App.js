@@ -1,28 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, BackHandler, Platform } from 'react-native';
+import { StyleSheet, View, BackHandler, Platform, ActivityIndicator, Image, Text, Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
 import React, { useRef, useEffect } from 'react';
+
+const { width } = Dimensions.get('window');
 
 export default function App() {
     const webViewRef = useRef(null);
     const SERVER_URL = 'https://moda-gomez.onrender.com';
 
-    // Handle Android Back Button to navigate content history instead of closing app
+    // Handle Android Back Button
     useEffect(() => {
         if (Platform.OS === 'android') {
             const onBackPress = () => {
                 if (webViewRef.current) {
                     webViewRef.current.goBack();
-                    return true; // Prevent default behavior (exit)
+                    return true;
                 }
                 return false;
             };
 
             BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
             return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
         }
     }, []);
+
+    const LoadingScreen = () => (
+        <View style={styles.loadingContainer}>
+            <Image
+                source={require('./assets/icon.png')}
+                style={styles.loadingLogo}
+                resizeMode="contain"
+            />
+            <ActivityIndicator size="large" color="#bfa37c" style={{ marginTop: 20 }} />
+            <Text style={styles.loadingText}>Cargando DERSSG'M...</Text>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -34,9 +47,9 @@ export default function App() {
                 javaScriptEnabled={true}
                 domStorageEnabled={true}
                 startInLoadingState={true}
+                renderLoading={LoadingScreen}
                 scalesPageToFit={true}
                 allowsBackForwardNavigationGestures={true}
-                // Cache optimization for 3D/assets
                 cacheEnabled={true}
             />
         </View>
@@ -50,6 +63,29 @@ const styles = StyleSheet.create({
     },
     webview: {
         flex: 1,
-        marginTop: 30, // Status bar offset
+        marginTop: Platform.OS === 'android' ? 30 : 0,
     },
+    loadingContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1,
+    },
+    loadingLogo: {
+        width: width * 0.4,
+        height: width * 0.4,
+        borderRadius: 20,
+    },
+    loadingText: {
+        color: '#fff',
+        marginTop: 15,
+        fontSize: 16,
+        fontWeight: '600',
+        letterSpacing: 1,
+    }
 });

@@ -1,27 +1,29 @@
 {
   "expo": {
-    "name": "DERSSGM Manga",
+    "name": "DERSSGM Moda",
     "slug": "derssgm-manga",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "sdkVersion": "49.0.0",
     "platforms": [
       "android"
     ],
     "android": {
       "package": "com.surchaing.derssgm",
-      "versionCode": 1,
-      "adaptiveIcon": {
-        "backgroundColor": "#000000"
-      },
+      "versionCode": 4,
       "permissions": []
     },
     "extra": {
       "eas": {
-        "projectId": "333b05ae-9d9d-4bb9-aa1d-3d97ce209993"
+        "projectId": "01acf82b-dfe7-4a94-ba30-500db0961d9c"
       }
-    },
-    "owner": "egwegfdf"
+    }
   }
 }

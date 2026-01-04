@@ -54,8 +54,7 @@
 
     .bg-panel {
         flex: 1;
-        /* FIXED: Removed missing 'images/home_bg.jpg' which caused 500 Error */
-        background: #111;
+        background: url("{% static 'images/home_bg.jpg' %}") center/cover no-repeat;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
         filter: brightness(0.6) contrast(1.1);
     }
