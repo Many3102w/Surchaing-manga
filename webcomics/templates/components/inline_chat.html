@@ -1,0 +1,215 @@
+<div class="inline-chat-tray">
+    <div class="inline-chat-header">
+        <i class="bi bi-chat-right-text-fill"></i> BANDEJA DE MENSAJES
+    </div>
+    <div id="inline-chat-messages" class="inline-chat-messages">
+        <!-- Messages load here -->
+    </div>
+    <div class="inline-chat-input-area">
+        <input type="text" id="inline-chat-input" placeholder="Escribe un mensaje..."
+            onkeypress="handleInlineChatKey(event)">
+        <button onclick="sendInlineChatMessage()"><i class="bi bi-send-fill"></i></button>
+    </div>
+</div>
+
+<style>
+    .inline-chat-tray {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 400px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .inline-chat-header {
+        background: #f8f8f8;
+        padding: 12px 20px;
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .inline-chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #fafafa;
+    }
+
+    .inline-chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .inline-chat-messages::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 10px;
+    }
+
+    .chat-msg {
+        position: relative;
+        max-width: 85%;
+        padding: 10px 14px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .chat-msg.user {
+        align-self: flex-end;
+        background: #111;
+        color: #fff;
+        border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.admin {
+        align-self: flex-start;
+        background: #eee;
+        color: #111;
+        border-bottom-left-radius: 2px;
+    }
+
+    .chat-time {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+
+    .inline-chat-input-area {
+        padding: 15px;
+        background: #fff;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 10px;
+    }
+
+    #inline-chat-input {
+        flex: 1;
+        border: 1px solid #eee;
+        padding: 12px 18px;
+        border-radius: 30px;
+        outline: none;
+        font-size: 0.9rem;
+        transition: 0.3s;
+    }
+
+    #inline-chat-input:focus {
+        border-color: #111;
+    }
+
+    .inline-chat-input-area button {
+        background: #111;
+        color: #fff;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .inline-chat-input-area button:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+    let inlineLastCount = -1;
+    let isInlineSending = false;
+
+    function handleInlineChatKey(e) {
+        if (e.key === 'Enter') sendInlineChatMessage();
+    }
+
+    async function loadInlineMessages() {
+        try {
+            const resp = await fetch('/chat/get/');
+            const data = await resp.json();
+            const container = document.getElementById('inline-chat-messages');
+
+            if (data.messages.length !== inlineLastCount) {
+                container.innerHTML = '';
+
+                // Add initial AI greeting if no messages
+                if (data.messages.length === 0) {
+                    const greeting = document.createElement('div');
+                    greeting.className = 'chat-msg admin';
+                    greeting.innerHTML = `¡Hola! Soy el asistente de DERSSG'M. ¿En qué puedo ayudarte con esta prenda? <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+                    container.appendChild(greeting);
+                }
+
+                data.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `chat-msg ${msg.is_from_admin ? 'admin' : 'user'}`;
+
+                    // We can reuse formatChatMessage if it's available globally, 
+                    // or just show text for now. Since chat_widget is usually loaded,
+                    // we might have it.
+                    let content = msg.message;
+                    if (window.formatChatMessage) {
+                        content = window.formatChatMessage(msg.message);
+                    }
+
+                    div.innerHTML = `${content} <span class="chat-time">${msg.timestamp || ''}</span>`;
+                    container.appendChild(div);
+                });
+
+                container.scrollTop = container.scrollHeight;
+                inlineLastCount = data.messages.length;
+            }
+        } catch (e) { console.error("Inline chat load error", e); }
+    }
+
+    async function sendInlineChatMessage(forceMsg = null) {
+        if (isInlineSending) return;
+        const input = document.getElementById('inline-chat-input');
+        const msg = forceMsg || input.value.trim();
+        if (!msg) return;
+
+        isInlineSending = true;
+        if (!forceMsg) input.value = '';
+
+        try {
+            const formData = new FormData();
+            formData.append('message', msg);
+            const resp = await fetch('/chat/send/', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            });
+            const data = await resp.json();
+
+            // Sync with global widget if it exists
+            if (window.loadMessages) window.loadMessages();
+
+            await loadInlineMessages();
+        } catch (e) {
+            console.error("Inline chat send error", e);
+            if (!forceMsg) input.value = msg;
+        } finally {
+            isInlineSending = false;
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        loadInlineMessages();
+        setInterval(loadInlineMessages, 5000);
+    });
+</script>

@@ -112,7 +112,9 @@
         }
     </style>
 
+    {% if request.resolver_match.url_name != 'product_detail' %}
     {% include "../components/chat_widget.html" %}
+    {% endif %}
     {% include "../components/footer.html" %}
     {% include "../components/scripts_import.html" %}
     {% block extra_js %}{% endblock %}

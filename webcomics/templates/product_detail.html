@@ -239,32 +239,13 @@
             <div class="size-badge">Talla: {{ manga.talla }}</div>
             {% endif %}
 
-            <div class="requirements-section">
-                <h3 class="requirements-title">
-                    <i class="bi bi-shield-check"></i>
-                    Garantía y Requisitos DERSSG'M
-                </h3>
-                <div class="requirement-item">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span><strong>Autenticidad:</strong> Prenda 100% verificada por nuestros expertos.</span>
-                </div>
-                <div class="requirement-item">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span><strong>Envíos:</strong> Entrega segura en CDMX y envíos a todo México.</span>
-                </div>
-                <div class="requirement-item">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span><strong>Apartado:</strong> Reserva con el 50% para prendas exclusivas.</span>
-                </div>
-                <div class="requirement-item">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span><strong>Seguridad:</strong> Proceso de preventa y compra protegida.</span>
-                </div>
+            <div style="margin-top: 30px;">
+                {% include "components/inline_chat.html" %}
             </div>
 
             {% if not manga.vendido %}
-            <button class="buy-button" onclick="initiatepurchase()">
-                <i class="bi bi-chat-left-dots-fill"></i> Preguntar Disponibilidad
+            <button class="buy-button" onclick="askAboutProduct()">
+                <i class="bi bi-chat-left-dots-fill"></i> Preguntar por esta prenda
             </button>
             {% else %}
             <button class="buy-button sold-out" disabled>
@@ -276,23 +257,15 @@
 </div>
 
 <script>
-    let isProcessing = false;
-    function initiatepurchase() {
-        if (isProcessing) return;
-
-        // Inquiry via internal chat system
+    function askAboutProduct() {
         const productName = "{{ manga.nombre_del_manga|escapejs }}";
         const productPrice = "{{ manga.precio }}";
-        const message = `¡Hola! Me interesa este producto: ${productName} ($${productPrice} MXN). ¿Podrías darme más información?`;
+        const message = `¡Hola! Me interesa esta prenda: ${productName} ($${productPrice} MXN). ¿Está disponible?`;
 
-        if (window.openProductInquiry) {
-            isProcessing = true;
-            window.openProductInquiry(message).finally(() => {
-                isProcessing = false;
-            });
-        } else {
-            console.error("Chat widget not loaded yet");
-            alert("El sistema de chat se está cargando, por favor intenta de nuevo en un momento.");
+        if (window.sendInlineChatMessage) {
+            window.sendInlineChatMessage(message);
+            // Optional: scroll input into view
+            document.getElementById('inline-chat-messages').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 </script>
