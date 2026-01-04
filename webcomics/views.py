@@ -735,6 +735,87 @@ def send_dm_message(request):
         return JsonResponse({'status': 'sent'})
     return JsonResponse({'status': 'error'}, status=400)
 
-def health_check(request):
-    """Simple view to keep the server alive."""
     return JsonResponse({'status': 'ok', 'message': 'I am alive!'})
+
+# --- Notification Logic ---
+from exponent_server_sdk import PushClient, PushMessage
+from .models import ExpoPushToken
+
+@csrf_exempt
+def register_push_token(request):
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            token = data.get('token')
+            
+            if not token:
+                return JsonResponse({'error': 'Token missing'}, status=400)
+            
+            # Save for the first superuser found (since this app is single-admin mostly)
+            # OR if request.user is authenticated, save for them.
+            # Assuming mobile app logs in as superuser or we just want to notify THE superuser.
+            
+            # Strategy: Store token for specific user if logged in, otherwise generic?
+            # User flow: Admin logs in on mobile -> App sends token.
+            
+            if request.user.is_authenticated:
+                ExpoPushToken.objects.update_or_create(
+                    user=request.user,
+                    defaults={'token': token}
+                )
+                return JsonResponse({'status': 'registered', 'user': request.user.username})
+            else:
+                return JsonResponse({'error': 'Authentication required'}, status=401)
+                
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def send_push_notification(title, body, data=None):
+    try:
+        # Get all superusers tokens
+        tokens = ExpoPushToken.objects.filter(user__is_superuser=True)
+        if not tokens.exists():
+            return
+            
+        messages = []
+        for t in tokens:
+            messages.append(PushMessage(
+                to=t.token,
+                title=title,
+                body=body,
+                data=data,
+                sound='default'
+            ))
+            
+        PushClient().publish_multiple(messages)
+    except Exception as e:
+        print(f"Push Error: {e}")
+
+# Modify existing send_dm_message to trigger push
+def send_dm_message(request):
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+            
+        msg = ChatMessage.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=session_key,
+            message=message_text,
+            is_dm=True
+        )
+        
+        # Trigger Push Notification to Admin
+        sender_name = request.user.username if request.user.is_authenticated else f"Cliente {session_key[-4:]}"
+        send_push_notification(
+            title="Nuevo DM de Producto",
+            body=f"{sender_name}: {message_text}",
+            data={'msg_id': msg.id, 'session_key': session_key}
+        )
+        
+        return JsonResponse({'status': 'sent'})
+    return JsonResponse({'status': 'error'}, status=400)

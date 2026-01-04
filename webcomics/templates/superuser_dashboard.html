@@ -1266,5 +1266,25 @@
             checkDmNotifications();
         }
     }, 5000);
+
+    // Push Token Registration (Injected from Mobile App)
+    window.registerToken = function (token) {
+        console.log("Registered Token received:", token);
+        fetch('/api/register-push-token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ token: token })
+        }).then(res => res.json())
+            .then(data => console.log("Token Registration:", data))
+            .catch(err => console.error("Token Registration Error:", err));
+    };
+
+    // Check if token was already injected before this script ran
+    if (window.EXPO_PUSH_TOKEN) {
+        window.registerToken(window.EXPO_PUSH_TOKEN);
+    }
 </script>
 {% endblock %}

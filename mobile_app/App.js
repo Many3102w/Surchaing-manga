@@ -20,15 +20,49 @@ export default function App() {
     const webViewRef = useRef(null);
     const SERVER_URL = 'https://moda-gomez.onrender.com';
 
-    // Request Permissions on load
+    // Request Permissions on load and Register Token
     useEffect(() => {
-        const checkPermissions = async () => {
-            const { status } = await Notifications.getPermissionsAsync();
-            if (status !== 'granted') {
-                await Notifications.requestPermissionsAsync();
+        const registerForPushNotificationsAsync = async () => {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
             }
+
+            if (finalStatus !== 'granted') {
+                console.warn('Failed to get push token for push notification!');
+                return;
+            }
+
+            // Get the token
+            const tokenData = await Notifications.getExpoPushTokenAsync({
+                projectId: 'e0e0e0e0-e0e0-e0e0-e0e0-e0e0e0e0e0e0', // Replace with actual ID if using EAS
+            });
+            const token = tokenData.data;
+            console.log('Expo Push Token:', token);
+
+            // Send to Backend
+            // Note: We need the user to be logged in for this to work 100% correctly with our backend logic
+            // But App.js runs on load. 
+            // The WebView shares cookies? Yes, likely.
+            // But fetching from RN side might not share the specific session cookie unless configured.
+            // For now, let's try. If it fails (401), we might need to inject JS into WebView to post it.
+            // OR simpler: Just inject it into the WebView so the WebView scripts post it.
+
+            // BETTER STRATEGY: Inject the token into the WebView
+            if (webViewRef.current) {
+                webViewRef.current.injectJavaScript(`
+                    window.EXPO_PUSH_TOKEN = '${token}';
+                    if(window.registerToken) window.registerToken('${token}');
+                `);
+            }
+            // Store it in ref to inject when WebView loads
+            window.expoPushToken = token;
         };
-        checkPermissions();
+
+        registerForPushNotificationsAsync();
     }, []);
 
     // Handle Android Back Button

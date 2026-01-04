@@ -1,5 +1,6 @@
 from typing import Any
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
@@ -130,6 +131,14 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+class ExpoPushToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.token}"
 
     def __str__(self):
         sender = "Admin" if self.is_from_admin else (self.user.username if self.user else f"Anon {self.session_key[:8]}")
