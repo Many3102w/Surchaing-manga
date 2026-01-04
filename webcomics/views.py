@@ -581,6 +581,7 @@ def get_unread_dm_notifications(request):
 
 
 from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
 
 def send_chat_message(request):
@@ -718,23 +719,9 @@ def get_dm_messages(request):
         ]
     })
 
-def send_dm_message(request):
-    if request.method == 'POST':
-        message_text = request.POST.get('message')
-        session_key = request.session.session_key
-        if not session_key:
-            request.session.create()
-            session_key = request.session.session_key
-            
-        ChatMessage.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            session_key=session_key,
-            message=message_text,
-            is_dm=True
-        )
-        return JsonResponse({'status': 'sent'})
-    return JsonResponse({'status': 'error'}, status=400)
 
+def health_check(request):
+    """Simple view to keep the server alive."""
     return JsonResponse({'status': 'ok', 'message': 'I am alive!'})
 
 # --- Notification Logic ---
