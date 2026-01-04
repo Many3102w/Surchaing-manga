@@ -773,7 +773,9 @@ def send_push_notification(title, body, data=None):
                 title=title,
                 body=body,
                 data=data,
-                sound='default'
+                sound='default',
+                priority='high',
+                channel_id='default'
             ))
             
         PushClient().publish_multiple(messages)

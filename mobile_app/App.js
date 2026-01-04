@@ -63,6 +63,16 @@ export default function App() {
         };
 
         registerForPushNotificationsAsync();
+
+        // Set up Android High Priority Channel
+        if (Platform.OS === 'android') {
+            Notifications.setNotificationChannelAsync('default', {
+                name: 'Default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
+        }
     }, []);
 
     // Handle Android Back Button
