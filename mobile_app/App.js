@@ -66,8 +66,8 @@ export default function App() {
 
         // Set up Android High Priority Channel
         if (Platform.OS === 'android') {
-            Notifications.setNotificationChannelAsync('default', {
-                name: 'Default',
+            Notifications.setNotificationChannelAsync('high_importance_channel', {
+                name: 'High Importance Notifications',
                 importance: Notifications.AndroidImportance.MAX,
                 vibrationPattern: [0, 250, 250, 250],
                 lightColor: '#FF231F7C',
