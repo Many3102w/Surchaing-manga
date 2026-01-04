@@ -11,5 +11,4 @@ dj-database-url
 psycopg2-binary
 requests
 gradio_client
-gradio_client
-google-genai
+google-generativeai
