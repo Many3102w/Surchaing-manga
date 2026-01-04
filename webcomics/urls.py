@@ -7,7 +7,7 @@ from .views import (
     toggle_favorite, add_comment, delete_post, toggle_vendido,
     update_warehouse, SuperUserDashboardView, product_detail,
     get_chat_messages, send_chat_message, admin_chat_reply,
-    get_dm_messages, send_dm_message
+    get_dm_messages, send_dm_message, get_unread_dm_notifications
 )
 from django.contrib.auth.views import LogoutView
 

@@ -1,11 +1,13 @@
 import os
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from django.conf import settings
 from .models import Manga
 
 # Configuration de Gemini
 API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyDnIncZ2x9w1V7-QqdvDX3Ot799jKXdrT8')
-genai.configure(api_key=API_KEY)
+# New Client Initialization
+client = genai.Client(api_key=API_KEY)
 
 def get_shop_context():
     """Obtiene información actualizada del catálogo para dársela a la IA."""
@@ -40,31 +42,40 @@ def get_shop_context():
         return "Eres el asistente de DERSSG'M Moda. Ayuda al cliente en lo que necesite."
 
 def get_ai_response(user_message, chat_history=[]):
-    """Genera una respuesta usando Gemini Pro."""
+    """Genera una respuesta usando Gemini Pro (SDK Nuevo)."""
     try:
         # Use a model that is available in this environment
-        # Test showed gemini-2.5-flash works, while 1.5-flash was not found
-        model_name = 'gemini-2.5-flash'
+        # Switching to stable 1.5-flash as default, 2.5 was likely invalid/experimental
+        model_name = 'gemini-1.5-flash' 
         
         # Construir el prompt con contexto e historial
         context = get_shop_context()
         
-        # Filtrar historial para solo incluir mensajes relevantes
-        history_prompts = []
-        for msg in chat_history[-6:]: # Últimos 6 mensajes
+        # Format history for google-genai
+        contents = []
+        for msg in chat_history[-6:]:
             role = "model" if msg['is_from_admin'] else "user"
-            history_prompts.append({"role": role, "parts": [msg['message']]})
+            contents.append(types.Content(
+                role=role,
+                parts=[types.Part.from_text(text=msg['message'])]
+            ))
             
-        # Iniciar chat con el contexto como "system instruction"
-        model = genai.GenerativeModel(
-            model_name=model_name,
-            system_instruction=context
+        # Add current message
+        contents.append(types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=user_message)]
+        ))
+            
+        # Call GenerateContent
+        response = client.models.generate_content(
+            model=model_name,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=context
+            )
         )
-        
-        chat = model.start_chat(history=history_prompts)
-        response = chat.send_message(user_message)
         
         return response.text
     except Exception as e:
-        print(f"Error in Gemini: {e}")
+        print(f"Error in Gemini (New SDK): {e}")
         return "Lo siento, estoy teniendo dificultades técnicas. Un humano te atenderá pronto."
