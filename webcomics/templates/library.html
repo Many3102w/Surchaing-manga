@@ -262,6 +262,28 @@
         cursor: pointer;
     }
 
+    .btn-buy {
+        background: #111;
+        color: #fff !important;
+        padding: 8px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        font-weight: 800;
+        font-family: 'HeavyHeader', sans-serif;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #111;
+        transition: 0.25s;
+        letter-spacing: 1px;
+    }
+
+    .btn-buy:hover {
+        background: #fff;
+        color: #111 !important;
+    }
+
     /* Zoom Modal Styles */
     #zoom-modal {
         display: none;
@@ -370,22 +392,22 @@
                 {% endif %}
             </div>
 
-            <div class="feed-actions">
-                <button class="action-btn" onclick="toggleLike('{{ manga.id }}')">
-                    <i id="like-icon-{{ manga.id }}"
-                        class="bi bi-heart{% if request.user in manga.likes.all %}-fill liked{% endif %}"></i>
-                </button>
-                <span id="like-count-{{ manga.id }}"
-                    style="font-size: 1.1rem; font-weight: bold; margin-left: -15px;">{{ manga.likes.count }}</span>
-                <button class="action-btn"><i class="bi bi-chat-left-text"></i></button>
-                <button class="action-btn"
-                    onclick="shareManga('{{ manga.nombre_del_manga|escapejs }}', '{{ manga.id }}')">
-                    <i class="bi bi-share"></i>
-                </button>
-                <button class="action-btn" style="margin-left: auto;">
-                    <i class="bi bi-bookmark"></i>
-                </button>
-                <div style="margin-left: auto;"><i class="bi bi-bookmark-star"></i></div>
+            <div class="feed-actions" style="align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <a href="https://wa.me/521XXXXXXXXXX?text=Hola,%20me%20interesa%20comprar:%20{{ manga.nombre_del_manga|urlencode }}"
+                        class="btn-buy" target="_blank">
+                        COMPRA
+                    </a>
+
+                    <button class="action-btn" title="Comentar">
+                        <i class="bi bi-chat-left-text"></i>
+                    </button>
+
+                    <button class="action-btn" title="Compartir"
+                        onclick="shareManga('{{ manga.nombre_del_manga|escapejs }}', '{{ manga.id }}')">
+                        <i class="bi bi-share"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="feed-caption">
