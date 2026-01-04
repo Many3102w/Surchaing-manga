@@ -34,9 +34,11 @@ def get_shop_context():
         return "Eres el asistente de DERSSG'M Moda. Ayuda al cliente en lo que necesite."
 
 def get_ai_response(user_message, chat_history=[]):
-    """Genera una respuesta usando Gemini Pro 1.5."""
+    """Genera una respuesta usando Gemini Pro."""
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Use a model that is available in this environment
+        # Test showed gemini-2.5-flash works, while 1.5-flash was not found
+        model_name = 'gemini-2.5-flash'
         
         # Construir el prompt con contexto e historial
         context = get_shop_context()
@@ -47,10 +49,9 @@ def get_ai_response(user_message, chat_history=[]):
             role = "model" if msg['is_from_admin'] else "user"
             history_prompts.append({"role": role, "parts": [msg['message']]})
             
-        # Iniciar chat con el contexto como "system instruction" (simulado en el primer mensaje si no hay system_instruction nativa fácil)
-        # Gemini 1.5 soporte system_instruction directamente:
+        # Iniciar chat con el contexto como "system instruction"
         model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name=model_name,
             system_instruction=context
         )
         
