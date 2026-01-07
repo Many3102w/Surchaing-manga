@@ -448,8 +448,41 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             catalog_counts['Dandy Hats'], 
             catalog_counts['Barbas Hats']
         ]
-        context['chart_radar_labels'] = ['Denim Tears', 'Essentials', 'Dandy Hats', 'Barbas Hats']
         context['chart_radar_data'] = category_perf
+
+        # 4. Warehouse Margins
+        margin_products = sold_items.filter(fecha_venta__isnull=False)
+        revenue_margin = sum(float(p.precio) - float(p.costo) for p in margin_products)
+        potential_margin = sum(float(p.precio) - float(p.costo) for p in Manga.objects.filter(vendido=False))
+        
+        context['chart_margin_data'] = [revenue_margin, potential_margin, 0] # 0 is placeholder
+        
+        # --- MESSAGING CONTEXT (Previously Missing) ---
+        
+        # Helper to group messages by session/user
+        def get_chats(is_dm=False):
+            # Get latest message per session/user
+            # Postgres DISTINCT ON is great but let's do pythonic for compatibility
+            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).order_by('-created_at')
+            chats_map = {}
+            for m in all_msgs:
+                key = m.user.username if m.user else m.session_key
+                if key not in chats_map:
+                    chats_map[key] = {
+                        'session_key': m.session_key,
+                        'user': m.user.id if m.user else None,
+                        'display_name': m.user.username if m.user else f"Anónimo {m.session_key[-4:].upper()}",
+                        'last_msg_time': m.created_at,
+                        'last_msg_text': m.message,
+                        'last_msg_is_admin': m.is_from_admin
+                    }
+            return list(chats_map.values())
+
+        context['support_chats'] = get_chats(is_dm=False)
+        context['dm_chats'] = get_chats(is_dm=True)
+        
+        context['support_chats'] = get_chats(is_dm=False)
+        context['dm_chats'] = get_chats(is_dm=True)
         
         # 4. Trends / Festivities (Demo + Real)
         context['chart_trend_labels'] = ['Navidad', 'Black Friday', 'Rebajas Verano', 'Día del Padre', 'Día de la Madre']
@@ -476,46 +509,8 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             max(0, total_exp_revenue - total_inv_cost)
         ]
 
-        # 6. Active Chats for Support (Better Grouping: User-first, then Session)
-        support_latest = ChatMessage.objects.filter(
-            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key')),
-            is_dm=False
-        ).order_by('-created_at')
-
-        support_chats_raw = ChatMessage.objects.filter(is_dm=False).values('session_key', 'user', 'user__username').annotate(
-            last_msg_time=Max('created_at'),
-            last_msg_text=Subquery(support_latest.values('message')[:1]),
-            last_msg_is_admin=Subquery(support_latest.values('is_from_admin')[:1])
-        ).order_by('-last_msg_time')
-
-        # DMs (Direct Messages from products)
-        dm_latest = ChatMessage.objects.filter(
-            Q(user_id=OuterRef('user')) if OuterRef('user') else Q(session_key=OuterRef('session_key')),
-            is_dm=True
-        ).order_by('-created_at')
-
-        dm_chats_raw = ChatMessage.objects.filter(is_dm=True).values('session_key', 'user', 'user__username').annotate(
-            last_msg_time=Max('created_at'),
-            last_msg_text=Subquery(dm_latest.values('message')[:1]),
-            last_msg_is_admin=Subquery(dm_latest.values('is_from_admin')[:1])
-        ).order_by('-last_msg_time')
-
-        def process_chats(raw_list):
-            processed = []
-            for chat in raw_list:
-                display_name = chat['user__username']
-                if not display_name:
-                    s_key = chat['session_key'] or ""
-                    short_id = s_key[-4:].upper() if len(s_key) >= 4 else "TEMP"
-                    display_name = f"Anónimo {short_id}"
-                chat['display_name'] = display_name
-                processed.append(chat)
-            return processed
-
-        context['support_chats'] = process_chats(support_chats_raw)
-        context['dm_chats'] = process_chats(dm_chats_raw)
-        context['active_chats'] = context['support_chats'] # For backward compatible template usage if needed
-
+        # Old complex query logic removed in favor of python-based get_chats above for stability
+        
         return context
 
 class IndexView(TemplateView):
