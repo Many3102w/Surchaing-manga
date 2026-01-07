@@ -4,8 +4,12 @@ from django.conf import settings
 from .models import Manga
 
 # Configuration de Gemini
-API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyDnIncZ2x9w1V7-QqdvDX3Ot799jKXdrT8')
-genai.configure(api_key=API_KEY)
+API_KEY = os.environ.get('GEMINI_API_KEY')
+
+if not API_KEY:
+    print("WARNING: GEMINI_API_KEY not found in environment variables. AI features will be disabled.")
+else:
+    genai.configure(api_key=API_KEY)
 
 def get_shop_context():
     """Obtiene información actualizada del catálogo para dársela a la IA."""
