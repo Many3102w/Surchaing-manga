@@ -345,6 +345,7 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from django.db.models import Sum
+        from django.db.models.functions import TruncMonth
         
         # Latest products for the inventory table
         context['latest_products'] = Manga.objects.all().order_by('-fecha_de_carga')[:5]
@@ -413,10 +414,14 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         # 1. Monthly Sales (Real Data + Demo Fallback)
         month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
         sales_real = [0] * 12
-        for item in sold_items:
-            if item.fecha_de_carga:
-                m_idx = item.fecha_de_carga.month - 1
-                sales_real[m_idx] += float(item.precio or 0)
+        
+        # Optimize: Use DB Aggregation instead of Python Loop
+        sales_by_month = sold_items.annotate(month=TruncMonth('fecha_de_carga')).values('month').annotate(total=Sum('precio')).order_by('month')
+        
+        for entry in sales_by_month:
+            if entry['month']:
+                m_idx = entry['month'].month - 1
+                sales_real[m_idx] = float(entry['total'] or 0)
         
         # Fallback if no sales
         if sum(sales_real) == 0:
@@ -463,8 +468,9 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         # Helper to group messages by session/user
         def get_chats(is_dm=False):
             # Get latest message per session/user
-            # Postgres DISTINCT ON is great but let's do pythonic for compatibility
-            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).order_by('-created_at')
+            # LIMIT to last 2000 messages to prevent timeout on large history
+            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).order_by('-created_at')[:2000]
+            chats_map = {}
             chats_map = {}
             for m in all_msgs:
                 key = m.user.username if m.user else m.session_key
