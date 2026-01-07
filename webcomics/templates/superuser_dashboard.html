@@ -405,6 +405,22 @@
 
 {% block content %}
 <div class="dashboard-container">
+    {% if dashboard_error %}
+    <div class="alert alert-danger" role="alert"
+        style="margin-bottom: 30px; padding: 20px; border-left: 5px solid #c53030; background: #fff5f5; border-radius: 8px;">
+        <h4 class="alert-heading" style="color: #c53030; font-weight: bold; margin-bottom: 10px;">
+            <i class="bi bi-exclamation-triangle-fill"></i> System Warning: Data Load Incomplete
+        </h4>
+        <p style="color: #2c2c2c;">Some widgets could not be loaded due to a server error. The panel has been loaded in
+            <strong>Safe Mode</strong> to maintain availability.</p>
+        <hr style="border-top-color: #feb2b2;">
+        <p class="mb-0"
+            style="font-family: monospace; font-size: 0.85rem; color: #742a2a; background: #fed7d7; padding: 10px; border-radius: 4px;">
+            <strong>Error Trace:</strong> {{ dashboard_error }}
+        </p>
+    </div>
+    {% endif %}
+
     <div class="dashboard-header">
         <div class="dashboard-title">
             <h1>Panel de Control</h1>

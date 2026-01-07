@@ -344,188 +344,212 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        from django.db.models import Sum
-        from django.db.models.functions import TruncMonth
-        
-        # Latest products for the inventory table
-        context['latest_products'] = Manga.objects.all().order_by('-fecha_de_carga')[:5]
-        
-        # Real metrics from DB
-        sold_items = Manga.objects.filter(vendido=True)
-        total_sales_raw = sold_items.aggregate(Sum('precio'))['precio__sum'] or 0
-        context['total_sales'] = round(float(total_sales_raw), 2)
-        context['active_orders'] = sold_items.count()
-        
-        # All available digital products for the warehouse modal (as JSON list)
-        import json
-        digital_products_raw = Manga.objects.filter(vendido=False).values('id', 'nombre_del_manga', 'type_of_manga', 'precio')
-        # Convert Decimal to float for JSON serialization
-        digital_products_list = [
-            {
-                'id': p['id'],
-                'nombre_del_manga': p['nombre_del_manga'],
-                'type_of_manga': p['type_of_manga'],
-                'precio': float(p['precio'] or 0)
+        try:
+            from django.db.models import Sum
+            from django.db.models.functions import TruncMonth
+            
+            # Latest products for the inventory table
+            context['latest_products'] = Manga.objects.all().order_by('-fecha_de_carga')[:5]
+            
+            # Real metrics from DB
+            sold_items = Manga.objects.filter(vendido=True)
+            total_sales_raw = sold_items.aggregate(Sum('precio'))['precio__sum'] or 0
+            context['total_sales'] = round(float(total_sales_raw), 2)
+            context['active_orders'] = sold_items.count()
+            
+            # All available digital products for the warehouse modal (as JSON list)
+            import json
+            digital_products_raw = Manga.objects.filter(vendido=False).values('id', 'nombre_del_manga', 'type_of_manga', 'precio')
+            # Convert Decimal to float for JSON serialization
+            digital_products_list = [
+                {
+                    'id': p['id'],
+                    'nombre_del_manga': p['nombre_del_manga'],
+                    'type_of_manga': p['type_of_manga'],
+                    'precio': float(p['precio'] or 0)
+                }
+                for p in digital_products_raw
+            ]
+            context['all_digital_products'] = json.dumps(digital_products_list)
+            
+            # Categorized stock (Digital Catalog)
+            catalog_counts = {
+                'Denim Tears': Manga.objects.filter(type_of_manga='Denim Tears', vendido=False).count(),
+                'Essentials': Manga.objects.filter(type_of_manga='Essentials', vendido=False).count(),
+                'Dandy Hats': Manga.objects.filter(type_of_manga='Dandy Hats', vendido=False).count(),
+                'Barbas Hats': Manga.objects.filter(type_of_manga='Barbas Hats', vendido=False).count(),
             }
-            for p in digital_products_raw
-        ]
-        context['all_digital_products'] = json.dumps(digital_products_list)
-        
-        # Categorized stock (Digital Catalog)
-        catalog_counts = {
-            'Denim Tears': Manga.objects.filter(type_of_manga='Denim Tears', vendido=False).count(),
-            'Essentials': Manga.objects.filter(type_of_manga='Essentials', vendido=False).count(),
-            'Dandy Hats': Manga.objects.filter(type_of_manga='Dandy Hats', vendido=False).count(),
-            'Barbas Hats': Manga.objects.filter(type_of_manga='Barbas Hats', vendido=False).count(),
-        }
-        
-        context['stock_gorras'] = catalog_counts['Dandy Hats'] + catalog_counts['Barbas Hats']
-        context['stock_prendas'] = catalog_counts['Denim Tears'] + catalog_counts['Essentials']
-        
-        # Warehouse vs Catalog Comparison
-        comparison = []
-        total_warehouse = 0
-        categories = ['Denim Tears', 'Essentials', 'Dandy Hats', 'Barbas Hats']
-        
-        for cat in categories:
-            w_item, _ = WarehouseItem.objects.get_or_create(category=cat)
-            catalog_qty = catalog_counts[cat]
-            diff = w_item.quantity - catalog_qty
-            total_warehouse += w_item.quantity
             
-            comparison.append({
-                'category': cat,
-                'warehouse': w_item.quantity,
-                'catalog': catalog_qty,
-                'diff': diff,
-                'abs_diff': abs(diff),
-                'display_diff': str(diff),
-                'display_abs_diff': str(abs(diff)),
-                'status': 'match' if diff == 0 else ('excess' if diff > 0 else 'missing')
-            })
+            context['stock_gorras'] = catalog_counts['Dandy Hats'] + catalog_counts['Barbas Hats']
+            context['stock_prendas'] = catalog_counts['Denim Tears'] + catalog_counts['Essentials']
             
-        context['comparison'] = comparison
-        context['total_warehouse'] = total_warehouse
-        
-        # --- Analytics Data for Reports ---
-        month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-        current_month_idx = timezone.now().month - 1
-        
-        # 1. Monthly Sales (Real Data + Demo Fallback)
-        month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-        sales_real = [0] * 12
-        
-        # Optimize: Use DB Aggregation instead of Python Loop
-        sales_by_month = sold_items.annotate(month=TruncMonth('fecha_de_carga')).values('month').annotate(total=Sum('precio')).order_by('month')
-        
-        for entry in sales_by_month:
-            if entry['month']:
-                m_idx = entry['month'].month - 1
-                sales_real[m_idx] = float(entry['total'] or 0)
-        
-        # Fallback if no sales
-        if sum(sales_real) == 0:
-            sales_real = [500, 600, 450, 700, 850, 900, 1200, 1100, 1500, 1800, 2000, 1900]
+            # Warehouse vs Catalog Comparison
+            comparison = []
+            total_warehouse = 0
+            categories = ['Denim Tears', 'Essentials', 'Dandy Hats', 'Barbas Hats']
             
-        context['chart_sales_labels'] = month_names
-        context['chart_sales_data'] = sales_real
-        
-        # 2. Profit vs Loss (Real Data Only)
-        total_revenue = float(context['total_sales'])
-        total_cost_sold = sum(float(item.costo) for item in sold_items)
-        
-        context['chart_pie_labels'] = ['Ganancia Neta (Ventas)', 'Costo de Mercancía Vendida', 'Gastos Operativos (Estimados)']
-        pie_data = [
-            max(0, total_revenue - total_cost_sold), 
-            total_cost_sold, 
-            total_revenue * 0.1 # 10% estimated overhead
-        ]
-        
-        # Fallback if no revenue
-        if sum(pie_data) == 0:
-            pie_data = [700, 500, 200]
+            for cat in categories:
+                w_item, _ = WarehouseItem.objects.get_or_create(category=cat)
+                catalog_qty = catalog_counts[cat]
+                diff = w_item.quantity - catalog_qty
+                total_warehouse += w_item.quantity
+                
+                comparison.append({
+                    'category': cat,
+                    'warehouse': w_item.quantity,
+                    'catalog': catalog_qty,
+                    'diff': diff,
+                    'abs_diff': abs(diff),
+                    'display_diff': str(diff),
+                    'display_abs_diff': str(abs(diff)),
+                    'status': 'match' if diff == 0 else ('excess' if diff > 0 else 'missing')
+                })
+                
+            context['comparison'] = comparison
+            context['total_warehouse'] = total_warehouse
             
-        context['chart_pie_data'] = pie_data
-        
-        # 3. Seasonality (Categories - Real Catalog)
-        category_perf = [
-            catalog_counts['Denim Tears'], 
-            catalog_counts['Essentials'], 
-            catalog_counts['Dandy Hats'], 
-            catalog_counts['Barbas Hats']
-        ]
-        context['chart_radar_data'] = category_perf
+            # --- Analytics Data for Reports ---
+            month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            current_month_idx = timezone.now().month - 1
+            
+            # 1. Monthly Sales (Real Data + Demo Fallback)
+            month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            sales_real = [0] * 12
+            
+            # Optimize: Use DB Aggregation instead of Python Loop
+            sales_by_month = sold_items.annotate(month=TruncMonth('fecha_de_carga')).values('month').annotate(total=Sum('precio')).order_by('month')
+            
+            for entry in sales_by_month:
+                if entry['month']:
+                    m_idx = entry['month'].month - 1
+                    sales_real[m_idx] = float(entry['total'] or 0)
+            
+            # Fallback if no sales
+            if sum(sales_real) == 0:
+                sales_real = [500, 600, 450, 700, 850, 900, 1200, 1100, 1500, 1800, 2000, 1900]
+                
+            context['chart_sales_labels'] = month_names
+            context['chart_sales_data'] = sales_real
+            
+            # 2. Profit vs Loss (Real Data Only)
+            total_revenue = float(context['total_sales'])
+            total_cost_sold = sum(float(item.costo or 0) for item in sold_items)
+            
+            context['chart_pie_labels'] = ['Ganancia Neta (Ventas)', 'Costo de Mercancía Vendida', 'Gastos Operativos (Estimados)']
+            pie_data = [
+                max(0, total_revenue - total_cost_sold), 
+                total_cost_sold, 
+                total_revenue * 0.1 # 10% estimated overhead
+            ]
+            
+            # Fallback if no revenue
+            if sum(pie_data) == 0:
+                pie_data = [700, 500, 200]
+                
+            context['chart_pie_data'] = pie_data
+            
+            # 3. Seasonality (Categories - Real Catalog)
+            category_perf = [
+                catalog_counts['Denim Tears'], 
+                catalog_counts['Essentials'], 
+                catalog_counts['Dandy Hats'], 
+                catalog_counts['Barbas Hats']
+            ]
+            context['chart_radar_data'] = category_perf
 
-        # 4. Warehouse Margins
-        # Optimize: Use Aggregation for margins instead of loading all objects
-        from django.db.models import F
-        
-        margin_agg = sold_items.filter(fecha_venta__isnull=False).aggregate(
-            revenue=Sum('precio'),
-            cost=Sum('costo')
-        )
-        revenue_margin = float(margin_agg['revenue'] or 0) - float(margin_agg['cost'] or 0)
-        
-        potential_agg = Manga.objects.filter(vendido=False).aggregate(
-            revenue=Sum('precio'),
-            cost=Sum('costo')
-        )
-        potential_margin = float(potential_agg['revenue'] or 0) - float(potential_agg['cost'] or 0)
-        
-        context['chart_margin_data'] = [revenue_margin, potential_margin, 0] # 0 is placeholder
-        
-        # --- MESSAGING CONTEXT (Previously Missing) ---
-        
-        # Helper to group messages by session/user
-        def get_chats(is_dm=False):
-            # Get latest message per session/user
-            # LIMIT to last 2000 messages to prevent timeout on large history
-            # Fix N+1: Use select_related('user') to fetch users in the same query
-            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).select_related('user').order_by('-created_at')[:2000]
-            chats_map = {}
-            for m in all_msgs:
-                key = m.user.username if m.user else m.session_key
-                if key not in chats_map:
-                    chats_map[key] = {
-                        'session_key': m.session_key,
-                        'user': m.user.id if m.user else None,
-                        'display_name': m.user.username if m.user else f"Anónimo {m.session_key[-4:].upper() if m.session_key else 'nie'}",
-                        'last_msg_time': m.created_at,
-                        'last_msg_text': m.message,
-                        'last_msg_is_admin': m.is_from_admin
-                    }
-            return list(chats_map.values())
-
-        context['support_chats'] = get_chats(is_dm=False)
-        context['dm_chats'] = get_chats(is_dm=True)
-        
-        context['support_chats'] = get_chats(is_dm=False)
-        context['dm_chats'] = get_chats(is_dm=True)
-        
-        # 4. Trends / Festivities (Demo + Real)
-        context['chart_trend_labels'] = ['Navidad', 'Black Friday', 'Rebajas Verano', 'Día del Padre', 'Día de la Madre']
-        context['chart_trend_data'] = [120, 150, 80, 200, 140]
-        
-        # 5. Projected Profit Margins (Warehouse)
-        warehouse_entries = WarehouseEntry.objects.all()
-        total_inv_cost = 0
-        total_exp_revenue = 0
-        
-        for entry in warehouse_entries:
-            total_inv_cost += float(entry.unit_cost or 0) * entry.quantity
-            total_exp_revenue += float(entry.unit_price or 0) * entry.quantity
-        
-        # Add demo data if no warehouse entries exist yet
-        if total_inv_cost == 0 and total_exp_revenue == 0:
-            total_inv_cost = 500  # Demo: $500 invested
-            total_exp_revenue = 800  # Demo: $800 expected return
+            # 4. Warehouse Margins
+            # Optimize: Use Aggregation for margins instead of loading all objects
+            from django.db.models import F
             
-        context['chart_margin_labels'] = ['Inversión Total', 'Retorno Esperado', 'Ganancia Proyectada']
-        context['chart_margin_data'] = [
-            total_inv_cost,
-            total_exp_revenue,
-            max(0, total_exp_revenue - total_inv_cost)
-        ]
+            margin_agg = sold_items.filter(fecha_venta__isnull=False).aggregate(
+                revenue=Sum('precio'),
+                cost=Sum('costo')
+            )
+            revenue_margin = float(margin_agg['revenue'] or 0) - float(margin_agg['cost'] or 0)
+            
+            potential_agg = Manga.objects.filter(vendido=False).aggregate(
+                revenue=Sum('precio'),
+                cost=Sum('costo')
+            )
+            potential_margin = float(potential_agg['revenue'] or 0) - float(potential_agg['cost'] or 0)
+            
+            context['chart_margin_data'] = [revenue_margin, potential_margin, 0] # 0 is placeholder
+            
+            # --- MESSAGING CONTEXT (Previously Missing) ---
+            
+            # Helper to group messages by session/user
+            def get_chats(is_dm=False):
+                # Get latest message per session/user
+                # LIMIT to last 2000 messages to prevent timeout on large history
+                # Fix N+1: Use select_related('user') to fetch users in the same query
+                all_msgs = ChatMessage.objects.filter(is_dm=is_dm).select_related('user').order_by('-created_at')[:2000]
+                chats_map = {}
+                for m in all_msgs:
+                    key = m.user.username if m.user else m.session_key
+                    if key not in chats_map:
+                        chats_map[key] = {
+                            'session_key': m.session_key,
+                            'user': m.user.id if m.user else None,
+                            'display_name': m.user.username if m.user else f"Anónimo {m.session_key[-4:].upper() if m.session_key else 'nie'}",
+                            'last_msg_time': m.created_at,
+                            'last_msg_text': m.message,
+                            'last_msg_is_admin': m.is_from_admin
+                        }
+                return list(chats_map.values())
+
+            context['support_chats'] = get_chats(is_dm=False)
+            context['dm_chats'] = get_chats(is_dm=True)
+            
+            # 4. Trends / Festivities (Demo + Real)
+            context['chart_trend_labels'] = ['Navidad', 'Black Friday', 'Rebajas Verano', 'Día del Padre', 'Día de la Madre']
+            context['chart_trend_data'] = [120, 150, 80, 200, 140]
+            
+            # 5. Projected Profit Margins (Warehouse)
+            warehouse_entries = WarehouseEntry.objects.all()
+            total_inv_cost = 0
+            total_exp_revenue = 0
+            
+            for entry in warehouse_entries:
+                total_inv_cost += float(entry.unit_cost or 0) * entry.quantity
+                total_exp_revenue += float(entry.unit_price or 0) * entry.quantity
+            
+            # Add demo data if no warehouse entries exist yet
+            if total_inv_cost == 0 and total_exp_revenue == 0:
+                total_inv_cost = 500  # Demo: $500 invested
+                total_exp_revenue = 800  # Demo: $800 expected return
+                
+            context['chart_margin_labels'] = ['Inversión Total', 'Retorno Esperado', 'Ganancia Proyectada']
+            context['chart_margin_data'] = [
+                total_inv_cost,
+                total_exp_revenue,
+                max(0, total_exp_revenue - total_inv_cost)
+            ]
+
+        except Exception as e:
+            # SAFETY CATCH: If anything fails, load the page anyway with an error message
+            import traceback
+            traceback.print_exc()
+            context['dashboard_error'] = str(e)
+            
+            # Add minimal defaults to prevent template crashes
+            context['latest_products'] = Manga.objects.all().order_by('-fecha_de_carga')[:5] # Still try to get latest products
+            context['total_sales'] = 0
+            context['total_warehouse'] = 0
+            context['active_orders'] = 0
+            context['all_digital_products'] = '[]'
+            context['comparison'] = []
+            context['support_chats'] = []
+            context['dm_chats'] = []
+            # Empty charts
+            context['chart_sales_labels'] = month_names if 'month_names' in locals() else []
+            context['chart_sales_data'] = []
+            context['chart_pie_labels'] = ['Ganancia Neta (Ventas)', 'Costo de Mercancía Vendida', 'Gastos Operativos (Estimados)']
+            context['chart_pie_data'] = []
+            context['chart_radar_data'] = []
+            context['chart_trend_labels'] = ['Navidad', 'Black Friday', 'Rebajas Verano', 'Día del Padre', 'Día de la Madre']
+            context['chart_trend_data'] = []
+            context['chart_margin_labels'] = ['Inversión Total', 'Retorno Esperado', 'Ganancia Proyectada']
+            context['chart_margin_data'] = []
 
         # Old complex query logic removed in favor of python-based get_chats above for stability
         
