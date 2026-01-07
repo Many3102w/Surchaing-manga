@@ -499,9 +499,10 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
             # Helper to group messages by session/user
             def get_chats(is_dm=False):
                 # Get latest message per session/user
-                # LIMIT to last 2000 messages to prevent timeout on large history
-                # Fix N+1: Use select_related('user') to fetch users in the same query
-                all_msgs = ChatMessage.objects.filter(is_dm=is_dm).select_related('user').order_by('-created_at')[:2000]
+                # LIMIT to last 500 messages (Reduced from 2000 for performance)
+                # Fix N+1: Use select_related('user')
+                # OPTIMIZATION: Use '-id' instead of '-created_at' to utilize Primary Key Index (avoid full table scan)
+                all_msgs = ChatMessage.objects.filter(is_dm=is_dm).select_related('user').order_by('-id')[:500]
                 chats_map = {}
                 for m in all_msgs:
                     key = m.user.username if m.user else m.session_key
