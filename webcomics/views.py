@@ -365,7 +365,7 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
                 'id': p['id'],
                 'nombre_del_manga': p['nombre_del_manga'],
                 'type_of_manga': p['type_of_manga'],
-                'precio': float(p['precio'])
+                'precio': float(p['precio'] or 0)
             }
             for p in digital_products_raw
         ]
