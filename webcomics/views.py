@@ -457,9 +457,20 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         context['chart_radar_data'] = category_perf
 
         # 4. Warehouse Margins
-        margin_products = sold_items.filter(fecha_venta__isnull=False)
-        revenue_margin = sum(float(p.precio or 0) - float(p.costo or 0) for p in margin_products)
-        potential_margin = sum(float(p.precio or 0) - float(p.costo or 0) for p in Manga.objects.filter(vendido=False))
+        # Optimize: Use Aggregation for margins instead of loading all objects
+        from django.db.models import F
+        
+        margin_agg = sold_items.filter(fecha_venta__isnull=False).aggregate(
+            revenue=Sum('precio'),
+            cost=Sum('costo')
+        )
+        revenue_margin = float(margin_agg['revenue'] or 0) - float(margin_agg['cost'] or 0)
+        
+        potential_agg = Manga.objects.filter(vendido=False).aggregate(
+            revenue=Sum('precio'),
+            cost=Sum('costo')
+        )
+        potential_margin = float(potential_agg['revenue'] or 0) - float(potential_agg['cost'] or 0)
         
         context['chart_margin_data'] = [revenue_margin, potential_margin, 0] # 0 is placeholder
         
@@ -469,8 +480,8 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         def get_chats(is_dm=False):
             # Get latest message per session/user
             # LIMIT to last 2000 messages to prevent timeout on large history
-            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).order_by('-created_at')[:2000]
-            chats_map = {}
+            # Fix N+1: Use select_related('user') to fetch users in the same query
+            all_msgs = ChatMessage.objects.filter(is_dm=is_dm).select_related('user').order_by('-created_at')[:2000]
             chats_map = {}
             for m in all_msgs:
                 key = m.user.username if m.user else m.session_key
