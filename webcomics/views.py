@@ -471,7 +471,7 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
                     chats_map[key] = {
                         'session_key': m.session_key,
                         'user': m.user.id if m.user else None,
-                        'display_name': m.user.username if m.user else f"Anónimo {m.session_key[-4:].upper()}",
+                        'display_name': m.user.username if m.user else f"Anónimo {m.session_key[-4:].upper() if m.session_key else 'nie'}",
                         'last_msg_time': m.created_at,
                         'last_msg_text': m.message,
                         'last_msg_is_admin': m.is_from_admin
