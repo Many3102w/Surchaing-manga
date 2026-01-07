@@ -135,6 +135,8 @@ export default function App() {
                 scalesPageToFit={true}
                 allowsBackForwardNavigationGestures={true}
                 cacheEnabled={true}
+                sharedCookiesEnabled={true}
+                thirdPartyCookiesEnabled={true}
                 onMessage={handleMessage}
                 onLoadEnd={() => {
                     // Inject token even if loaded after initial mount

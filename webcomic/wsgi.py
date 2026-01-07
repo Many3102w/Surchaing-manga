@@ -14,3 +14,10 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webcomic.settings')
 
 application = get_wsgi_application()
+
+# Start the keep-alive bot
+try:
+    from .keep_alive import start_keep_alive
+    start_keep_alive()
+except ImportError:
+    pass

@@ -634,6 +634,7 @@ def send_chat_message(request):
             
             if user is not None:
                 login(request, user)
+                request.session.save() # Ensure session is saved before AJAX response
                 reply = f"✅ ¡Acceso concedido! Bienvenido de nuevo, **{user.username}**. Ya puedes cerrar el chat o seguir navegando."
                 ChatMessage.objects.create(session_key=session_key, message="[CONTRASEÑA PROPORCIONADA]", is_from_admin=False)
                 ChatMessage.objects.create(session_key=session_key, message=reply, is_from_admin=True)
