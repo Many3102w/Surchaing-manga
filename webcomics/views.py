@@ -341,6 +341,25 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         return self.request.user.is_superuser
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Exception as e:
+            # EMERGENCY CATCH-ALL: Catch template rendering errors too
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"CRITICAL DASHBOARD ERROR: {error_trace}")
+            
+            # If user is superuser, show the error safely
+            if request.user.is_superuser:
+                from django.shortcuts import render
+                return render(request, self.template_name, {
+                    'dashboard_error': f"CRITICAL RENDER ERROR: {str(e)}\n{error_trace}",
+                    'view': self # Ensure view is present for context
+                })
+            else:
+                raise e # Propagate if not authorized (shouldn't happen due to test_func but good practice)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
