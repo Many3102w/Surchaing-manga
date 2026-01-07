@@ -141,14 +141,7 @@ class ExpoPushToken(models.Model):
         return f"{self.user.username} - {self.token}"
 
     def __str__(self):
-        if self.is_from_admin:
-            sender = "Admin"
-        elif self.user:
-            sender = self.user.username
-        else:
-            s_key = self.session_key or ""
-            short_id = s_key[-4:].upper() if len(s_key) >= 4 else "TEMP"
-            sender = f"Anónimo {short_id}"
+        sender = "Admin" if self.is_from_admin else (self.user.username if self.user else f"Anon {self.session_key[:8]}")
         return f"From {sender} at {self.created_at}"
 
 class WebPushSubscription(models.Model):
