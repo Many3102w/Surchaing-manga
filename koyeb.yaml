@@ -1,0 +1,29 @@
+type: web
+name: moda-gomez
+env:
+  PORT: 8000
+  DJANGO_SETTINGS_MODULE: webcomic.settings
+  PYTHON_VERSION: 3.12.10
+  # Koyeb doesn't use buildCommand inside the yaml like Render sometimes, 
+  # but we define the run command or let it use Docker CMD.
+  # We can override the Docker CMD here for production.
+  
+build:
+  docker:
+    dockerfile: dockerfile
+
+# Instance definitions
+models:
+  - type: micro
+    regions:
+      - was
+    ports:
+      - port: 8000
+        protocol: http
+    
+    # Environment variables needing manual entry in dashboard or here safely
+    # We put safe defaults here. Secrets must be added manually.
+    env:
+      DEBUG: "False"
+      # DATABASE_URL: (Add natively in Koyeb)
+      # GEMINI_API_KEY: (Add natively in Koyeb)

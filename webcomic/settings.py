@@ -149,3 +149,10 @@ cloudinary.config(
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Gemini Configuration
+GEMINI_API_KEY = env('GEMINI_API_KEY', default=None)
+
+# Web Push VAPID Configuration
+VAPID_PRIVATE_KEY = env('VAPID_PRIVATE_KEY', default='')
+VAPID_PUBLIC_KEY = env('VAPID_PUBLIC_KEY', default='')

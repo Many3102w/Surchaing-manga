@@ -770,33 +770,62 @@ def register_push_token(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def send_push_notification(title, body, data=None):
+    # 1. Mobile (Expo)
     try:
-        # Get all superusers tokens
         tokens = ExpoPushToken.objects.filter(user__is_superuser=True)
-        if not tokens.exists():
-            return
-            
-        messages = []
-        for t in tokens:
-            messages.append(PushMessage(
-                to=t.token,
-                title=title,
-                body=body,
-                data=data,
-                sound='default',
-                priority='high',
-                channel_id='high_importance_channel'
-            ))
-            
-        PushClient().publish_multiple(messages)
+        if tokens.exists():
+            messages = []
+            for t in tokens:
+                messages.append(PushMessage(
+                    to=t.token,
+                    title=title,
+                    body=body,
+                    data=data,
+                    sound='default',
+                    priority='high',
+                    channel_id='high_importance_channel'
+                ))
+            try:
+                PushClient().publish_multiple(messages)
+            except Exception as e:
+                 print(f"Expo Push Error: {e}")
     except Exception as e:
-        print(f"Push Error: {e}")
+        print(f"Expo Query Error: {e}")
+
+    # 2. Web Push (Chrome/Desktop)
+    try:
+        from .models import WebPushSubscription
+        from .web_push_utils import send_web_push
+        
+        # Notify all superusers
+        subs = WebPushSubscription.objects.filter(user__is_superuser=True)
+        for sub in subs:
+            payload = {
+                "title": title,
+                "body": body,
+                "url": "/superuser/" # Click action URL
+            }
+            # Convert QuerySet object to dict for utility
+            sub_info = {
+                "endpoint": sub.endpoint,
+                "keys": {
+                    "p256dh": sub.p256dh,
+                    "auth": sub.auth
+                }
+            }
+            # Send (in thread ideally, but sync for now is fine)
+            import json
+            send_web_push(sub_info, json.dumps(payload))
+            
+    except Exception as e:
+        print(f"Web Push Error: {e}")
 
 # Modify existing send_dm_message to trigger push
 @csrf_exempt
 def send_dm_message(request):
     if request.method == 'POST':
         message_text = request.POST.get('message')
+        # If user is anonymous, verify they have a session
         session_key = request.session.session_key
         if not session_key:
             request.session.create()
@@ -809,7 +838,7 @@ def send_dm_message(request):
             is_dm=True
         )
         
-        # Trigger Push Notification to Admin
+        # Trigger Push Notification to Admin (Mobile + Web)
         sender_name = request.user.username if request.user.is_authenticated else f"Cliente {session_key[-4:]}"
         send_push_notification(
             title="Nuevo DM de Producto",
@@ -819,3 +848,36 @@ def send_dm_message(request):
         
         return JsonResponse({'status': 'sent'})
     return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def save_web_push_subscription(request):
+    """Endpoint to save Chrome Push Subscription object"""
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            endpoint = data.get('endpoint')
+            keys = data.get('keys', {})
+            
+            if not endpoint or not keys:
+                return JsonResponse({'error': 'Invalid subscription data'}, status=400)
+            
+            # Assuming only admins subscribe for now, or any logged in user
+            # Ideally restrict to superuser
+            if not request.user.is_authenticated:
+                return JsonResponse({'error': 'Auth required'}, status=401)
+                
+            from .models import WebPushSubscription
+            WebPushSubscription.objects.update_or_create(
+                endpoint=endpoint,
+                user=request.user,
+                defaults={
+                    'p256dh': keys.get('p256dh'),
+                    'auth': keys.get('auth'),
+                    'user_agent': request.META.get('HTTP_USER_AGENT', '')[:255]
+                }
+            )
+            return JsonResponse({'status': 'subscribed'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)

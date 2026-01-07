@@ -409,6 +409,9 @@
         <div class="dashboard-title">
             <h1>Panel de Control</h1>
             <div class="dashboard-subtitle">Gestión de Negocio - Ropa & Gorras Premium</div>
+            <button id="enable-notifications-btn" class="btn btn-sm btn-outline-dark mt-2">
+                <i class="bi bi-bell-fill"></i> Activar Notificaciones PC
+            </button>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 0.9rem; color: #888;">FECHA</div>
@@ -1287,4 +1290,5 @@
         window.registerToken(window.EXPO_PUSH_TOKEN);
     }
 </script>
+<script src="{% static 'js/notifications.js' %}"></script>
 {% endblock %}

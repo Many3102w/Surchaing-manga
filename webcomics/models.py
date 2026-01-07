@@ -143,3 +143,18 @@ class ExpoPushToken(models.Model):
     def __str__(self):
         sender = "Admin" if self.is_from_admin else (self.user.username if self.user else f"Anon {self.session_key[:8]}")
         return f"From {sender} at {self.created_at}"
+
+class WebPushSubscription(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='web_push_subscriptions', null=True, blank=True)
+    endpoint = models.URLField(max_length=500)
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=255)
+    user_agent = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('endpoint', 'user')
+
+    def __str__(self):
+        username = self.user.username if self.user else 'Anon'
+        return f"WebPush for {username} ({self.endpoint[:30]}...)"

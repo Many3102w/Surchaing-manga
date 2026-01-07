@@ -13,3 +13,4 @@ requests
 gradio_client
 google-generativeai
 exponent_server_sdk
+pywebpush
