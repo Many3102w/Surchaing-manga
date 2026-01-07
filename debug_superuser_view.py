@@ -38,7 +38,11 @@ def debug_view():
         print("Calling get_context_data...")
         context = view.get_context_data()
         print("SUCCESS! Context generated.")
-        print("Keys:", context.keys())
+        print(f"Keys: {context.keys()}")
+        if 'dashboard_error' in context:
+            print(f"FAIL-SAFE TRIGGERED: {context['dashboard_error']}")
+        else:
+            print("FAIL-SAFE NOT TRIGGERED (Normal Operation)")
     except Exception as e:
         print("\n!!! CRASH DETECTED !!!")
         import traceback
