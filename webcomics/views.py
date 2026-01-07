@@ -414,8 +414,9 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         month_names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
         sales_real = [0] * 12
         for item in sold_items:
-            m_idx = item.fecha_de_carga.month - 1
-            sales_real[m_idx] += float(item.precio)
+            if item.fecha_de_carga:
+                m_idx = item.fecha_de_carga.month - 1
+                sales_real[m_idx] += float(item.precio or 0)
         
         # Fallback if no sales
         if sum(sales_real) == 0:
@@ -452,8 +453,8 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
 
         # 4. Warehouse Margins
         margin_products = sold_items.filter(fecha_venta__isnull=False)
-        revenue_margin = sum(float(p.precio) - float(p.costo) for p in margin_products)
-        potential_margin = sum(float(p.precio) - float(p.costo) for p in Manga.objects.filter(vendido=False))
+        revenue_margin = sum(float(p.precio or 0) - float(p.costo or 0) for p in margin_products)
+        potential_margin = sum(float(p.precio or 0) - float(p.costo or 0) for p in Manga.objects.filter(vendido=False))
         
         context['chart_margin_data'] = [revenue_margin, potential_margin, 0] # 0 is placeholder
         
@@ -494,8 +495,8 @@ class SuperUserDashboardView(UserPassesTestMixin, TemplateView):
         total_exp_revenue = 0
         
         for entry in warehouse_entries:
-            total_inv_cost += float(entry.unit_cost) * entry.quantity
-            total_exp_revenue += float(entry.unit_price) * entry.quantity
+            total_inv_cost += float(entry.unit_cost or 0) * entry.quantity
+            total_exp_revenue += float(entry.unit_price or 0) * entry.quantity
         
         # Add demo data if no warehouse entries exist yet
         if total_inv_cost == 0 and total_exp_revenue == 0:
