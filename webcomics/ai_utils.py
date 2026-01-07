@@ -1,15 +1,11 @@
 import os
-import google.generativeai as genai
 from django.conf import settings
 from .models import Manga
+import logging
 
-# Configuration de Gemini
-API_KEY = os.environ.get('GEMINI_API_KEY')
+logger = logging.getLogger(__name__)
 
-if not API_KEY:
-    print("WARNING: GEMINI_API_KEY not found in environment variables. AI features will be disabled.")
-else:
-    genai.configure(api_key=API_KEY)
+# Configuration lazily handled in get_ai_response to avoid boot time overhead
 
 def get_shop_context():
     """Obtiene información actualizada del catálogo para dársela a la IA."""
@@ -46,6 +42,15 @@ def get_shop_context():
 def get_ai_response(user_message, chat_history=[]):
     """Genera una respuesta usando Gemini Pro."""
     try:
+        import google.generativeai as genai
+        
+        API_KEY = os.environ.get('GEMINI_API_KEY')
+        if not API_KEY:
+            # Fallback immediato si no hay key
+            return "⚠️ El asistente está en mantenimiento (Clave API no configurada)."
+
+        genai.configure(api_key=API_KEY)
+
         # Use a model that is available in this environment
         # Test showed gemini-2.5-flash works, while 1.5-flash was not found
         model_name = 'gemini-2.5-flash'

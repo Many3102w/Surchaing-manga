@@ -4,7 +4,13 @@ import os
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
+# Only read .env if it exists and we are not forcing ENV vars (Render populates os.environ)
+try:
+    env_file = os.path.join(Path(__file__).resolve().parent.parent, '.env')
+    if os.path.exists(env_file):
+        environ.Env.read_env(env_file)
+except Exception as e:
+    print(f"WARNING: Could not read .env file: {e}")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
